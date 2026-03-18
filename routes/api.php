@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 Route::prefix('public')->group(function () {
     Route::get('success-stories', [PublicController::class, 'successStories']);
     Route::get('faqs', [PublicController::class, 'faqs']);
+    Route::post('subscribe', [PublicController::class, 'subscribe']);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

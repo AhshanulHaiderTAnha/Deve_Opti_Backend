@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\SupportTicketController as AdminSupportTicketCont
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SuccessStoryController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\SubscriberController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -57,6 +58,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Success Stories & FAQ
         Route::resource('success-stories', SuccessStoryController::class)->except(['create', 'edit', 'show']);
         Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
+        Route::resource('subscribers', SubscriberController::class)->only(['index', 'destroy']);
     });
 });
 
