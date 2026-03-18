@@ -49,15 +49,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
+    // Relationships
     public function kycSubmission()
     {
         return $this->hasOne(KycSubmission::class);
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
 
+    // Helpers
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');

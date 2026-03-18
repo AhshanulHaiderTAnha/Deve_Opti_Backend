@@ -149,9 +149,12 @@ export default function UserIndex({ users, filters }) {
                                         >
                                             <span className="material-icons-outlined">edit_note</span>
                                         </button>
-                                        <button className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all">
+                                        <Link
+                                            href={route('admin.users.show', user.id)}
+                                            className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all inline-block"
+                                        >
                                             <span className="material-icons-outlined">visibility</span>
-                                        </button>
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}

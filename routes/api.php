@@ -14,11 +14,8 @@ use Illuminate\Support\Facades\Storage;
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register',              [AuthController::class, 'register']);
     Route::post('login',                 [AuthController::class, 'login']);
-    Route::get('verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-         ->middleware('signed')
-         ->name('api.auth.verify-email');
+    Route::get('verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware('signed')->name('api.auth.verify-email');
     Route::post('resend-verification',   [AuthController::class, 'resendVerification']);
-
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('forgot-password',   [AuthController::class, 'forgotPassword']);
         Route::post('reset-password',    [AuthController::class, 'resetPassword']);
@@ -33,14 +30,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/me',      [AuthController::class, 'me']);
 
-    // ── User Routes ──────────────────────────────────────────────────────────
+    // User Routes
     Route::prefix('user')->middleware('role:user')->group(function () {
         Route::get('profile',           [AuthController::class, 'me']);
         Route::post('kyc-submit',       [UserKycController::class, 'submit']);
         Route::get('kyc-status',        [UserKycController::class, 'status']);
     });
 
-    // ── Admin Routes ─────────────────────────────────────────────────────────
+    // Admin Routes
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('dashboard',         [DashboardController::class, 'stats']);
 

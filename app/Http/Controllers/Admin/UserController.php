@@ -36,9 +36,11 @@ class UserController extends Controller
     public function show(int $id): Response
     {
         $user = User::with(['kycSubmission.reviewer', 'roles'])->findOrFail($id);
+        $activities = $user->activities()->latest()->limit(5)->get();
 
         return Inertia::render('Admin/Users/Show', [
-            'user' => new UserResource($user),
+            'user'       => new UserResource($user),
+            'activities' => $activities,
         ]);
     }
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\UserActivity;
 
 class AuthController extends Controller
 {
@@ -36,11 +37,18 @@ class AuthController extends Controller
         }
 
         if ($user->status !== 'active') {
-            return back()->withErrors(['email' => 'Your account has been suspended.'])->onlyInput('email');
+            return back()->withErrors(['email' => 'Your account has been suspended.']);
         }
 
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
+
+        UserActivity::create([
+            'user_id'    => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'action'     => 'login',
+        ]);
 
         return redirect()->intended(route('admin.dashboard'));
     }

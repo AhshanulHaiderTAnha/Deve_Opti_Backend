@@ -10,14 +10,12 @@ class KycSubmission extends Model
 {
     use HasFactory;
 
-    // ─── Status Constants ─────────────────────────────────────────────────────
-
+    //  Status Constants 
     const STATUS_PENDING  = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
 
-    // ─── Fillable ─────────────────────────────────────────────────────────────
-
+    //  Fillable
     protected $fillable = [
         'user_id',
         'full_name',
@@ -34,8 +32,7 @@ class KycSubmission extends Model
         'rejection_reason',
     ];
 
-    // ─── Casts ────────────────────────────────────────────────────────────────
-
+    //  Casts
     protected function casts(): array
     {
         return [
@@ -44,8 +41,7 @@ class KycSubmission extends Model
         ];
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
+    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -56,8 +52,7 @@ class KycSubmission extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    // ─── Accessors ────────────────────────────────────────────────────────────
-
+    // Accessors
     public function getIdDocumentUrlAttribute(): ?string
     {
         return $this->id_document_path
@@ -72,8 +67,7 @@ class KycSubmission extends Model
             : null;
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-
+    // Helpers
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;

@@ -24,6 +24,13 @@ class AuthService
 
         $user->assignRole('user');
 
+        \App\Models\UserActivity::create([
+            'user_id'    => $user->id,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'action'     => 'register',
+        ]);
+
         event(new Registered($user));
 
         return $user;

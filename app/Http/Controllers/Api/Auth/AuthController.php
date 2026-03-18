@@ -21,8 +21,7 @@ class AuthController extends Controller
     {
     }
 
-    // ─── Register ─────────────────────────────────────────────────────────────
-
+    // Register
     public function register(RegisterRequest $request): JsonResponse
     {
         $user  = $this->authService->register($request->validated());
@@ -35,8 +34,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // ─── Login ────────────────────────────────────────────────────────────────
-
+    // Login
     public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
@@ -51,6 +49,13 @@ class AuthController extends Controller
 
         $token = $this->authService->issueToken($user, $request->input('device_name', 'api'));
 
+        \App\Models\UserActivity::create([
+            'user_id'    => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'action'     => 'login',
+        ]);
+
         return response()->json([
             'message' => 'Login successful.',
             'user'    => new UserResource($user),
@@ -58,8 +63,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // ─── Logout ───────────────────────────────────────────────────────────────
-
+    // Logout
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -67,8 +71,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully.']);
     }
 
-    // ─── Email Verification ───────────────────────────────────────────────────
-
+    // Email Verification
     public function verifyEmail(Request $request): JsonResponse
     {
         $user = User::findOrFail($request->route('id'));
@@ -102,8 +105,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Verification link sent.']);
     }
 
-    // ─── Password Reset ───────────────────────────────────────────────────────
-
+    // Password Reset
     public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate(['email' => ['required', 'email']]);
@@ -137,7 +139,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Invalid or expired reset token.'], 400);
     }
 
-    // ─── Profile ──────────────────────────────────────────────────────────────
+    // Profile
 
     public function me(Request $request): JsonResponse
     {
