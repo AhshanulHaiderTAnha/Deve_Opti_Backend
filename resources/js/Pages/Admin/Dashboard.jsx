@@ -4,7 +4,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function Dashboard({ stats, recentActivity }) {
     const statCards = [
-        { label: 'Total Users', value: stats.total_users, icon: 'people', color: 'bg-blue-500' },
+        { label: 'Total Users', value: stats.total_users, icon: 'people', color: 'bg-orange-500' },
         { label: 'Pending KYC', value: stats.pending_kyc, icon: 'hourglass_empty', color: 'bg-amber-500' },
         { label: 'Approved KYC', value: stats.approved_kyc, icon: 'verified', color: 'bg-emerald-500' },
         { label: 'Rejected KYC', value: stats.rejected_kyc, icon: 'cancel', color: 'bg-rose-500' },
@@ -61,11 +61,10 @@ export default function Dashboard({ stats, recentActivity }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                                                item.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                                item.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                                'bg-rose-50 text-rose-700 border-rose-100'
-                                            }`}>
+                                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${item.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                    item.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                        'bg-rose-50 text-rose-700 border-rose-100'
+                                                }`}>
                                                 {item.status.toUpperCase()}
                                             </span>
                                         </td>

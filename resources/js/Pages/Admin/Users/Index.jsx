@@ -23,7 +23,7 @@ export default function UserIndex({ users, filters }) {
                         </span>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-blue-500 focus:border-blue-500"
+                            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-orange-500 focus:border-orange-500"
                             placeholder="Search by name or email..."
                             defaultValue={filters.search}
                         />
@@ -76,7 +76,7 @@ export default function UserIndex({ users, filters }) {
                                         {new Date(user.created_at).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-2">
-                                        <button title="Edit User" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                                        <button title="Edit User" className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all">
                                             <span className="material-icons-outlined text-lg">edit</span>
                                         </button>
                                         <button title="View Details" className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">

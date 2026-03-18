@@ -16,7 +16,7 @@ export default function AdminLayout({ children }) {
             {/* Sidebar */}
             <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col`}>
                 <div className="h-16 flex items-center px-6 border-b border-gray-100">
-                    <span className="text-blue-600 font-bold text-xl">{isSidebarOpen ? 'DEVE OPTI' : 'DO'}</span>
+                    <span className="text-orange-500 font-bold text-xl">{isSidebarOpen ? 'DEVE OPTI' : 'DO'}</span>
                 </div>
 
                 <nav className="flex-1 py-6 px-4 space-y-2">
@@ -25,7 +25,7 @@ export default function AdminLayout({ children }) {
                             key={item.name}
                             href={item.href}
                             className={`flex items-center p-3 rounded-lg transition-colors ${
-                                route().current(item.href) ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+                                route().current(item.href) ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
                             }`}
                         >
                             <span className="material-icons-outlined text-xl">{item.icon}</span>
@@ -59,7 +59,7 @@ export default function AdminLayout({ children }) {
                             <p className="text-sm font-semibold text-gray-900">{auth?.user?.name || 'Admin User'}</p>
                             <p className="text-xs text-gray-500 uppercase tracking-wider">{auth?.user?.role || 'Administrator'}</p>
                         </div>
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
+                        <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold border border-orange-200">
                             {auth?.user?.name?.[0] || 'A'}
                         </div>
                     </div>

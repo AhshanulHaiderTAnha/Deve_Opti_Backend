@@ -26,7 +26,7 @@ export default function KycShow({ kyc }) {
             <div className="max-w-5xl mx-auto space-y-8">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Link href={route('admin.kyc.index')} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                        <Link href={route('admin.kyc.index')} className="p-2 hover:bg-orange-50 rounded-xl text-orange-500 transition-colors">
                             <span className="material-icons-outlined">arrow_back</span>
                         </Link>
                         <div>

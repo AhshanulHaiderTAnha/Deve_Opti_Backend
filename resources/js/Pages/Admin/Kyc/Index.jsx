@@ -52,7 +52,7 @@ export default function KycIndex({ submissions, filters }) {
                                     <td className="px-6 py-4 text-right">
                                         <Link
                                             href={route('admin.kyc.show', kyc.id)}
-                                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                            className="inline-flex items-center px-3 py-1.5 border border-orange-200 text-sm font-semibold rounded-lg text-orange-600 bg-orange-50 hover:bg-orange-100 transition-colors"
                                         >
                                             <span className="material-icons-outlined text-lg mr-1.5">visibility</span>
                                             Review
