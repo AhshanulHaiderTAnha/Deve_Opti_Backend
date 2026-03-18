@@ -6,10 +6,11 @@ export default function AdminLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const navigation = [
-        { name: 'Dashboard', href: route('admin.dashboard'), icon: 'dashboard' },
-        { name: 'Users', href: route('admin.users.index'), icon: 'people' },
-        { name: 'KYC Review', href: route('admin.kyc.index'), icon: 'verified_user' },
-        { name: 'Settings', href: route('admin.settings.index'), icon: 'settings' },
+        { name: 'Dashboard', href: route('admin.dashboard'), current: route().current('admin.dashboard'), icon: 'dashboard' },
+        { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
+        { name: 'Users', href: route('admin.users.index'), current: route().current('admin.users.*'), icon: 'people' },
+        { name: 'KYC Review', href: route('admin.kyc.index'), current: route().current('admin.kyc.*'), icon: 'verified_user' },
+        { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
     ];
 
     return (
@@ -34,7 +35,7 @@ export default function AdminLayout({ children }) {
                             key={item.name}
                             href={item.href}
                             className={`flex items-center p-3 rounded-lg transition-colors ${
-                                route().current(item.href) ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
+                                item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
                             }`}
                         >
                             <span className="material-icons-outlined text-xl">{item.icon}</span>
