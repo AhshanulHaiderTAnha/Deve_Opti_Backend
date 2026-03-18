@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KycController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
@@ -37,6 +38,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/kyc/{id}/reject',  [KycController::class, 'reject'])->name('kyc.reject');
         // Seller Management
         Route::resource('sellers', SellerController::class)->except(['create', 'edit', 'show']);
+        // Payment Methods Management
+        Route::resource('payment-methods', PaymentMethodController::class)->except(['create', 'edit', 'show']);
     });
 });
 

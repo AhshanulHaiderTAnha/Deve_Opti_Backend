@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\KycController as AdminKycController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\KycController as UserKycController;
+use App\Http\Controllers\Api\User\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,6 +36,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('profile',           [AuthController::class, 'me']);
         Route::post('kyc-submit',       [UserKycController::class, 'submit']);
         Route::get('kyc-status',        [UserKycController::class, 'status']);
+        // Payment Methods
+        Route::get('payment-methods',         [PaymentMethodController::class, 'index']);
+        Route::get('payment-methods/{slug}',  [PaymentMethodController::class, 'show']);
     });
 
     // Admin Routes

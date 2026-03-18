@@ -11,6 +11,7 @@ export default function AdminLayout({ children }) {
         { name: 'Users', href: route('admin.users.index'), current: route().current('admin.users.*'), icon: 'people' },
         { name: 'KYC Review', href: route('admin.kyc.index'), current: route().current('admin.kyc.*'), icon: 'verified_user' },
         { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
+        { name: 'Payments', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
     ];
 
     return (
@@ -19,10 +20,10 @@ export default function AdminLayout({ children }) {
             <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shadow-sm z-20`}>
                 <div className="h-16 flex items-center px-6 border-b border-gray-100 overflow-hidden">
                     {settings?.site_logo ? (
-                        <img 
-                            src={settings.site_logo} 
-                            alt={settings.system_name} 
-                            className={`transition-all ${isSidebarOpen ? 'h-8' : 'h-6'}`} 
+                        <img
+                            src={settings.site_logo}
+                            alt={settings.system_name}
+                            className={`transition-all ${isSidebarOpen ? 'h-8' : 'h-6'}`}
                         />
                     ) : (
                         <span className="text-orange-500 font-black text-xl tracking-tighter shrink-0">{isSidebarOpen ? settings?.system_name || 'DEVE OPTI' : (settings?.system_name?.[0] || 'D')}</span>
@@ -34,9 +35,8 @@ export default function AdminLayout({ children }) {
                         <Link
                             key={item.name}
                             href={item.href}
-                            className={`flex items-center p-3 rounded-lg transition-colors ${
-                                item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
-                            }`}
+                            className={`flex items-center p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
+                                }`}
                         >
                             <span className="material-icons-outlined text-xl">{item.icon}</span>
                             {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
