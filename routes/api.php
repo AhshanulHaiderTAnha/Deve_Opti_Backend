@@ -9,8 +9,17 @@ use App\Http\Controllers\Api\User\PaymentMethodController;
 use App\Http\Controllers\Api\User\DepositPlanController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\SupportTicketController;
+use App\Http\Controllers\Api\Public\PublicController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public Resources (Cached)
+// ─────────────────────────────────────────────────────────────────────────────
+Route::prefix('public')->group(function () {
+    Route::get('success-stories', [PublicController::class, 'successStories']);
+    Route::get('faqs', [PublicController::class, 'faqs']);
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public Auth Routes  (rate limited)

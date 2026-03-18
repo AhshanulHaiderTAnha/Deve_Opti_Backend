@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SuccessStoryController;
+use App\Http\Controllers\Admin\FaqController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -52,6 +54,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('support-tickets/{support_ticket}', [AdminSupportTicketController::class, 'show'])->name('support-tickets.show');
         Route::post('support-tickets/{support_ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('support-tickets.reply');
         Route::patch('support-tickets/{support_ticket}/close', [AdminSupportTicketController::class, 'close'])->name('support-tickets.close');
+        // Success Stories & FAQ
+        Route::resource('success-stories', SuccessStoryController::class)->except(['create', 'edit', 'show']);
+        Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
     });
 });
 

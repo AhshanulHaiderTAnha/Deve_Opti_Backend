@@ -15,6 +15,8 @@ export default function AdminLayout({ children }) {
         { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
         { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
+        { name: 'Success Stories', href: route('admin.success-stories.index'), current: route().current('admin.success-stories.*'), icon: 'auto_awesome' },
+        { name: 'FAQs', href: route('admin.faqs.index'), current: route().current('admin.faqs.*'), icon: 'quiz' },
 
 
     ];
