@@ -46,7 +46,7 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:published,inactive',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(5);
@@ -73,7 +73,7 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:published,inactive',
         ]);
 
         if ($request->hasFile('image')) {

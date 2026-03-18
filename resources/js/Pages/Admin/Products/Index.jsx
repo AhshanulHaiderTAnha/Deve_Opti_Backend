@@ -18,7 +18,7 @@ export default function ProductIndex({ products, filters }) {
         stock_quantity: 0,
         description: '',
         image: null,
-        status: 'active',
+        status: 'published',
     });
 
     const openModal = (product = null) => {
@@ -90,7 +90,7 @@ export default function ProductIndex({ products, filters }) {
                         <h1 className="text-2xl font-black tracking-tight text-gray-900">Products</h1>
                         <p className="text-gray-500 font-medium">Manage your product catalog and platform links.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => openModal()}
                         className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold flex items-center shadow-lg transition-all hover:-translate-y-0.5"
                     >
@@ -102,7 +102,7 @@ export default function ProductIndex({ products, filters }) {
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
                     <form onSubmit={handleSearch} className="relative w-full md:w-96">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
-                        <input 
+                        <input
                             type="text"
                             placeholder="Search by title, keyword, or SKU..."
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
@@ -111,7 +111,7 @@ export default function ProductIndex({ products, filters }) {
                         />
                     </form>
                     <div className="flex items-center space-x-4">
-                        <select 
+                        <select
                             className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs appearance-none"
                             onChange={e => router.get(route('admin.products.index'), { platform: e.target.value }, { preserveState: true })}
                             value={filters.platform || ''}
@@ -159,12 +159,11 @@ export default function ProductIndex({ products, filters }) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                                                product.platform === 'Amazon' ? 'bg-orange-50 text-orange-600' :
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${product.platform === 'Amazon' ? 'bg-orange-50 text-orange-600' :
                                                 product.platform === 'eBay' ? 'bg-blue-50 text-blue-600' :
-                                                product.platform === 'AliExpress' ? 'bg-rose-50 text-rose-600' :
-                                                'bg-gray-100 text-gray-600'
-                                            }`}>
+                                                    product.platform === 'AliExpress' ? 'bg-rose-50 text-rose-600' :
+                                                        'bg-gray-100 text-gray-600'
+                                                }`}>
                                                 {product.platform}
                                             </span>
                                         </td>
@@ -177,9 +176,8 @@ export default function ProductIndex({ products, filters }) {
                                             </p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${
-                                                product.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600'
-                                            }`}>
+                                            <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${product.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600'
+                                                }`}>
                                                 {product.status}
                                             </span>
                                         </td>
@@ -208,11 +206,10 @@ export default function ProductIndex({ products, filters }) {
                                 key={i}
                                 onClick={() => router.visit(link.url)}
                                 disabled={!link.url || link.active}
-                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                                    link.active ? 'bg-gray-900 text-white' : 
+                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
                                     !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                    'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
-                                }`}
+                                        'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
@@ -239,7 +236,7 @@ export default function ProductIndex({ products, filters }) {
                                     <div className="space-y-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Product Title</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                 value={data.title}
@@ -251,7 +248,7 @@ export default function ProductIndex({ products, filters }) {
                                         <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Platform</label>
-                                                <select 
+                                                <select
                                                     className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                     value={data.platform}
                                                     onChange={e => setData('platform', e.target.value)}
@@ -264,7 +261,7 @@ export default function ProductIndex({ products, filters }) {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Target Keyword</label>
-                                                <input 
+                                                <input
                                                     type="text"
                                                     className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                     value={data.target_keyword}
@@ -275,7 +272,7 @@ export default function ProductIndex({ products, filters }) {
 
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Product URL</label>
-                                            <input 
+                                            <input
                                                 type="url"
                                                 className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                 value={data.product_url}
@@ -305,18 +302,18 @@ export default function ProductIndex({ products, filters }) {
                                         <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Status</label>
-                                                <select 
+                                                <select
                                                     className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                     value={data.status}
                                                     onChange={e => setData('status', e.target.value)}
                                                 >
-                                                    <option value="active">Active</option>
+                                                    <option value="published">Published</option>
                                                     <option value="inactive">Inactive</option>
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">SKU</label>
-                                                <input 
+                                                <input
                                                     type="text"
                                                     className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold font-mono"
                                                     value={data.sku}
@@ -332,7 +329,7 @@ export default function ProductIndex({ products, filters }) {
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Sale Price</label>
                                         <div className="relative">
                                             <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                                            <input 
+                                            <input
                                                 type="number" step="0.01"
                                                 className="w-full pl-10 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                 value={data.price}
@@ -344,7 +341,7 @@ export default function ProductIndex({ products, filters }) {
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Compare Price</label>
                                         <div className="relative">
                                             <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
-                                            <input 
+                                            <input
                                                 type="number" step="0.01"
                                                 className="w-full pl-10 pr-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-gray-400"
                                                 value={data.compare_at_price}
@@ -354,7 +351,7 @@ export default function ProductIndex({ products, filters }) {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Inventory</label>
-                                        <input 
+                                        <input
                                             type="number"
                                             className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                             value={data.stock_quantity}
@@ -365,7 +362,7 @@ export default function ProductIndex({ products, filters }) {
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Product Description</label>
-                                    <textarea 
+                                    <textarea
                                         rows="6"
                                         className="w-full px-6 py-5 bg-gray-50 border-none rounded-[2rem] focus:ring-2 focus:ring-orange-500/20 font-medium"
                                         value={data.description}
@@ -376,14 +373,14 @@ export default function ProductIndex({ products, filters }) {
 
                             <div className="p-10 border-t border-gray-50 bg-white shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.05)]">
                                 <div className="flex space-x-4">
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
                                         className="flex-1 py-5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-3xl font-black uppercase tracking-widest text-xs transition-all"
                                     >
                                         Discard
                                     </button>
-                                    <button 
+                                    <button
                                         type="submit"
                                         disabled={processing}
                                         className="flex-[2] py-5 bg-orange-500 hover:bg-orange-600 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-orange-100 transition-all disabled:opacity-50"

@@ -10,7 +10,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::where('status', 'active')
+        $products = Product::where('status', 'published')
             ->latest()
             ->paginate(12);
 
@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::where('slug', $slug)
-            ->where('status', 'active')
+            ->where('status', 'published')
             ->firstOrFail();
 
         return response()->json([
