@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KycController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/users/{id}',     [UserController::class, 'show'])->name('users.show');
         Route::patch('/users/{id}',   [UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{id}/status', [UserController::class, 'updateStatus'])->name('users.status');
+        // Settings management
+        Route::get('/settings',       [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings',      [SettingController::class, 'update'])->name('settings.update');
+
         // KYC management
         Route::get('/kyc',            [KycController::class, 'index'])->name('kyc.index');
         Route::get('/kyc/{id}',       [KycController::class, 'show'])->name('kyc.show');

@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Stateful API domains for Sanctum (admin Inertia app)
         $middleware->statefulApi();
 
+        $middleware->web(append: [
+            \App\Http\Middleware\HandleInertiaRequests::class,
+        ]);
+
         // Register custom middleware aliases
         $middleware->alias([
             'role'         => \App\Http\Middleware\EnsureRole::class,

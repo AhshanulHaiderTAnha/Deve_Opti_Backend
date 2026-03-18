@@ -2,21 +2,30 @@ import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function AdminLayout({ children }) {
-    const { auth } = usePage().props;
+    const { auth, settings } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const navigation = [
         { name: 'Dashboard', href: route('admin.dashboard'), icon: 'dashboard' },
         { name: 'Users', href: route('admin.users.index'), icon: 'people' },
         { name: 'KYC Review', href: route('admin.kyc.index'), icon: 'verified_user' },
+        { name: 'Settings', href: route('admin.settings.index'), icon: 'settings' },
     ];
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
             {/* Sidebar */}
-            <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col`}>
-                <div className="h-16 flex items-center px-6 border-b border-gray-100">
-                    <span className="text-orange-500 font-bold text-xl">{isSidebarOpen ? 'DEVE OPTI' : 'DO'}</span>
+            <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shadow-sm z-20`}>
+                <div className="h-16 flex items-center px-6 border-b border-gray-100 overflow-hidden">
+                    {settings?.site_logo ? (
+                        <img 
+                            src={settings.site_logo} 
+                            alt={settings.system_name} 
+                            className={`transition-all ${isSidebarOpen ? 'h-8' : 'h-6'}`} 
+                        />
+                    ) : (
+                        <span className="text-orange-500 font-black text-xl tracking-tighter shrink-0">{isSidebarOpen ? settings?.system_name || 'DEVE OPTI' : (settings?.system_name?.[0] || 'D')}</span>
+                    )}
                 </div>
 
                 <nav className="flex-1 py-6 px-4 space-y-2">
