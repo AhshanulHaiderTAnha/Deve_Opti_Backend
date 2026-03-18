@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DepositPlanController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,6 +47,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
         // Deposit Plans Management
         Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
+        // Support Tickets
+        Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
+        Route::get('support-tickets/{support_ticket}', [AdminSupportTicketController::class, 'show'])->name('support-tickets.show');
+        Route::post('support-tickets/{support_ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('support-tickets.reply');
+        Route::patch('support-tickets/{support_ticket}/close', [AdminSupportTicketController::class, 'close'])->name('support-tickets.close');
     });
 });
 

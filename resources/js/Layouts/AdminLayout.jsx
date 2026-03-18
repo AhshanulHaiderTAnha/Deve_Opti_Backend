@@ -14,6 +14,8 @@ export default function AdminLayout({ children }) {
         { name: 'Payments', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
         { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
         { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
+        { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
+
 
     ];
 

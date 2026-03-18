@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\User\KycController as UserKycController;
 use App\Http\Controllers\Api\User\PaymentMethodController;
 use App\Http\Controllers\Api\User\DepositPlanController;
 use App\Http\Controllers\Api\User\ProductController;
+use App\Http\Controllers\Api\User\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -47,6 +48,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Deposit Plans
         Route::get('deposit-plans',         [DepositPlanController::class, 'index']);
         Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
+        // Support Tickets
+        Route::get('support-tickets',         [SupportTicketController::class, 'index']);
+        Route::post('support-tickets',        [SupportTicketController::class, 'store']);
+        Route::get('support-tickets/{ticket_id}', [SupportTicketController::class, 'show']);
+        Route::post('support-tickets/{ticket_id}/reply', [SupportTicketController::class, 'reply']);
     });
 
     // Admin Routes
