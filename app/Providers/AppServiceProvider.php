@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // ─── Rate Limiters ────────────────────────────────────────────────────
+        //Rate Limiters
 
         // Auth routes: 10 attempts per minute per IP
         RateLimiter::for('auth', function (Request $request) {
@@ -33,6 +35,23 @@ class AppServiceProvider extends ServiceProvider
             return $request->user()
                 ? Limit::perMinute(60)->by($request->user()->id)
                 : Limit::perMinute(30)->by($request->ip());
+        });
+
+        // Custom Email Notification URLs
+
+        // Custom Verification URL for Frontend/API
+        VerifyEmail::createUrlUsing(function ($notifiable) {
+            $id   = $notifiable->getKey();
+            $hash = sha1($notifiable->getEmailForVerification());
+            // This points to the API verification route, which then handles the logic
+            return route('api.auth.verify-email', ['id' => $id, 'hash' => $hash]);
+        });
+
+        // Custom Reset Password URL for Frontend
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            // Frontend reset password page URL
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+            return "{$frontendUrl}/reset-password?token={$token}&email=" . urlencode($user->email);
         });
     }
 }
