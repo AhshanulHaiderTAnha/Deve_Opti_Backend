@@ -7,8 +7,8 @@ export default function AdminLayout({ children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('admin.dashboard'), icon: 'dashboard' },
-        { name: 'Users List', href: route('admin.users.index'), icon: 'users' },
-        { name: 'KYC Review', href: route('admin.kyc.index'), icon: 'check_circle' },
+        { name: 'Users', href: route('admin.users.index'), icon: 'people' },
+        { name: 'KYC Review', href: route('admin.kyc.index'), icon: 'verified_user' },
     ];
 
     return (

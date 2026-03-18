@@ -42,17 +42,66 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, int $id)
+    public function store(Request $request)
     {
-        $request->validate(['status' => ['required', 'in:active,inactive,suspended']]);
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'status'   => ['required', 'in:active,inactive,suspended'],
+            'role'     => ['required', 'in:admin,user'],
+        ]);
+
+        $user = User::create([
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'status'   => $validated['status'],
+        ]);
+
+        $user->assignRole($validated['role']);
+
+        return back()->with('success', 'User created successfully.');
+    }
+
+    public function update(Request $request, int $id)
+    {
         $user = User::findOrFail($id);
 
-        if ($user->hasRole('admin')) {
-            return back()->withErrors(['status' => 'Cannot change admin status.']);
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', "unique:users,email,{$id}"],
+            'password' => ['nullable', 'string', 'min:8'],
+            'status'   => ['required', 'in:active,inactive,suspended'],
+            'role'     => ['required', 'in:admin,user'],
+        ]);
+
+        $user->update([
+            'name'   => $validated['name'],
+            'email'  => $validated['email'],
+            'status' => $validated['status'],
+        ]);
+
+        if (!empty($validated['password'])) {
+            $user->update(['password' => bcrypt($validated['password'])]);
         }
 
-        $user->update(['status' => $request->status]);
+        $user->syncRoles([$validated['role']]);
 
-        return back()->with('success', "User status updated to {$request->status}.");
+        return back()->with('success', 'User updated successfully.');
+    }
+
+    public function updateStatus(Request $request, int $id)
+    {
+        $validated = $request->validate(['status' => ['required', 'in:active,inactive,suspended']]);
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('admin') && $validated['status'] !== 'active') {
+            return back()->withErrors(['status' => 'Cannot suspend an administrator.']);
+        }
+
+        $user->update(['status' => $validated['status']]);
+
+        return back()->with('success', "User status updated to {$validated['status']}.");
     }
 }
