@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KycController;
 use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\DepositPlanController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SettingController;
@@ -43,6 +44,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('payment-methods', PaymentMethodController::class)->except(['create', 'edit', 'show']);
         // Product Management
         Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
+        // Deposit Plans Management
+        Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
     });
 });
 

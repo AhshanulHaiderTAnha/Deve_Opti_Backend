@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\KycController as UserKycController;
 use App\Http\Controllers\Api\User\PaymentMethodController;
+use App\Http\Controllers\Api\User\DepositPlanController;
 use App\Http\Controllers\Api\User\ProductController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -43,6 +44,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Products
         Route::get('products',         [ProductController::class, 'index']);
         Route::get('products/{slug}',  [ProductController::class, 'show']);
+        // Deposit Plans
+        Route::get('deposit-plans',         [DepositPlanController::class, 'index']);
+        Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
     });
 
     // Admin Routes

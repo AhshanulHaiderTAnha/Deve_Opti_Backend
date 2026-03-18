@@ -13,6 +13,7 @@ export default function AdminLayout({ children }) {
         { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
         { name: 'Payments', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
         { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
+        { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
 
     ];
 
