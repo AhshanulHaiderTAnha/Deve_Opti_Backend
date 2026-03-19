@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function SupportTicketShow({ ticket }) {
     const messagesEndRef = useRef(null);
@@ -28,9 +29,29 @@ export default function SupportTicketShow({ ticket }) {
     };
 
     const closeTicket = () => {
-        if (confirm('Mark this ticket as closed?')) {
-            router.patch(route('admin.support-tickets.close', ticket.id));
-        }
+        Swal.fire({
+            title: 'Close Ticket?',
+            text: "Are you sure you want to mark this ticket as closed?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, Close it',
+            background: '#ffffff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.patch(route('admin.support-tickets.close', ticket.id), {}, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Closed!',
+                            text: 'The ticket has been marked as closed successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#f59e0b'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
