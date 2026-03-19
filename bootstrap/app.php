@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Stateful API domains for Sanctum (admin Inertia app)
         $middleware->statefulApi();
+
+        $middleware->redirectGuestsTo('/admin/login');
         
         $middleware->validateCsrfTokens(except: [
             'api/*',

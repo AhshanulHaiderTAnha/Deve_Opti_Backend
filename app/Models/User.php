@@ -16,6 +16,10 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that are mass assignable.
      */
+    protected $appends = [
+        'role',
+        'profile_image_url',
+    ];
     protected $fillable = [
         'name',
         'email',
@@ -26,7 +30,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
         'email_verified_at',
+        'profile_image_path',
     ];
+
+    /**
+     * Get the profile image URL.
+     */
+    protected function profileImageUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn () => $this->profile_image_path 
+                ? asset('storage/' . $this->profile_image_path) 
+                : asset('assets/images/default-avatar.png'),
+        );
+    }
 
     /**
      * The attributes that should be hidden for serialization.

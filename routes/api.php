@@ -27,7 +27,7 @@ Route::prefix('public')->group(function () {
 // ─────────────────────────────────────────────────────────────────────────────
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register',              [AuthController::class, 'register']);
-    Route::post('login',                 [AuthController::class, 'login']);
+    Route::post('login',                 [AuthController::class, 'login'])->name('login');
     Route::get('verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware('signed')->name('api.auth.verify-email');
     Route::post('resend-verification',   [AuthController::class, 'resendVerification']);
     Route::middleware('throttle:5,1')->group(function () {
@@ -43,6 +43,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/me',      [AuthController::class, 'me']);
+    Route::patch('auth/profile', [AuthController::class, 'updateProfile']);
+    Route::patch('auth/change-password', [AuthController::class, 'changePassword']);
+    Route::post('auth/profile-image', [AuthController::class, 'updateProfileImage']);
 
     // User Routes
     Route::prefix('user')->middleware('role:user')->group(function () {

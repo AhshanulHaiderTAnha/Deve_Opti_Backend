@@ -78,4 +78,49 @@ class AuthService
             $user->tokens()->delete();
         });
     }
+
+    /**
+     * Update user profile.
+     */
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update([
+            'name'  => $data['name'] ?? $user->name,
+            'phone' => $data['phone'] ?? $user->phone,
+        ]);
+
+        return $user;
+    }
+
+    /**
+     * Change user password.
+     */
+    public function changePassword(User $user, string $newPassword): void
+    {
+        $user->update([
+            'password' => Hash::make($newPassword),
+        ]);
+
+        // Revoke all tokens to force re-login on all devices
+        $user->tokens()->delete();
+    }
+
+    /**
+     * Update user profile image.
+     */
+    public function updateProfileImage(User $user, \Illuminate\Http\UploadedFile $image): User
+    {
+        // Delete old image if exists
+        if ($user->profile_image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_image_path);
+        }
+
+        $path = $image->store('profile-images', 'public');
+
+        $user->update([
+            'profile_image_path' => $path,
+        ]);
+
+        return $user;
+    }
 }

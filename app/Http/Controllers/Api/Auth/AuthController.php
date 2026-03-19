@@ -147,4 +147,51 @@ class AuthController extends Controller
             'user' => new UserResource($request->user()->load('kycSubmission')),
         ]);
     }
+
+    // Profile Update
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name'  => ['sometimes', 'string', 'max:255'],
+            'phone' => ['sometimes', 'string', 'max:20'],
+        ]);
+
+        $user = $this->authService->updateProfile($request->user(), $request->only('name', 'phone'));
+
+        return response()->json([
+            'message' => 'Profile updated successfully.',
+            'user'    => new UserResource($user),
+        ]);
+    }
+
+    // Change Password
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password'         => ['required', 'string', 'min:8', 'confirmed',
+                                   'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'],
+        ], [
+            'password.regex' => 'The password must contain at least one uppercase letter, one lowercase letter, and one number.',
+        ]);
+
+        $this->authService->changePassword($request->user(), $request->password);
+
+        return response()->json(['message' => 'Password changed successfully.']);
+    }
+
+    // Profile Image Upload
+    public function updateProfileImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => ['required', 'image', 'max:2048'], // Max 2MB
+        ]);
+
+        $user = $this->authService->updateProfileImage($request->user(), $request->file('image'));
+
+        return response()->json([
+            'message' => 'Profile image updated successfully.',
+            'user'    => new UserResource($user),
+        ]);
+    }
 }
