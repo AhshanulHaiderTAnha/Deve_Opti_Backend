@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Password;
 
 class AuthService
@@ -19,7 +21,8 @@ class AuthService
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
             'phone'    => $data['phone'] ?? null,
-            'status'   => 'active',
+            'status'            => 'active',
+            'email_verified_at' => now(), // Auto-verify account
         ]);
 
         $user->assignRole('user');
@@ -32,6 +35,8 @@ class AuthService
         ]);
 
         event(new Registered($user));
+
+        Mail::to($user->email)->send(new WelcomeMail($user));
 
         return $user;
     }
