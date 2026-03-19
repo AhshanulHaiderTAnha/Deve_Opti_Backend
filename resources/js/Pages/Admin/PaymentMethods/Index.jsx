@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function PaymentMethodIndex({ methods }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,9 +70,30 @@ export default function PaymentMethodIndex({ methods }) {
     };
 
     const deleteMethod = (id) => {
-        if (confirm('Are you sure you want to delete this payment method?')) {
-            router.delete(route('admin.payment-methods.destroy', id));
-        }
+        Swal.fire({
+            title: 'Delete Gateway?',
+            text: "Are you sure you want to delete this payment gateway? This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, Delete',
+            background: '#ffffff',
+            borderRadius: '1.25rem'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.payment-methods.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Payment gateway has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#e11d48'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (

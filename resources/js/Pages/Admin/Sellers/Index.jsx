@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function SellerIndex({ sellers, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,9 +54,30 @@ export default function SellerIndex({ sellers, filters }) {
     };
 
     const deleteSeller = (id) => {
-        if (confirm('Are you sure you want to delete this seller?')) {
-            router.delete(route('admin.sellers.destroy', id));
-        }
+        Swal.fire({
+            title: 'Delete Seller?',
+            text: "Are you sure you want to delete this seller? This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, Delete',
+            background: '#ffffff',
+            borderRadius: '1.25rem'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.sellers.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Seller has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#e11d48'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (

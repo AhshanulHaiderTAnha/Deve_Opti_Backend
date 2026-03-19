@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function ProductIndex({ products, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,11 +69,31 @@ export default function ProductIndex({ products, filters }) {
     };
 
     const deleteProduct = (id) => {
-        if (confirm('Are you sure you want to delete this product?')) {
-            router.delete(route('admin.products.destroy', id), {
-                preserveScroll: true
-            });
-        }
+        Swal.fire({
+            title: 'Delete Product?',
+            text: "Are you sure you want to delete this product? This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, Delete',
+            background: '#ffffff',
+            borderRadius: '1.25rem'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.products.destroy', id), {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Product has been deleted successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#e11d48'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     const handleSearch = (e) => {
