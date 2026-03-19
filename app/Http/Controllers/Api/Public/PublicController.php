@@ -37,7 +37,8 @@ class PublicController extends Controller
             return SuccessStory::where('status', 'published')
                 ->orderBy('position')
                 ->limit(8)
-                ->get();
+                ->get()
+                ->toArray();
         });
 
         return response()->json([
@@ -52,7 +53,8 @@ class PublicController extends Controller
             return Faq::where('status', 'published')
                 ->orderBy('position')
                 ->limit(15)
-                ->get();
+                ->get()
+                ->toArray();
         });
 
         return response()->json([
