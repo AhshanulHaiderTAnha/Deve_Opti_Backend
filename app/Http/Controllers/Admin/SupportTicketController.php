@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SupportTicket;
 use App\Models\SupportMessage;
 use App\Mail\TicketClosedUserMail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -33,7 +34,7 @@ class SupportTicketController extends Controller
 
         return Inertia::render('Admin/SupportTickets/Index', [
             'tickets' => $query->latest('last_reply_at')->paginate(15)->withQueryString(),
-            'filters' => $request->only(['search', 'status'])
+            'filters' => $request->only(['search', 'status']),
         ]);
     }
 
@@ -42,6 +43,46 @@ class SupportTicketController extends Controller
         return Inertia::render('Admin/SupportTickets/Show', [
             'ticket' => $supportTicket->load(['user', 'messages.user']),
         ]);
+    }
+    
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'subject' => 'required|string|max:255',
+            'priority' => 'required|in:low,medium,high',
+            'message' => 'required|string',
+            'attachment' => 'nullable|file|max:5120',
+        ]);
+
+        $ticket = DB::transaction(function () use ($request) {
+            $ticket = SupportTicket::create([
+                'user_id' => $request->user_id,
+                'ticket_id' => 'ST-' . strtoupper(str_shuffle(substr(md5(time()), 0, 6))),
+                'subject' => $request->subject,
+                'priority' => $request->priority,
+                'status' => 'pending',
+                'last_reply_at' => now(),
+            ]);
+
+            $attachmentPath = null;
+            if ($request->hasFile('attachment')) {
+                $attachmentPath = $request->file('attachment')->store('support_attachments', 'public');
+            }
+
+            SupportMessage::create([
+                'support_ticket_id' => $ticket->id,
+                'user_id' => auth()->id(),
+                'message' => $request->message,
+                'attachment_path' => $attachmentPath,
+                'is_admin_reply' => true,
+            ]);
+
+            return $ticket;
+        });
+
+        return redirect()->route('admin.support-tickets.show', $ticket->id)
+            ->with('success', 'Support ticket created successfully.');
     }
 
     public function reply(Request $request, SupportTicket $supportTicket)

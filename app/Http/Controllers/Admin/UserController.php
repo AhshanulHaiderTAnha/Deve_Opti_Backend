@@ -33,6 +33,20 @@ class UserController extends Controller
         ]);
     }
 
+    public function searchAjax(Request $request)
+    {
+        $search = $request->search;
+        $users = User::role('user')
+            ->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->limit(10)
+            ->get(['id', 'name', 'email']);
+
+        return response()->json($users);
+    }
+
     public function show(int $id): Response
     {
         $user = User::with(['kycSubmission.reviewer', 'roles'])->findOrFail($id);

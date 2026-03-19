@@ -30,6 +30,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard',      [DashboardController::class, 'index'])->name('dashboard');
         // User management
         Route::get('/users',          [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/search-ajax', [UserController::class, 'searchAjax'])->name('users.search-ajax');
         Route::post('/users',         [UserController::class, 'store'])->name('users.store');
         Route::get('/users/{id}',     [UserController::class, 'show'])->name('users.show');
         Route::patch('/users/{id}',   [UserController::class, 'update'])->name('users.update');
@@ -53,6 +54,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
         // Support Tickets
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
+        Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
         Route::get('support-tickets/{support_ticket}', [AdminSupportTicketController::class, 'show'])->name('support-tickets.show');
         Route::post('support-tickets/{support_ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('support-tickets.reply');
         Route::patch('support-tickets/{support_ticket}/close', [AdminSupportTicketController::class, 'close'])->name('support-tickets.close');
