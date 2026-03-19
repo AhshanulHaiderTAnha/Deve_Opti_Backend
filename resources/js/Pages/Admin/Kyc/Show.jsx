@@ -1,22 +1,56 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
-export default function KycShow({ kyc }) {
+export default function KycShow({ kyc: kycWrap }) {
+    const kyc = kycWrap.data;
     const [isRejecting, setIsRejecting] = useState(false);
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         reason: '',
     });
 
     const approve = () => {
-        if (confirm('Are you sure you want to approve this KYC?')) {
-            post(route('admin.kyc.approve', kyc.id));
-        }
+        Swal.fire({
+            title: 'Approve KYC?',
+            text: "Are you sure you want to approve this verification request?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, Approve',
+            background: '#ffffff',
+            borderRadius: '1.25rem'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                post(route('admin.kyc.approve', kyc.id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Approved!',
+                            text: 'KYC submission has been approved successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#059669'
+                        });
+                    }
+                });
+            }
+        });
     };
 
     const reject = (e) => {
         e.preventDefault();
-        post(route('admin.kyc.reject', kyc.id));
+        post(route('admin.kyc.reject', kyc.id), {
+            onSuccess: () => {
+                setIsRejecting(false);
+                reset();
+                Swal.fire({
+                    title: 'Rejected!',
+                    text: 'KYC submission has been rejected.',
+                    icon: 'success',
+                    confirmButtonColor: '#e11d48'
+                });
+            }
+        });
     };
 
     return (

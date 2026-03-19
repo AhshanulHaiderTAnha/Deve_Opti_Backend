@@ -8,16 +8,17 @@ export default function AdminLayout({ children }) {
     const navigation = [
         { name: 'Dashboard', href: route('admin.dashboard'), current: route().current('admin.dashboard'), icon: 'dashboard' },
         { name: 'Users', href: route('admin.users.index'), current: route().current('admin.users.*'), icon: 'people' },
-        { name: 'Products', href: route('admin.products.index'), current: route().current('admin.products.*'), icon: 'inventory_2' },
         { name: 'KYC Review', href: route('admin.kyc.index'), current: route().current('admin.kyc.*'), icon: 'verified_user' },
-        { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
-        { name: 'Payments', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
         { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
+        { name: 'Products', href: route('admin.products.index'), current: route().current('admin.products.*'), icon: 'inventory_2' },
+        { name: 'Payments Gateway', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
         { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
         { name: 'Success Stories', href: route('admin.success-stories.index'), current: route().current('admin.success-stories.*'), icon: 'auto_awesome' },
         { name: 'FAQs', href: route('admin.faqs.index'), current: route().current('admin.faqs.*'), icon: 'quiz' },
         { name: 'Subscribers', href: route('admin.subscribers.index'), current: route().current('admin.subscribers.*'), icon: 'mail' },
+        { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
+
 
 
     ];

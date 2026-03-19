@@ -108,8 +108,12 @@ export default function UserIndex({ users, filters }) {
                                 <tr key={user.id} className="hover:bg-slate-50/30 transition-colors group">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center">
-                                            <div className="h-12 w-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 font-black text-lg border-2 border-white shadow-sm mr-4 shrink-0">
-                                                {user.name[0]}
+                                            <div className="h-12 w-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 font-black text-lg border-2 border-white shadow-sm mr-4 shrink-0 overflow-hidden">
+                                                {user.profile_image_url ? (
+                                                    <img src={user.profile_image_url} alt={user.name} className="h-full w-full object-cover" />
+                                                ) : (
+                                                    user.name[0]
+                                                )}
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="font-bold text-slate-900 truncate">{user.name}</span>

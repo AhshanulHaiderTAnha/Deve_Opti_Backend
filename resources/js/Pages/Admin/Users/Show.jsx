@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function UserShow({ user: userWrap, activities }) {
@@ -121,22 +121,43 @@ export default function UserShow({ user: userWrap, activities }) {
                             </p>
                             <Link
                                 href={user.kyc?.id ? route('admin.kyc.show', user.kyc.id) : '#'}
-                                className="inline-flex items-center px-6 py-3 bg-white text-orange-600 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg hover:bg-orange-50 transition-all"
+                                className={`inline-flex items-center px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg transition-all ${user.kyc?.id
+                                        ? 'bg-white text-orange-600 hover:bg-orange-50'
+                                        : 'bg-white/50 text-white/50 cursor-not-allowed'
+                                    }`}
                             >
                                 <span className="material-icons-outlined text-sm mr-2">visibility</span>
-                                Review KYC
+                                {user.kyc?.id ? 'Review KYC' : 'No Submission'}
                             </Link>
                         </div>
 
                         <div className="bg-white rounded-[2.5rem] p-8 border border-slate-50 shadow-sm text-center">
-                            <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300 font-black text-4xl border-2 border-slate-100">
-                                {user.name?.[0]}
+                            <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300 font-black text-4xl border-2 border-slate-100 overflow-hidden">
+                                {user.profile_image_url ? (
+                                    <img src={user.profile_image_url} alt={user.name} className="h-full w-full object-cover" />
+                                ) : (
+                                    user.name?.[0]
+                                )}
                             </div>
                             <h5 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1">User Identifier</h5>
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-tighter mb-4">UID: {user.id.toString().padStart(6, '0')}</p>
-                            <div className="flex justify-center space-x-2">
-                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Session</span>
+
+                            <div className="pt-4 border-t border-slate-50 space-y-3">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Update KYC Status</p>
+                                <div className="flex flex-col space-y-2">
+                                    {['pending', 'approved', 'rejected'].map((s) => (
+                                        <button
+                                            key={s}
+                                            onClick={() => router.patch(route('admin.users.kyc-status', user.id), { status: s })}
+                                            className={`py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all ${user.kyc_status === s
+                                                ? 'bg-orange-50 border-orange-200 text-orange-600'
+                                                : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                                                }`}
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

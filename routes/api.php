@@ -96,7 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 abort(404, 'Document not found.');
             }
 
-            return Storage::disk('local')->download($path);
+            return Storage::disk('local')->response($path);
         })->name('admin.kyc.document');
     });
 });

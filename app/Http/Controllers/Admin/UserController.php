@@ -93,6 +93,34 @@ class UserController extends Controller
         return back()->with('success', 'User updated successfully.');
     }
 
+    public function updateKycStatus(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:pending,approved,rejected']
+        ]);
+
+        $user = User::findOrFail($id);
+        
+        // If user already has a submission, update it
+        if ($user->kycSubmission) {
+            $user->kycSubmission->update([
+                'status' => $validated['status'],
+                'reviewed_by' => $request->user()->id,
+                'reviewed_at' => now(),
+            ]);
+        } else {
+            // Otherwise create a dummy submission to hold the status
+            $user->kycSubmission()->create([
+                'status' => $validated['status'],
+                'full_name' => $user->name,
+                'reviewed_by' => $request->user()->id,
+                'reviewed_at' => now(),
+            ]);
+        }
+
+        return back()->with('success', "KYC status updated to {$validated['status']}.");
+    }
+
     public function updateStatus(Request $request, int $id)
     {
         $validated = $request->validate(['status' => ['required', 'in:active,inactive,suspended']]);

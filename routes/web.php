@@ -34,6 +34,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/users/{id}',     [UserController::class, 'show'])->name('users.show');
         Route::patch('/users/{id}',   [UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{id}/status', [UserController::class, 'updateStatus'])->name('users.status');
+        Route::patch('/users/{id}/kyc-status', [UserController::class, 'updateKycStatus'])->name('users.kyc-status');
         // Settings management
         Route::get('/settings',       [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings',      [SettingController::class, 'update'])->name('settings.update');
