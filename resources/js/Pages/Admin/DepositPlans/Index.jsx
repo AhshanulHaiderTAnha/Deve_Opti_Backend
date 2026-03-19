@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function DepositPlanIndex({ plans, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,9 +90,38 @@ export default function DepositPlanIndex({ plans, filters }) {
     };
 
     const deletePlan = (id) => {
-        if (confirm('Are you sure you want to delete this deposit plan?')) {
-            router.delete(route('admin.deposit-plans.destroy', id), { preserveScroll: true });
-        }
+        Swal.fire({
+            title: 'Delete this plan?',
+            text: "All associated settings for this plan will be removed!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, delete it!',
+            customClass: {
+                popup: 'rounded-[1.5rem]',
+                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3',
+                cancelButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.deposit-plans.destroy', id), {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Deposit plan has been removed.',
+                            icon: 'success',
+                            confirmButtonColor: '#f59e0b',
+                            customClass: {
+                                popup: 'rounded-[1.5rem]',
+                                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     };
 
     const handleSearch = (e) => {
