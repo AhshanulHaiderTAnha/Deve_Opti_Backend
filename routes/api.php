@@ -13,18 +13,14 @@ use App\Http\Controllers\Api\Public\PublicController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Public Resources (Cached)
-// ─────────────────────────────────────────────────────────────────────────────
 Route::prefix('public')->group(function () {
     Route::get('success-stories', [PublicController::class, 'successStories']);
     Route::get('faqs', [PublicController::class, 'faqs']);
     Route::post('subscribe', [PublicController::class, 'subscribe']);
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Public Auth Routes  (rate limited)
-// ─────────────────────────────────────────────────────────────────────────────
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('register',              [AuthController::class, 'register']);
     Route::post('login',                 [AuthController::class, 'login'])->name('login');
@@ -36,9 +32,7 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Authenticated Routes
-// ─────────────────────────────────────────────────────────────────────────────
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('auth/logout', [AuthController::class, 'logout']);
