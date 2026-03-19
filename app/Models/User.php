@@ -46,6 +46,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's first role (Legacy accessor to avoid conflict with Spatie's role scope).
+     */
+    public function getRoleAttribute()
+    {
+        return $this->roles->first()?->name;
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      */
     protected $hidden = [

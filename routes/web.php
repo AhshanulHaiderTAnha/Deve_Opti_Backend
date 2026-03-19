@@ -62,5 +62,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// Redirect root to admin
-Route::get('/', fn () => redirect('/admin/login'));
+// Redirect root to dashboard (auth middleware will handle guest redirection to login)
+Route::get('/', fn () => redirect()->route('admin.dashboard'));
