@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function FaqIndex({ faqs }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,9 +51,37 @@ export default function FaqIndex({ faqs }) {
     };
 
     const deleteFaq = (id) => {
-        if (confirm('Delete this FAQ?')) {
-            router.delete(route('admin.faqs.destroy', id));
-        }
+        Swal.fire({
+            title: 'Delete this FAQ?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, delete it!',
+            customClass: {
+                popup: 'rounded-[1.5rem]',
+                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3',
+                cancelButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.faqs.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'FAQ has been removed.',
+                            icon: 'success',
+                            confirmButtonColor: '#f59e0b',
+                            customClass: {
+                                popup: 'rounded-[1.5rem]',
+                                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (

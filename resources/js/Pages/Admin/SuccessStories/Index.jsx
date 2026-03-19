@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function SuccessStoryIndex({ stories }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,9 +65,37 @@ export default function SuccessStoryIndex({ stories }) {
     };
 
     const deleteStory = (id) => {
-        if (confirm('Are you sure you want to delete this story?')) {
-            router.delete(route('admin.success-stories.destroy', id));
-        }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this success story!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, delete it!',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3',
+                cancelButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.success-stories.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Success story has been deleted.',
+                            icon: 'success',
+                            confirmButtonColor: '#f59e0b',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (

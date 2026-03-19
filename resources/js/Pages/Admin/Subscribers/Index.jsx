@@ -1,12 +1,41 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function SubscriberIndex({ subscribers }) {
     const deleteSubscriber = (id) => {
-        if (confirm('Permanently remove this subscriber?')) {
-            router.delete(route('admin.subscribers.destroy', id));
-        }
+        Swal.fire({
+            title: 'Remove Subscriber?',
+            text: "This email will be permanently removed from your list.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, remove it!',
+            customClass: {
+                popup: 'rounded-[1.5rem]',
+                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3',
+                cancelButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(route('admin.subscribers.destroy', id), {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Removed!',
+                            text: 'Subscriber has been successfully removed.',
+                            icon: 'success',
+                            confirmButtonColor: '#f59e0b',
+                            customClass: {
+                                popup: 'rounded-[1.5rem]',
+                                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+                            }
+                        });
+                    }
+                });
+            }
+        });
     };
 
     return (
@@ -81,8 +110,8 @@ export default function SubscriberIndex({ subscribers }) {
                                     onClick={() => router.visit(link.url)}
                                     disabled={!link.url || link.active}
                                     className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
-                                            !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                                'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600 shadow-sm border border-transparent'
+                                        !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
+                                            'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600 shadow-sm border border-transparent'
                                         }`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />

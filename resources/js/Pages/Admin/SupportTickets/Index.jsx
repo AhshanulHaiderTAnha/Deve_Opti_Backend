@@ -8,7 +8,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
+
     // User search states
     const [userSearch, setUserSearch] = useState('');
     const [foundUsers, setFoundUsers] = useState([]);
@@ -237,7 +237,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
                                     <div className="space-y-2 relative">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Target User</label>
                                         <div className="relative">
-                                            <input 
+                                            <input
                                                 type="text"
                                                 className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                                 placeholder="Search by name or email..."
@@ -254,7 +254,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
                                                 readOnly={!!selectedUser}
                                             />
                                             {selectedUser && (
-                                                <button 
+                                                <button
                                                     type="button"
                                                     onClick={() => {
                                                         setSelectedUser(null);
@@ -268,7 +268,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
                                                 </button>
                                             )}
                                         </div>
-                                        
+
                                         {!selectedUser && foundUsers.length > 0 && (
                                             <div className="absolute z-[60] left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-50 overflow-hidden py-2 max-h-48 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2">
                                                 {foundUsers.map(user => (
@@ -297,7 +297,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Priority</label>
-                                        <select 
+                                        <select
                                             className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold appearance-none"
                                             value={data.priority}
                                             onChange={e => setData('priority', e.target.value)}
