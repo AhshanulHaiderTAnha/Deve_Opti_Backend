@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function UserShow({ user: userWrap, activities }) {
+export default function UserShow({ user: userWrap, activities, wallet, deposits, withdrawals }) {
     const user = userWrap.data;
 
     return (
@@ -106,10 +106,109 @@ export default function UserShow({ user: userWrap, activities }) {
                                 </table>
                             </div>
                         </div>
+
+                        {/* Deposits Table */}
+                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-50 overflow-hidden">
+                            <div className="p-10 border-b border-slate-50">
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">Deposit History</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-50">
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Plan & Method</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amount</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {deposits.data.length > 0 ? deposits.data.map((d) => (
+                                            <tr key={d.id} className="hover:bg-slate-50/30 transition-colors">
+                                                <td className="px-10 py-5">
+                                                    <div className="font-bold text-slate-700 text-sm">{d.deposit_plan?.name || 'Custom'}</div>
+                                                    <div className="text-slate-400 text-[10px]">{d.payment_method?.name}</div>
+                                                </td>
+                                                <td className="px-10 py-5 text-emerald-600 font-black text-right tracking-tight">${parseFloat(d.amount).toFixed(2)}</td>
+                                                <td className="px-10 py-5 text-center">
+                                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${d.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : d.status === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>
+                                                        {d.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-10 py-5 text-slate-400 text-[10px] font-bold text-right">{new Date(d.created_at).toLocaleDateString()}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No deposits found</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div className="p-5 flex flex-wrap justify-center gap-2 border-t border-slate-50">
+                                    {deposits.links.map((link, i) => (
+                                        <Link key={i} href={link.url || '#'} className={`px-3 py-1 rounded-lg text-xs font-bold ${link.active ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'} ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Withdrawals Table */}
+                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-50 overflow-hidden">
+                            <div className="p-10 border-b border-slate-50">
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">Withdrawal History</h3>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-50">
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Gateway Config</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amount</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {withdrawals.data.length > 0 ? withdrawals.data.map((w) => (
+                                            <tr key={w.id} className="hover:bg-slate-50/30 transition-colors">
+                                                <td className="px-10 py-5">
+                                                    <div className="font-medium text-slate-600 text-xs">{w.payment_gateway_info}</div>
+                                                </td>
+                                                <td className="px-10 py-5 text-red-600 font-black text-right tracking-tight">${parseFloat(w.amount).toFixed(2)}</td>
+                                                <td className="px-10 py-5 text-center">
+                                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${w.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : w.status === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>
+                                                        {w.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-10 py-5 text-slate-400 text-[10px] font-bold text-right">{new Date(w.created_at).toLocaleDateString()}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No withdrawals found</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div className="p-5 flex flex-wrap justify-center gap-2 border-t border-slate-50">
+                                    {withdrawals.links.map((link, i) => (
+                                        <Link key={i} href={link.url || '#'} className={`px-3 py-1 rounded-lg text-xs font-bold ${link.active ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'} ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Side Cards */}
                     <div className="col-span-12 lg:col-span-4 space-y-8">
+                        {/* Wallet Card */}
+                        <div className="bg-emerald-500 rounded-[2.5rem] p-10 text-white shadow-xl shadow-emerald-100">
+                            <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
+                                <span className="material-icons-outlined text-3xl">account_balance_wallet</span>
+                            </div>
+                            <h4 className="text-xl font-black tracking-tight mb-2">Wallet Balance</h4>
+                            <p className="text-emerald-100 text-xs font-medium leading-relaxed mb-6">
+                                The total approved funds currently available in this account.
+                            </p>
+                            <div className="text-5xl font-black tracking-tighter">
+                                ${parseFloat(wallet?.balance || 0).toFixed(2)}
+                            </div>
+                        </div>
+
                         <div className="bg-orange-500 rounded-[2.5rem] p-10 text-white shadow-xl shadow-orange-100">
                             <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
                                 <span className="material-icons-outlined text-3xl">verified</span>
@@ -122,8 +221,8 @@ export default function UserShow({ user: userWrap, activities }) {
                             <Link
                                 href={user.kyc?.id ? route('admin.kyc.show', user.kyc.id) : '#'}
                                 className={`inline-flex items-center px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg transition-all ${user.kyc?.id
-                                        ? 'bg-white text-orange-600 hover:bg-orange-50'
-                                        : 'bg-white/50 text-white/50 cursor-not-allowed'
+                                    ? 'bg-white text-orange-600 hover:bg-orange-50'
+                                    : 'bg-white/50 text-white/50 cursor-not-allowed'
                                     }`}
                             >
                                 <span className="material-icons-outlined text-sm mr-2">visibility</span>

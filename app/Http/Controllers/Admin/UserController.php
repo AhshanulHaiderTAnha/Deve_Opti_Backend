@@ -47,14 +47,28 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function show(int $id): Response
+    public function show(int $id, Request $request): Response
     {
-        $user = User::with(['kycSubmission.reviewer', 'roles'])->findOrFail($id);
+        $user = User::with(['kycSubmission.reviewer', 'roles', 'wallet'])->findOrFail($id);
         $activities = $user->activities()->latest()->limit(5)->get();
+
+        $deposits = \App\Models\DepositRequest::with(['depositPlan', 'paymentMethod'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->paginate(5, ['*'], 'deposits_page')
+            ->withQueryString();
+
+        $withdrawals = \App\Models\WithdrawalRequest::where('user_id', $user->id)
+            ->latest()
+            ->paginate(5, ['*'], 'withdrawals_page')
+            ->withQueryString();
 
         return Inertia::render('Admin/Users/Show', [
             'user'       => new UserResource($user),
+            'wallet'     => $user->wallet,
             'activities' => $activities,
+            'deposits'   => $deposits,
+            'withdrawals'=> $withdrawals,
         ]);
     }
 
