@@ -8,6 +8,12 @@ export default function Dashboard({ stats, recentActivity }) {
         { label: 'Pending KYC', value: stats.pending_kyc, icon: 'hourglass_empty', color: 'bg-amber-500' },
         { label: 'Approved KYC', value: stats.approved_kyc, icon: 'verified', color: 'bg-emerald-500' },
         { label: 'Rejected KYC', value: stats.rejected_kyc, icon: 'cancel', color: 'bg-rose-500' },
+        { label: 'Total Deposits', value: '$' + (parseFloat(stats.total_deposits) || 0).toFixed(2), icon: 'file_download', color: 'bg-teal-500' },
+        { label: 'Total Withdrawals', value: '$' + (parseFloat(stats.total_withdrawals) || 0).toFixed(2), icon: 'file_upload', color: 'bg-indigo-500' },
+        { label: 'This Month Deposits', value: '$' + (parseFloat(stats.this_month_deposits) || 0).toFixed(2), icon: 'trending_up', color: 'bg-emerald-400' },
+        { label: 'This Month Withdrawals', value: '$' + (parseFloat(stats.this_month_withdrawals) || 0).toFixed(2), icon: 'trending_down', color: 'bg-rose-400' },
+        { label: 'Pending Deposits', value: stats.pending_deposits_count, icon: 'pending_actions', color: 'bg-amber-400' },
+        { label: 'Pending Withdrawals', value: stats.pending_withdrawals_count, icon: 'hourglass_top', color: 'bg-orange-400' },
     ];
 
     return (

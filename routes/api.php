@@ -60,6 +60,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('support-tickets',        [SupportTicketController::class, 'store']);
         Route::get('support-tickets/{ticket_id}', [SupportTicketController::class, 'show']);
         Route::post('support-tickets/{ticket_id}/reply', [SupportTicketController::class, 'reply']);
+
+        // Wallet System
+        Route::get('wallet',                  [\App\Http\Controllers\Api\User\WalletController::class, 'show']);
+        Route::get('wallet/transactions',     [\App\Http\Controllers\Api\User\WalletController::class, 'transactions']);
+        Route::get('deposits',                [\App\Http\Controllers\Api\User\DepositController::class, 'index']);
+        Route::post('deposits',               [\App\Http\Controllers\Api\User\DepositController::class, 'store']);
+        Route::get('withdrawals',             [\App\Http\Controllers\Api\User\WithdrawalController::class, 'index']);
+        Route::post('withdrawals',            [\App\Http\Controllers\Api\User\WithdrawalController::class, 'store']);
     });
 
     // Admin Routes
