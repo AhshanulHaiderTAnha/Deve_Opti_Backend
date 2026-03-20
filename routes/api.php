@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\User\DepositController;
 use App\Http\Controllers\Api\User\WithdrawalController;
 use App\Http\Controllers\Api\User\AnnouncementController;
 use App\Http\Controllers\Api\User\ActivityLogController;
+use App\Http\Controllers\Api\User\CommissionTierController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,6 +24,7 @@ Route::prefix('public')->group(function () {
     Route::get('success-stories', [PublicController::class, 'successStories']);
     Route::get('faqs', [PublicController::class, 'faqs']);
     Route::post('subscribe', [PublicController::class, 'subscribe']);
+    Route::get('commission-tiers', [CommissionTierController::class, 'index']);
 });
 
 // Public Auth Routes  (rate limited)
@@ -60,6 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Deposit Plans
         Route::get('deposit-plans',         [DepositPlanController::class, 'index']);
         Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
+        Route::get('commission-tiers',      [CommissionTierController::class, 'index']);
         // Support Tickets
         Route::get('support-tickets',         [SupportTicketController::class, 'index']);
         Route::post('support-tickets',        [SupportTicketController::class, 'store']);

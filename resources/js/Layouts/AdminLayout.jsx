@@ -25,6 +25,7 @@ export default function AdminLayout({ children }) {
             current: route().current('admin.payment-methods.*') || route().current('admin.deposit-plans.*'),
             children: [
                 { name: 'Payment Gateways', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'settings_input_component' },
+                { name: 'Commission Tiers', href: route('admin.commission-tiers.index'), current: route().current('admin.commission-tiers.*'), icon: 'military_tech' },
                 { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
             ]
         },

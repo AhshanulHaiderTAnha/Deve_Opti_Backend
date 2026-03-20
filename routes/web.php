@@ -55,6 +55,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
         // Deposit Plans Management
         Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
+        // Commission Tiers Management
+        Route::resource('commission-tiers', \App\Http\Controllers\Admin\CommissionTierController::class)->except(['create', 'edit', 'show']);
         // Support Tickets
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
         Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
@@ -75,7 +77,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
         Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
-
         // Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'index'])->name('activity-logs.index');
         Route::delete('activity-logs/{userActivityLog}', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
