@@ -64,6 +64,13 @@ class SupportTicketController extends Controller
             return $ticket;
         });
 
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Support Ticket Created',
+            'details' => "Created Ticket #{$ticket->ticket_id}",
+            'ip_address' => $request->ip()
+        ]);
+
         // Notify Admins
         $admin = env('ADMIN_EMAIL'); // Or notify all admins
         if ($admin) {
@@ -127,6 +134,13 @@ class SupportTicketController extends Controller
                 'last_reply_at' => now(),
             ]);
         });
+
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Support Ticket Replied',
+            'details' => "Replied to Ticket #{$ticket->ticket_id}",
+            'ip_address' => $request->ip()
+        ]);
 
         return response()->json([
             'status' => 'success',

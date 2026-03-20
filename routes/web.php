@@ -75,6 +75,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
         Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
+
+        // Logs
+        Route::get('activity-logs', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::delete('activity-logs/{userActivityLog}', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+        Route::post('activity-logs/clear-old', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
+        
+        // Announcements
+        Route::resource('announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->except(['create', 'edit', 'show']);
     });
 });
 

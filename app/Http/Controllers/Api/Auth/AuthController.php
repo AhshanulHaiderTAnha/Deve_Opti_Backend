@@ -49,11 +49,11 @@ class AuthController extends Controller
 
         $token = $this->authService->issueToken($user, $request->input('device_name', 'api'));
 
-        \App\Models\UserActivity::create([
+        \App\Models\UserActivityLog::create([
             'user_id'    => $user->id,
             'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'action'     => 'login',
+            'details'    => $request->userAgent(),
+            'action'     => 'Logged In',
         ]);
 
         return response()->json([
@@ -67,6 +67,12 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
+
+        \App\Models\UserActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'Logged Out',
+            'ip_address' => $request->ip()
+        ]);
 
         return response()->json(['message' => 'Logged out successfully.']);
     }
@@ -158,6 +164,12 @@ class AuthController extends Controller
 
         $user = $this->authService->updateProfile($request->user(), $request->only('name', 'phone'));
 
+        \App\Models\UserActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'Account Profile Updated',
+            'ip_address' => $request->ip()
+        ]);
+
         return response()->json([
             'message' => 'Profile updated successfully.',
             'user'    => new UserResource($user),
@@ -176,6 +188,12 @@ class AuthController extends Controller
         ]);
 
         $this->authService->changePassword($request->user(), $request->password);
+
+        \App\Models\UserActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'Password Changed',
+            'ip_address' => $request->ip()
+        ]);
 
         return response()->json(['message' => 'Password changed successfully.']);
     }

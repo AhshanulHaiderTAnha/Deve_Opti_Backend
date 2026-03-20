@@ -62,6 +62,13 @@ class DepositController extends Controller
 
         $deposit = DepositRequest::create($data);
 
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Deposit Requested',
+            'details' => "Requested \${$request->amount} deposit via Plan #{$request->deposit_plan_id}",
+            'ip_address' => $request->ip()
+        ]);
+
         // Notify Admin
         $adminEmail = env('ADMIN_EMAIL');
         if ($adminEmail) {
@@ -91,6 +98,13 @@ class DepositController extends Controller
         }
 
         $deposit->delete();
+
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Deposit Request Cancelled',
+            'details' => "Cancelled deposit request #{$id}",
+            'ip_address' => request()->ip()
+        ]);
 
         return response()->json([
             'status' => 'success',

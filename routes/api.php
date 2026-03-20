@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\Public\PublicController;
 use App\Http\Controllers\Api\User\WalletController;
 use App\Http\Controllers\Api\User\DepositController;
 use App\Http\Controllers\Api\User\WithdrawalController;
+use App\Http\Controllers\Api\User\AnnouncementController;
+use App\Http\Controllers\Api\User\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -72,6 +74,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('withdrawals',             [WithdrawalController::class, 'index']);
         Route::post('withdrawals',            [WithdrawalController::class, 'store']);
         Route::delete('withdrawals/{id}',     [WithdrawalController::class, 'destroy']);
+        // Announcements
+        Route::get('announcements', [AnnouncementController::class, 'index']);
+        Route::post('announcements/{id}/read', [AnnouncementController::class, 'markAsRead']);
+        // Activity Logs
+        Route::get('activity-logs', [ActivityLogController::class, 'index']);
     });
 
     // Admin Routes

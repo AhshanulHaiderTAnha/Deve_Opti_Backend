@@ -44,6 +44,13 @@ class KycController extends Controller
             $request->file('selfie')
         );
 
+        \App\Models\UserActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'KYC Verification Submitted',
+            'details' => "User submitted KYC verification data",
+            'ip_address' => $request->ip()
+        ]);
+
         return response()->json([
             'message' => 'KYC submitted successfully. Pending admin review.',
             'kyc'     => new KycResource($kyc),

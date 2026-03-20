@@ -57,6 +57,13 @@ class WithdrawalController extends Controller
             'status' => 'pending'
         ]);
 
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Withdrawal Requested',
+            'details' => "Requested \${$request->amount} withdrawal",
+            'ip_address' => $request->ip()
+        ]);
+
         // Send Emails
         $adminEmail = env('ADMIN_EMAIL');
         if ($adminEmail) {
@@ -83,6 +90,13 @@ class WithdrawalController extends Controller
         }
 
         $withdrawal->delete();
+
+        \App\Models\UserActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'Withdrawal Request Cancelled',
+            'details' => "Cancelled withdrawal request #{$id}",
+            'ip_address' => request()->ip()
+        ]);
 
         return response()->json([
             'status' => 'success',
