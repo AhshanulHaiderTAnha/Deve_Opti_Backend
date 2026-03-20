@@ -65,9 +65,9 @@ class SupportTicketController extends Controller
         });
 
         // Notify Admins
-        $admin = User::role('admin')->first(); // Or notify all admins
+        $admin = env('ADMIN_EMAIL'); // Or notify all admins
         if ($admin) {
-            Mail::to($admin->email)->send(new TicketCreatedAdminMail($ticket));
+            Mail::to($admin)->send(new TicketCreatedAdminMail($ticket));
         }
 
         return response()->json([
