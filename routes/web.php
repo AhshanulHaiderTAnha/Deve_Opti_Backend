@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SuccessStoryController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\WalletController;
+use App\Http\Controllers\Admin\DepositController;
+use App\Http\Controllers\Admin\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -61,18 +64,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Success Stories & FAQ
         Route::resource('success-stories', SuccessStoryController::class)->except(['create', 'edit', 'show']);
         Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
-        Route::resource('subscribers', \App\Http\Controllers\Admin\SubscriberController::class)->only(['index', 'destroy']);
-
+        Route::resource('subscribers',SubscriberController::class)->only(['index', 'destroy']);
         // Wallet System
-        Route::get('wallets', [\App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallets.index');
-        
-        Route::get('deposits', [\App\Http\Controllers\Admin\DepositController::class, 'index'])->name('deposits.index');
-        Route::post('deposits/{deposit}/approve', [\App\Http\Controllers\Admin\DepositController::class, 'approve'])->name('deposits.approve');
-        Route::post('deposits/{deposit}/reject', [\App\Http\Controllers\Admin\DepositController::class, 'reject'])->name('deposits.reject');
-        
-        Route::get('withdrawals', [\App\Http\Controllers\Admin\WithdrawalController::class, 'index'])->name('withdrawals.index');
-        Route::post('withdrawals/{withdrawal}/approve', [\App\Http\Controllers\Admin\WithdrawalController::class, 'approve'])->name('withdrawals.approve');
-        Route::post('withdrawals/{withdrawal}/reject', [\App\Http\Controllers\Admin\WithdrawalController::class, 'reject'])->name('withdrawals.reject');
+        Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
+        // Deposit
+        Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
+        Route::post('deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');
+        Route::post('deposits/{deposit}/reject', [DepositController::class, 'reject'])->name('deposits.reject');
+        // Withdrawals
+        Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
+        Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
+        Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
     });
 });
 
