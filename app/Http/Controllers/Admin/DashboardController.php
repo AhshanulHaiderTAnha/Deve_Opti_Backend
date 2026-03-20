@@ -10,6 +10,9 @@ use Inertia\Response;
 
 use App\Models\DepositRequest;
 use App\Models\WithdrawalRequest;
+use App\Models\SupportTicket;
+use App\Models\Product;
+use App\Models\Seller;
 
 class DashboardController extends Controller
 {
@@ -28,6 +31,10 @@ class DashboardController extends Controller
             'this_month_withdrawals' => WithdrawalRequest::where('status', 'approved')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('amount'),
             'pending_deposits_count' => DepositRequest::where('status', 'pending')->count(),
             'pending_withdrawals_count' => WithdrawalRequest::where('status', 'pending')->count(),
+            'total_support_tickets' => SupportTicket::count(),
+            'pending_support_tickets' => SupportTicket::where('status', 'open')->count(),
+            'total_products' => Product::count(),
+            'total_sellers' => Seller::count(),
         ];
 
         $recentActivity = KycSubmission::with('user')

@@ -5,15 +5,17 @@ import AdminLayout from '@/Layouts/AdminLayout';
 export default function Dashboard({ stats, recentActivity }) {
     const statCards = [
         { label: 'Total Users', value: stats.total_users, icon: 'people', color: 'bg-orange-500' },
+        { label: 'Total Sellers', value: stats.total_sellers, icon: 'storefront', color: 'bg-purple-500' },
+        { label: 'Total Products', value: stats.total_products, icon: 'inventory_2', color: 'bg-blue-500' },
+        { label: 'Support Tickets', value: stats.total_support_tickets, icon: 'history', color: 'bg-gray-700' },
+        { label: 'Pending Tickets', value: stats.pending_support_tickets, icon: 'confirmation_number', color: 'bg-rose-500' },
         { label: 'Pending KYC', value: stats.pending_kyc, icon: 'hourglass_empty', color: 'bg-amber-500' },
-        { label: 'Approved KYC', value: stats.approved_kyc, icon: 'verified', color: 'bg-emerald-500' },
-        { label: 'Rejected KYC', value: stats.rejected_kyc, icon: 'cancel', color: 'bg-rose-500' },
         { label: 'Total Deposits', value: '$' + (parseFloat(stats.total_deposits) || 0).toFixed(2), icon: 'file_download', color: 'bg-teal-500' },
         { label: 'Total Withdrawals', value: '$' + (parseFloat(stats.total_withdrawals) || 0).toFixed(2), icon: 'file_upload', color: 'bg-indigo-500' },
+        { label: 'Pending Deposits', value: stats.pending_deposits_count, icon: 'pending_actions', color: 'bg-amber-400' },
+        { label: 'Pending Withdrawals', value: stats.pending_withdrawals_count, icon: 'hourglass_top', color: 'bg-red-400' },
         { label: 'This Month Deposits', value: '$' + (parseFloat(stats.this_month_deposits) || 0).toFixed(2), icon: 'trending_up', color: 'bg-emerald-400' },
         { label: 'This Month Withdrawals', value: '$' + (parseFloat(stats.this_month_withdrawals) || 0).toFixed(2), icon: 'trending_down', color: 'bg-rose-400' },
-        { label: 'Pending Deposits', value: stats.pending_deposits_count, icon: 'pending_actions', color: 'bg-amber-400' },
-        { label: 'Pending Withdrawals', value: stats.pending_withdrawals_count, icon: 'hourglass_top', color: 'bg-orange-400' },
     ];
 
     return (
