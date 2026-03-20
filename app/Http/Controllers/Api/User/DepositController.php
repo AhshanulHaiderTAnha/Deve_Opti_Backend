@@ -40,6 +40,18 @@ class DepositController extends Controller
             'comments' => 'nullable|string'
         ]);
 
+        $isValidAmount = \App\Models\DepositPlanLevel::where('deposit_plan_id', $request->deposit_plan_id)
+            ->where('status', 'active')
+            ->where('amount', $request->amount)
+            ->exists();
+
+        if (!$isValidAmount) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The provided amount does not match any valid investment tier for the selected deposit plan.'
+            ], 422);
+        }
+
         $data = $request->except('screenshot');
         $data['user_id'] = auth()->id();
         $data['status'] = 'pending';
