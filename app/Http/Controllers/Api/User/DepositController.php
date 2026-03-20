@@ -62,4 +62,27 @@ class DepositController extends Controller
             'data' => $deposit
         ]);
     }
+
+    public function destroy($id)
+    {
+        $deposit = DepositRequest::where('user_id', auth()->id())->findOrFail($id);
+        
+        if ($deposit->status !== 'pending') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only pending deposit requests can be deleted.'
+            ], 400);
+        }
+
+        if ($deposit->screenshot_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($deposit->screenshot_path);
+        }
+
+        $deposit->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deposit request deleted successfully.'
+        ]);
+    }
 }

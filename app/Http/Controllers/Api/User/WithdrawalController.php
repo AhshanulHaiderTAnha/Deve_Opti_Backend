@@ -70,4 +70,23 @@ class WithdrawalController extends Controller
             'data' => $withdrawal
         ]);
     }
+
+    public function destroy($id)
+    {
+        $withdrawal = WithdrawalRequest::where('user_id', auth()->id())->findOrFail($id);
+        
+        if ($withdrawal->status !== 'pending') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only pending withdrawal requests can be deleted.'
+            ], 400);
+        }
+
+        $withdrawal->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Withdrawal request deleted successfully.'
+        ]);
+    }
 }

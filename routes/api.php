@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\User\DepositPlanController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\SupportTicketController;
 use App\Http\Controllers\Api\Public\PublicController;
+use App\Http\Controllers\Api\User\WalletController;
+use App\Http\Controllers\Api\User\DepositController;
+use App\Http\Controllers\Api\User\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,14 +63,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('support-tickets',        [SupportTicketController::class, 'store']);
         Route::get('support-tickets/{ticket_id}', [SupportTicketController::class, 'show']);
         Route::post('support-tickets/{ticket_id}/reply', [SupportTicketController::class, 'reply']);
-
         // Wallet System
-        Route::get('wallet',                  [\App\Http\Controllers\Api\User\WalletController::class, 'show']);
-        Route::get('wallet/transactions',     [\App\Http\Controllers\Api\User\WalletController::class, 'transactions']);
-        Route::get('deposits',                [\App\Http\Controllers\Api\User\DepositController::class, 'index']);
-        Route::post('deposits',               [\App\Http\Controllers\Api\User\DepositController::class, 'store']);
-        Route::get('withdrawals',             [\App\Http\Controllers\Api\User\WithdrawalController::class, 'index']);
-        Route::post('withdrawals',            [\App\Http\Controllers\Api\User\WithdrawalController::class, 'store']);
+        Route::get('wallet',                  [WalletController::class, 'show']);
+        Route::get('wallet/transactions',     [WalletController::class, 'transactions']);
+        Route::get('deposits',                [DepositController::class, 'index']);
+        Route::post('deposits',               [DepositController::class, 'store']);
+        Route::delete('deposits/{id}',        [DepositController::class, 'destroy']);
+        Route::get('withdrawals',             [WithdrawalController::class, 'index']);
+        Route::post('withdrawals',            [WithdrawalController::class, 'store']);
+        Route::delete('withdrawals/{id}',     [WithdrawalController::class, 'destroy']);
     });
 
     // Admin Routes
