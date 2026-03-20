@@ -40,8 +40,7 @@ class DepositPlanController extends Controller
             'benefits' => 'nullable|array',
             'benefits.*' => 'required|string|max:255',
             'levels' => 'required|array|min:1',
-            'levels.*.min_amount' => 'required|numeric|min:0',
-            'levels.*.max_amount' => 'required|numeric|min:0|gte:levels.*.min_amount',
+            'levels.*.amount' => 'required|numeric|min:0',
             'levels.*.profit_value' => 'required|numeric|min:0',
             'levels.*.profit_type' => 'required|in:fixed,percentage',
         ]);
@@ -82,8 +81,7 @@ class DepositPlanController extends Controller
             'benefits' => 'nullable|array',
             'benefits.*' => 'required|string|max:255',
             'levels' => 'required|array|min:1',
-            'levels.*.min_amount' => 'required|numeric|min:0',
-            'levels.*.max_amount' => 'required|numeric|min:0|gte:levels.*.min_amount',
+            'levels.*.amount' => 'required|numeric|min:0',
             'levels.*.profit_value' => 'required|numeric|min:0',
             'levels.*.profit_type' => 'required|in:fixed,percentage',
         ]);

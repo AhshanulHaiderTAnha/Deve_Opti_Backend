@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DepositPlanLevel extends Model
 {
-    protected $fillable = ['deposit_plan_id', 'min_amount', 'max_amount', 'profit_value', 'profit_type', 'status'];
+    protected $fillable = ['deposit_plan_id', 'amount', 'profit_value', 'profit_type', 'status'];
 
     public function plan()
     {

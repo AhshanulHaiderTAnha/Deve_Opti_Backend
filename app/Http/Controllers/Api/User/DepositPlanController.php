@@ -16,8 +16,8 @@ class DepositPlanController extends Controller
         $plans = DepositPlan::with([
                 'benefits' => fn ($q) => $q->where('status', 'active')->select('id', 'deposit_plan_id', 'benefit_text'),
                 'levels'   => fn ($q) => $q->where('status', 'active')
-                                           ->select('id', 'deposit_plan_id', 'min_amount', 'max_amount', 'profit_value', 'profit_type')
-                                           ->orderBy('min_amount'),
+                                           ->select('id', 'deposit_plan_id', 'amount', 'profit_value', 'profit_type')
+                                           ->orderBy('amount'),
             ])
             ->where('status', 'published')
             ->latest()
@@ -39,8 +39,8 @@ class DepositPlanController extends Controller
             $plan = DepositPlan::with([
                     'benefits' => fn ($q) => $q->where('status', 'active')->select('id', 'deposit_plan_id', 'benefit_text'),
                     'levels'   => fn ($q) => $q->where('status', 'active')
-                                               ->select('id', 'deposit_plan_id', 'min_amount', 'max_amount', 'profit_value', 'profit_type')
-                                               ->orderBy('min_amount'),
+                                               ->select('id', 'deposit_plan_id', 'amount', 'profit_value', 'profit_type')
+                                               ->orderBy('amount'),
                 ])
                 ->where('slug', $slug)
                 ->where('status', 'published')
@@ -75,8 +75,7 @@ class DepositPlanController extends Controller
             'benefits'      => $plan->benefits->pluck('benefit_text'),
             'levels'        => $plan->levels->map(fn ($l) => [
                 'id'          => $l->id,
-                'min_amount'  => (float) $l->min_amount,
-                'max_amount'  => (float) $l->max_amount,
+                'amount'      => (float) $l->amount,
                 'profit_value'=> (float) $l->profit_value,
                 'profit_type' => $l->profit_type,
             ]),

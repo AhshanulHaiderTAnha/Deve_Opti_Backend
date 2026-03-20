@@ -15,7 +15,7 @@ export default function DepositPlanIndex({ plans, filters }) {
         status: 'published',
         image: null,
         benefits: [''],
-        levels: [{ min_amount: '', max_amount: '', profit_value: '', profit_type: 'percentage' }],
+        levels: [{ amount: '', profit_value: '', profit_type: 'percentage' }],
     });
 
     const openModal = (plan = null) => {
@@ -29,11 +29,10 @@ export default function DepositPlanIndex({ plans, filters }) {
                 image: null,
                 benefits: plan.benefits?.length > 0 ? plan.benefits.map(b => b.benefit_text) : [''],
                 levels: plan.levels?.length > 0 ? plan.levels.map(l => ({
-                    min_amount: l.min_amount,
-                    max_amount: l.max_amount,
+                    amount: l.amount,
                     profit_value: l.profit_value,
                     profit_type: l.profit_type
-                })) : [{ min_amount: '', max_amount: '', profit_value: '', profit_type: 'percentage' }],
+                })) : [{ amount: '', profit_value: '', profit_type: 'percentage' }],
             });
         } else {
             setEditingPlan(null);
@@ -55,7 +54,7 @@ export default function DepositPlanIndex({ plans, filters }) {
         setData('benefits', newBenefits);
     };
 
-    const addLevel = () => setData('levels', [...data.levels, { min_amount: '', max_amount: '', profit_value: '', profit_type: 'percentage' }]);
+    const addLevel = () => setData('levels', [...data.levels, { amount: '', profit_value: '', profit_type: 'percentage' }]);
     const removeLevel = (index) => {
         const newLevels = [...data.levels];
         newLevels.splice(index, 1);
@@ -139,7 +138,7 @@ export default function DepositPlanIndex({ plans, filters }) {
                         <h1 className="text-2xl font-black tracking-tight text-gray-900">Deposit Plans</h1>
                         <p className="text-gray-500 font-medium">Configure investment tiers and dynamic levels.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => openModal()}
                         className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold flex items-center shadow-lg transition-all hover:-translate-y-0.5"
                     >
@@ -151,7 +150,7 @@ export default function DepositPlanIndex({ plans, filters }) {
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
                     <form onSubmit={handleSearch} className="relative w-full md:w-96">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
-                        <input 
+                        <input
                             type="text"
                             placeholder="Search plans..."
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
@@ -198,7 +197,7 @@ export default function DepositPlanIndex({ plans, filters }) {
                                     <div className="space-y-2">
                                         {plan.levels?.slice(0, 3).map((level, idx) => (
                                             <div key={idx} className="flex justify-between items-center text-xs font-bold">
-                                                <span className="text-gray-500">${level.min_amount} - ${level.max_amount}</span>
+                                                <span className="text-gray-500">${level.amount} Fixed</span>
                                                 <span className="text-orange-600">{level.profit_type === 'percentage' ? `${level.profit_value}%` : `$${level.profit_value}`}</span>
                                             </div>
                                         ))}
@@ -218,11 +217,10 @@ export default function DepositPlanIndex({ plans, filters }) {
                                 key={i}
                                 onClick={() => router.visit(link.url)}
                                 disabled={!link.url || link.active}
-                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                                    link.active ? 'bg-gray-900 text-white' : 
+                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
                                     !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                    'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
-                                }`}
+                                        'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
@@ -279,16 +277,10 @@ export default function DepositPlanIndex({ plans, filters }) {
                                             <div className="space-y-3">
                                                 {data.levels.map((level, index) => (
                                                     <div key={index} className="grid grid-cols-1 md:grid-cols-9 gap-3 items-center bg-gray-50 p-4 rounded-3xl group animate-in slide-in-from-left-2 duration-200">
-                                                        <div className="md:col-span-2">
+                                                        <div className="md:col-span-4">
                                                             <div className="relative">
                                                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-xs">$</span>
-                                                                <input type="number" placeholder="Min" className="w-full pl-8 pr-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs" value={level.min_amount} onChange={e => handleLevelChange(index, 'min_amount', e.target.value)} />
-                                                            </div>
-                                                        </div>
-                                                        <div className="md:col-span-2">
-                                                            <div className="relative">
-                                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-xs">$</span>
-                                                                <input type="number" placeholder="Max" className="w-full pl-8 pr-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs" value={level.max_amount} onChange={e => handleLevelChange(index, 'max_amount', e.target.value)} />
+                                                                <input type="number" placeholder="Fixed Amount" className="w-full pl-8 pr-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs" value={level.amount} onChange={e => handleLevelChange(index, 'amount', e.target.value)} />
                                                             </div>
                                                         </div>
                                                         <div className="md:col-span-2">
