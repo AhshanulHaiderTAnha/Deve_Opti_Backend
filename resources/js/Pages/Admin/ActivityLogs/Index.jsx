@@ -65,7 +65,7 @@ export default function ActivityLogIndex({ logs, filters }) {
                         <h1 className="text-2xl font-black tracking-tight text-gray-900">Activity Logs</h1>
                         <p className="text-gray-500 font-medium">Monitor user interactions and system events.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={clearOldLogs}
                         className="px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl font-bold flex items-center transition-all"
                     >
@@ -77,7 +77,7 @@ export default function ActivityLogIndex({ logs, filters }) {
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
                     <form onSubmit={handleSearch} className="relative w-full md:w-96">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
-                        <input 
+                        <input
                             type="text"
                             placeholder="Search by user, email or action..."
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
@@ -127,7 +127,7 @@ export default function ActivityLogIndex({ logs, filters }) {
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col">
                                                 <span className="text-gray-900 text-xs">{new Date(log.created_at).toLocaleDateString()}</span>
-                                                <span className="text-gray-400 text-[10px]">{new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                                <span className="text-gray-400 text-[10px]">{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5 text-right">
@@ -155,11 +155,10 @@ export default function ActivityLogIndex({ logs, filters }) {
                                 key={i}
                                 onClick={() => router.visit(link.url)}
                                 disabled={!link.url || link.active}
-                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                                    link.active ? 'bg-gray-900 text-white' : 
-                                    !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                    'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
+                                        !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
+                                            'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
