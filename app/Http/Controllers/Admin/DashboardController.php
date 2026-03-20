@@ -49,6 +49,30 @@ class DashboardController extends Controller
                 'submitted'  => $k->created_at->diffForHumans(),
             ]);
 
-        return Inertia::render('Admin/Dashboard', compact('stats', 'recentActivity'));
+        $recentDeposits = DepositRequest::with('user')
+            ->where('status', 'pending')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($d) => [
+                'id'         => $d->id,
+                'user_name'  => $d->user->name,
+                'amount'     => $d->amount,
+                'submitted'  => $d->created_at->diffForHumans(),
+            ]);
+
+        $recentWithdrawals = WithdrawalRequest::with('user')
+            ->where('status', 'pending')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($w) => [
+                'id'         => $w->id,
+                'user_name'  => $w->user->name,
+                'amount'     => $w->amount,
+                'submitted'  => $w->created_at->diffForHumans(),
+            ]);
+
+        return Inertia::render('Admin/Dashboard', compact('stats', 'recentActivity', 'recentDeposits', 'recentWithdrawals'));
     }
 }
