@@ -4,6 +4,14 @@ import { Link, usePage } from '@inertiajs/react';
 export default function AdminLayout({ children }) {
     const { auth, settings } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [openSubmenus, setOpenSubmenus] = useState({});
+
+    const toggleSubmenu = (name) => {
+        setOpenSubmenus(prev => ({
+            ...prev,
+            [name]: !prev[name]
+        }));
+    };
 
     const navigation = [
         { name: 'Dashboard', href: route('admin.dashboard'), current: route().current('admin.dashboard'), icon: 'dashboard' },
@@ -11,8 +19,15 @@ export default function AdminLayout({ children }) {
         { name: 'KYC Review', href: route('admin.kyc.index'), current: route().current('admin.kyc.*'), icon: 'verified_user' },
         { name: 'Sellers', href: route('admin.sellers.index'), current: route().current('admin.sellers.*'), icon: 'storefront' },
         { name: 'Products', href: route('admin.products.index'), current: route().current('admin.products.*'), icon: 'inventory_2' },
-        { name: 'Payments Gateway', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'payments' },
-        { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
+        {
+            name: 'Payments',
+            icon: 'payments',
+            current: route().current('admin.payment-methods.*') || route().current('admin.deposit-plans.*'),
+            children: [
+                { name: 'Payment Gateways', href: route('admin.payment-methods.index'), current: route().current('admin.payment-methods.*'), icon: 'settings_input_component' },
+                { name: 'Deposit Plans', href: route('admin.deposit-plans.index'), current: route().current('admin.deposit-plans.*'), icon: 'account_balance' },
+            ]
+        },
         { name: 'Wallets', href: route('admin.wallets.index'), current: route().current('admin.wallets.*'), icon: 'account_balance_wallet' },
         { name: 'Deposits', href: route('admin.deposits.index'), current: route().current('admin.deposits.*'), icon: 'file_download' },
         { name: 'Withdrawals', href: route('admin.withdrawals.index'), current: route().current('admin.withdrawals.*'), icon: 'file_upload' },
@@ -23,9 +38,6 @@ export default function AdminLayout({ children }) {
         { name: 'Announcements', href: route('admin.announcements.index'), current: route().current('admin.announcements.*'), icon: 'campaign' },
         { name: 'Activity Logs', href: route('admin.activity-logs.index'), current: route().current('admin.activity-logs.*'), icon: 'history' },
         { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
-
-
-
     ];
 
     return (
@@ -46,15 +58,48 @@ export default function AdminLayout({ children }) {
 
                 <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto custom-scrollbar">
                     {navigation.map((item) => (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`flex items-center p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'
-                                }`}
-                        >
-                            <span className="material-icons-outlined text-xl">{item.icon}</span>
-                            {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
-                        </Link>
+                        <div key={item.name}>
+                            {item.children ? (
+                                <>
+                                    <button
+                                        onClick={() => toggleSubmenu(item.name)}
+                                        className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    >
+                                        <div className="flex items-center">
+                                            <span className="material-icons-outlined text-xl">{item.icon}</span>
+                                            {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
+                                        </div>
+                                        {isSidebarOpen && (
+                                            <span className={`material-icons-outlined text-sm transition-transform ${openSubmenus[item.name] || item.current ? 'rotate-180' : ''}`}>
+                                                expand_more
+                                            </span>
+                                        )}
+                                    </button>
+                                    {(openSubmenus[item.name] || item.current) && isSidebarOpen && (
+                                        <div className="ml-4 mt-2 space-y-1 border-l-2 border-orange-100 pl-2">
+                                            {item.children.map((child) => (
+                                                <Link
+                                                    key={child.name}
+                                                    href={child.href}
+                                                    className={`flex items-center p-2 rounded-lg text-sm transition-colors ${child.current ? 'text-orange-600 font-bold' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50'}`}
+                                                >
+                                                    <span className="material-icons-outlined text-lg mr-3">{child.icon}</span>
+                                                    {child.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <Link
+                                    href={item.href}
+                                    className={`flex items-center p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    <span className="material-icons-outlined text-xl">{item.icon}</span>
+                                    {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
+                                </Link>
+                            )}
+                        </div>
                     ))}
                 </nav>
 
