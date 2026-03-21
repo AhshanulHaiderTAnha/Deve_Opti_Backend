@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Swal from 'sweetalert2';
-import Select from 'react-select'; // Need to make generic select or native multi-select, will use a native multi-select for simplicity to avoid installing dependencies unless user allows it.
 
 export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -19,7 +19,7 @@ class UserTaskController extends Controller
             'assignments' => UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type'])
                 ->latest()
                 ->paginate(15),
-            'users' => User::where('role', 'user')->get(['id', 'name', 'email']),
+            'users' => User::role('user')->get(['id', 'name', 'email']),
             'tasks' => OrderTask::where('status', 'active')->get(['id', 'title', 'required_orders', 'commission_type'])
         ]);
     }
