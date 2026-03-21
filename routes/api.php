@@ -62,6 +62,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Deposit Plans
         Route::get('deposit-plans',         [DepositPlanController::class, 'index']);
         Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
+        
+        // Order Tasks
+        Route::get('tasks/active', [\App\Http\Controllers\Api\User\UserTaskController::class, 'getActiveTask']);
+        Route::post('tasks/{id}/process-order', [\App\Http\Controllers\Api\User\UserTaskController::class, 'processOrder']);
+        Route::post('tasks/{id}/submit', [\App\Http\Controllers\Api\User\UserTaskController::class, 'submitTask']);
         Route::get('commission-tiers',      [CommissionTierController::class, 'index']);
         // Support Tickets
         Route::get('support-tickets',         [SupportTicketController::class, 'index']);

@@ -39,6 +39,15 @@ export default function AdminLayout({ children }) {
                 { name: 'Withdrawals', href: route('admin.withdrawals.index'), current: route().current('admin.withdrawals.*'), icon: 'file_upload' },
             ]
         },
+        {
+            name: 'Tasks & Orders',
+            icon: 'assignment',
+            current: route().current('admin.order-tasks.*') || route().current('admin.user-tasks.*'),
+            children: [
+                { name: 'Task Templates', href: route('admin.order-tasks.index'), current: route().current('admin.order-tasks.*'), icon: 'format_list_bulleted' },
+                { name: 'User Assignments', href: route('admin.user-tasks.index'), current: route().current('admin.user-tasks.*'), icon: 'assignment_ind' },
+            ]
+        },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
         { name: 'Success Stories', href: route('admin.success-stories.index'), current: route().current('admin.success-stories.*'), icon: 'auto_awesome' },
         { name: 'FAQs', href: route('admin.faqs.index'), current: route().current('admin.faqs.*'), icon: 'quiz' },

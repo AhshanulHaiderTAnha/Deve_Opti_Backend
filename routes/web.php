@@ -57,6 +57,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
         // Commission Tiers Management
         Route::resource('commission-tiers', \App\Http\Controllers\Admin\CommissionTierController::class)->except(['create', 'edit', 'show']);
+        // Order Tasks System
+        Route::resource('order-tasks', \App\Http\Controllers\Admin\OrderTaskController::class)->except(['create', 'edit', 'show']);
+        Route::resource('user-tasks', \App\Http\Controllers\Admin\UserTaskController::class)->only(['index', 'store', 'destroy']);
+        
         // Support Tickets
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
         Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
