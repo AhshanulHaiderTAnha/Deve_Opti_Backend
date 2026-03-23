@@ -63,12 +63,26 @@ class UserController extends Controller
             ->paginate(5, ['*'], 'withdrawals_page')
             ->withQueryString();
 
+        $userTasks = \App\Models\UserTask::with(['orderTask:id,title,required_orders,commission_type'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->paginate(5, ['*'], 'tasks_page')
+            ->withQueryString();
+
+        $taskStats = [
+            'running' => \App\Models\UserTask::where('user_id', $user->id)->where('status', 'in_progress')->count(),
+            'completed' => \App\Models\UserTask::where('user_id', $user->id)->where('status', 'completed')->count(),
+            'earned_commission' => \App\Models\UserTask::where('user_id', $user->id)->where('status', 'completed')->sum('total_earned_commission'),
+        ];
+
         return Inertia::render('Admin/Users/Show', [
             'user'       => new UserResource($user),
             'wallet'     => $user->wallet,
             'activities' => $activities,
             'deposits'   => $deposits,
             'withdrawals'=> $withdrawals,
+            'userTasks'  => $userTasks,
+            'taskStats'  => $taskStats,
         ]);
     }
 

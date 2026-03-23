@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function UserShow({ user: userWrap, activities, wallet, deposits, withdrawals }) {
+export default function UserShow({ user: userWrap, activities, wallet, deposits, withdrawals, userTasks, taskStats }) {
     const user = userWrap.data;
 
     return (
@@ -59,6 +59,25 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                             </div>
                         </div>
 
+                        {/* Task Statistics */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-sky-500 rounded-[2.5rem] p-8 text-white shadow-lg shadow-sky-100/50 flex flex-col justify-center items-center text-center">
+                                <span className="material-icons-outlined text-4xl mb-4 text-white/80">directions_run</span>
+                                <h4 className="text-[10px] font-black tracking-widest uppercase mb-1 text-sky-100">Running Tasks</h4>
+                                <div className="text-4xl font-black">{taskStats?.running || 0}</div>
+                            </div>
+                            <div className="bg-indigo-500 rounded-[2.5rem] p-8 text-white shadow-lg shadow-indigo-100/50 flex flex-col justify-center items-center text-center">
+                                <span className="material-icons-outlined text-4xl mb-4 text-white/80">task_alt</span>
+                                <h4 className="text-[10px] font-black tracking-widest uppercase mb-1 text-indigo-100">Completed Tasks</h4>
+                                <div className="text-4xl font-black">{taskStats?.completed || 0}</div>
+                            </div>
+                            <div className="bg-emerald-500 rounded-[2.5rem] p-8 text-white shadow-lg shadow-emerald-100/50 flex flex-col justify-center items-center text-center">
+                                <span className="material-icons-outlined text-4xl mb-4 text-white/80">monetization_on</span>
+                                <h4 className="text-[10px] font-black tracking-widest uppercase mb-1 text-emerald-100">Task Earnings</h4>
+                                <div className="text-4xl font-black tracking-tighter">${parseFloat(taskStats?.earned_commission || 0).toFixed(2)}</div>
+                            </div>
+                        </div>
+
                         {/* Recent Activity Log */}
                         <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-50 overflow-hidden">
                             <div className="p-10 border-b border-slate-50">
@@ -104,6 +123,57 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                         )}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+
+                        {/* User Tasks History List */}
+                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-50 overflow-hidden">
+                            <div className="p-10 border-b border-slate-50 flex justify-between items-center">
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">Task History</h3>
+                                <Link href={route('admin.user-tasks.index')} className="text-blue-600 text-xs font-bold uppercase tracking-wider hover:underline">Manage All Tasks</Link>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-50">
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Task Details</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Progress</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Commission</th>
+                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {userTasks?.data?.length > 0 ? userTasks.data.map((t) => (
+                                            <tr key={t.id} className="hover:bg-slate-50/30 transition-colors">
+                                                <td className="px-10 py-5">
+                                                    <div className="font-bold text-slate-700 text-sm tracking-tight">{t.order_task?.title}</div>
+                                                    <div className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mt-1">{t.order_task?.commission_type}</div>
+                                                </td>
+                                                <td className="px-10 py-5 text-center">
+                                                    <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-md text-xs font-black tracking-widest">
+                                                        {t.completed_orders} / {t.order_task?.required_orders}
+                                                    </span>
+                                                </td>
+                                                <td className="px-10 py-5 text-emerald-600 font-black text-right tracking-tight">
+                                                    +${parseFloat(t.total_earned_commission).toFixed(2)}
+                                                </td>
+                                                <td className="px-10 py-5 text-right flex justify-end">
+                                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter flex items-center w-fit ${t.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'}`}>
+                                                        {t.status === 'in_progress' && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 mr-2 animate-pulse"></span>}
+                                                        {t.status.replace('_', ' ')}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        )) : (
+                                            <tr><td colSpan="4" className="p-10 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No assigned tasks found</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div className="p-5 flex flex-wrap justify-center gap-2 border-t border-slate-50">
+                                    {userTasks?.links?.map((link, i) => (
+                                        <Link key={i} href={link.url || '#'} className={`px-3 py-1 rounded-lg text-xs font-bold ${link.active ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'} ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
