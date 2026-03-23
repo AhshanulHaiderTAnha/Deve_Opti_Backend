@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\User\WithdrawalController;
 use App\Http\Controllers\Api\User\AnnouncementController;
 use App\Http\Controllers\Api\User\ActivityLogController;
 use App\Http\Controllers\Api\User\CommissionTierController;
+use App\Http\Controllers\Api\User\UserTaskController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -47,7 +48,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('auth/profile', [AuthController::class, 'updateProfile']);
     Route::patch('auth/change-password', [AuthController::class, 'changePassword']);
     Route::post('auth/profile-image', [AuthController::class, 'updateProfileImage']);
-
     // User Routes
     Route::prefix('user')->middleware('role:user')->group(function () {
         Route::get('profile',           [AuthController::class, 'me']);
@@ -62,11 +62,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Deposit Plans
         Route::get('deposit-plans',         [DepositPlanController::class, 'index']);
         Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
-        
         // Order Tasks
-        Route::get('tasks/active', [\App\Http\Controllers\Api\User\UserTaskController::class, 'getActiveTask']);
-        Route::post('tasks/{id}/process-order', [\App\Http\Controllers\Api\User\UserTaskController::class, 'processOrder']);
-        Route::post('tasks/{id}/submit', [\App\Http\Controllers\Api\User\UserTaskController::class, 'submitTask']);
+        Route::get('tasks/active', [UserTaskController::class, 'getActiveTask']);
+        Route::post('tasks/{id}/process-order', [UserTaskController::class, 'processOrder']);
+        Route::post('tasks/{id}/submit', [UserTaskController::class, 'submitTask']);
         Route::get('commission-tiers',      [CommissionTierController::class, 'index']);
         // Support Tickets
         Route::get('support-tickets',         [SupportTicketController::class, 'index']);
@@ -92,18 +91,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Admin Routes
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('dashboard',         [DashboardController::class, 'stats']);
-
         // User management
         Route::get('users',             [AdminUserController::class, 'index']);
         Route::get('users/{id}',        [AdminUserController::class, 'show']);
         Route::patch('users/{id}/status', [AdminUserController::class, 'updateStatus']);
-
         // KYC management
         Route::get('kyc-list',          [AdminKycController::class, 'index']);
         Route::get('kyc/{id}',          [AdminKycController::class, 'show']);
         Route::post('kyc-approve/{id}', [AdminKycController::class, 'approve']);
         Route::post('kyc-reject/{id}',  [AdminKycController::class, 'reject']);
-
         // Secure KYC document download
         Route::get('kyc/{id}/document/{type}', function (int $id, string $type) {
             $kyc  = \App\Models\KycSubmission::findOrFail($id);

@@ -24,6 +24,7 @@ class SettingSeeder extends Seeder
             ['key' => 'meta_title', 'value' => 'Deve Opti - Next Gen Logistics', 'group' => 'seo', 'type' => 'string'],
             ['key' => 'meta_description', 'value' => 'Advanced logistics and e-commerce management platform.', 'group' => 'seo', 'type' => 'text'],
             ['key' => 'meta_keywords', 'value' => 'logistics, shipping, e-commerce, kyc', 'group' => 'seo', 'type' => 'string'],
+            ['key' => 'google_analytics_id', 'value' => 'G-XXXXXXXXXX', 'group' => 'seo', 'type' => 'string'],
             
             // Email
             ['key' => 'mail_from_name', 'value' => 'Deve Opti Support', 'group' => 'email', 'type' => 'string'],
