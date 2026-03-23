@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function AdminLayout({ children }) {
     const { auth, settings } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [openSubmenus, setOpenSubmenus] = useState({});
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsProfileDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const toggleSubmenu = (name) => {
         setOpenSubmenus(prev => ({
@@ -147,14 +159,50 @@ export default function AdminLayout({ children }) {
                         <span className="material-icons-outlined text-2xl">menu</span>
                     </button>
 
-                    <div className="flex items-center space-x-4">
-                        <div className="text-right">
-                            <p className="text-sm font-semibold text-gray-900">{auth?.user?.name || 'Admin User'}</p>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider">{auth?.user?.role || 'Administrator'}</p>
-                        </div>
-                        <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold border border-orange-200">
-                            {auth?.user?.name?.[0] || 'A'}
-                        </div>
+                    <div className="flex items-center space-x-4 relative" ref={dropdownRef}>
+                        <button
+                            onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                            className="flex items-center space-x-3 focus:outline-none hover:bg-gray-50 p-2 rounded-xl transition-colors"
+                        >
+                            <div className="text-right hidden sm:block">
+                                <p className="text-sm font-semibold text-gray-900">{auth?.user?.name || 'Admin User'}</p>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{auth?.user?.role || 'Administrator'}</p>
+                            </div>
+                            <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold border border-orange-200">
+                                {auth?.user?.name?.[0] || 'A'}
+                            </div>
+                            <span className="material-icons-outlined text-gray-400 text-sm">expand_more</span>
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isProfileDropdownOpen && (
+                            <div className="absolute top-[110%] right-0 mt-1 w-48 bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 py-2 z-50">
+                                <div className="px-4 py-3 border-b border-gray-100 sm:hidden">
+                                    <p className="text-sm font-semibold text-gray-900 truncate">{auth?.user?.name || 'Admin User'}</p>
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest truncate">{auth?.user?.role || 'Administrator'}</p>
+                                </div>
+
+                                <Link
+                                    href={route('admin.settings.index')}
+                                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                                >
+                                    <span className="material-icons-outlined text-lg mr-3">settings</span>
+                                    Settings
+                                </Link>
+
+                                <div className="border-t border-gray-100 my-1"></div>
+
+                                <Link
+                                    href={route('admin.logout')}
+                                    method="post"
+                                    as="button"
+                                    className="w-full flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <span className="material-icons-outlined text-lg mr-3">logout</span>
+                                    Logout
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </header>
 
