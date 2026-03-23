@@ -121,7 +121,7 @@ export default function ProductIndex({ products, filters }) {
                 </div>
 
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <form onSubmit={handleSearch} className="relative w-full md:w-96">
+                    <form onSubmit={handleSearch} className="relative w-full md:max-w-md">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
                         <input
                             type="text"
@@ -131,10 +131,10 @@ export default function ProductIndex({ products, filters }) {
                             onChange={e => setSearchQuery(e.target.value)}
                         />
                     </form>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                         <select
-                            className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs appearance-none"
-                            onChange={e => router.get(route('admin.products.index'), { platform: e.target.value }, { preserveState: true })}
+                            className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs appearance-none uppercase tracking-wider text-gray-700"
+                            onChange={e => router.get(route('admin.products.index'), { ...filters, platform: e.target.value }, { preserveState: true })}
                             value={filters.platform || ''}
                         >
                             <option value="">All Platforms</option>
@@ -143,6 +143,13 @@ export default function ProductIndex({ products, filters }) {
                             <option value="AliExpress">AliExpress</option>
                             <option value="Other">Other</option>
                         </select>
+                        <a
+                            href={route('admin.products.export', filters)}
+                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold rounded-2xl transition-all uppercase tracking-wider text-xs"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            Export CSV
+                        </a>
                     </div>
                 </div>
 

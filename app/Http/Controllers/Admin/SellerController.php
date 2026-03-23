@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class SellerController extends Controller
 {
-    public function index(Request $request)
+    protected function getFilteredSellersQuery(Request $request)
     {
         $query = Seller::query();
 
@@ -19,10 +19,49 @@ class SellerController extends Controller
                   ->orWhere('email', 'like', '%' . $request->search . '%');
         }
 
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
         return Inertia::render('Admin/Sellers/Index', [
-            'sellers' => $query->latest()->paginate(10)->withQueryString(),
+            'sellers' => $this->getFilteredSellersQuery($request)->latest()->paginate(10)->withQueryString(),
             'filters' => $request->only(['search'])
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $sellers = $this->getFilteredSellersQuery($request)->latest()->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=sellers_export_" . date('Y-m-d_H-i-s') . ".csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['ID', 'Name', 'Email', 'Status', 'Registered Date'];
+
+        $callback = function() use($sellers, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($sellers as $seller) {
+                fputcsv($file, [
+                    $seller->id,
+                    $seller->name,
+                    $seller->email,
+                    $seller->status,
+                    $seller->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function store(Request $request)

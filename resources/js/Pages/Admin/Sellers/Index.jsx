@@ -100,17 +100,24 @@ export default function SellerIndex({ sellers, filters }) {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="relative max-w-md">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="relative w-full md:max-w-md">
                         <span className="material-icons-outlined absolute left-4 top-3.5 text-gray-400">search</span>
                         <input
                             type="text"
                             placeholder="Search sellers by name or email..."
-                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-sm"
                             value={filters.search || ''}
                             onChange={e => router.get(route('admin.sellers.index'), { search: e.target.value }, { preserveState: true })}
                         />
                     </div>
+                    <a
+                        href={route('admin.sellers.export', filters)}
+                        className="w-full md:w-auto flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold rounded-xl transition-all uppercase tracking-wider text-xs"
+                    >
+                        <span className="material-icons-outlined mr-2 text-sm">download</span>
+                        Export CSV
+                    </a>
                 </div>
 
                 {/* Table */}

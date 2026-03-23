@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    protected function getFilteredProductsQuery(Request $request)
     {
         $query = Product::query();
 
@@ -27,10 +27,54 @@ class ProductController extends Controller
             $query->where('platform', $request->platform);
         }
 
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
         return Inertia::render('Admin/Products/Index', [
-            'products' => $query->latest()->paginate(10)->withQueryString(),
+            'products' => $this->getFilteredProductsQuery($request)->latest()->paginate(10)->withQueryString(),
             'filters' => $request->only(['search', 'platform'])
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $products = $this->getFilteredProductsQuery($request)->latest()->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=products_export_" . date('Y-m-d_H-i-s') . ".csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['ID', 'Title', 'Platform', 'SKU', 'Target Keyword', 'Base Price ($)', 'Compare At Price ($)', 'Stock', 'Status', 'Created Date'];
+
+        $callback = function() use($products, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($products as $product) {
+                fputcsv($file, [
+                    $product->id,
+                    $product->title,
+                    $product->platform,
+                    $product->sku ?? 'N/A',
+                    $product->target_keyword ?? 'N/A',
+                    $product->price,
+                    $product->compare_at_price ?? 'N/A',
+                    $product->stock_quantity,
+                    $product->status,
+                    $product->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function store(Request $request)
