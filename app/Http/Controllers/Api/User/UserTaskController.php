@@ -164,11 +164,12 @@ class UserTaskController extends Controller
             $wallet->increment('balance', $userTask->total_earned_commission);
             
             // Log user activity
-            log_user_activity(
-                $request->user(),
-                'Task Completed',
-                "Completed task '{$userTask->orderTask->title}' and earned $" . number_format($userTask->total_earned_commission, 2)
-            );
+            \App\Models\UserActivityLog::create([
+                'user_id' => $request->user()->id,
+                'action' => 'Task Completed',
+                'details' => "Completed task '{$userTask->orderTask->title}' and earned $" . number_format($userTask->total_earned_commission, 2),
+                'ip_address' => $request->ip()
+            ]);
 
             // Dispatch Emails
             try {

@@ -57,11 +57,12 @@ class UserTaskController extends Controller
             // Mute email errors
         }
 
-        log_user_activity(
-            $user,
-            'Task Assigned',
-            "Admin assigned you the task: {$userTask->orderTask->title}. Complete all {$userTask->orderTask->required_orders} orders to earn your commission."
-        );
+        \App\Models\UserActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'Task Assigned',
+            'details' => "Admin assigned you the task: {$userTask->orderTask->title}. Complete all {$userTask->orderTask->required_orders} orders to earn your commission.",
+            'ip_address' => $request->ip()
+        ]);
 
         return back()->with('success', 'Task successfully assigned to user and notification sent.');
     }
