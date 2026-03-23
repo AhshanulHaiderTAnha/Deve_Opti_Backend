@@ -7,7 +7,7 @@ use App\Models\KycSubmission;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use Illuminate\Support\Facades\Artisan;
 use App\Models\DepositRequest;
 use App\Models\WithdrawalRequest;
 use App\Models\SupportTicket;
@@ -112,5 +112,11 @@ class DashboardController extends Controller
             ]);
 
         return Inertia::render('Admin/Dashboard', compact('stats', 'recentActivity', 'recentDeposits', 'recentWithdrawals', 'recentPendingTasks', 'recentCompletedTasks'));
+    }
+
+    public function clearCache()
+    {
+        Artisan::call('optimize:clear');
+        return back()->with('success', 'System cache cleared successfully!');
     }
 }

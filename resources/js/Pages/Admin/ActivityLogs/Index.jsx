@@ -23,7 +23,7 @@ export default function ActivityLogIndex({ logs, filters }) {
             return;
         }
         const diffTime = new Date(endDate).getTime() - new Date(startDate).getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         if (diffDays > 15 || diffDays < 0) {
             Swal.fire({
                 icon: 'error',
@@ -209,8 +209,8 @@ export default function ActivityLogIndex({ logs, filters }) {
                                 onClick={() => router.visit(link.url)}
                                 disabled={!link.url || link.active}
                                 className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
-                                        !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                            'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
+                                    !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
+                                        'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
                                     }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />

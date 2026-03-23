@@ -1,6 +1,7 @@
 import React from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import Swal from 'sweetalert2';
 
 export default function Dashboard({ stats, recentActivity, recentDeposits, recentWithdrawals, recentPendingTasks, recentCompletedTasks }) {
     const statCards = [
@@ -29,6 +30,40 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
         { label: 'Monthly Running', value: stats.monthly_running_tasks, icon: 'calendar_month', color: 'bg-sky-600' },
         { label: 'Monthly Completed', value: stats.monthly_completed_tasks, icon: 'fact_check', color: 'bg-violet-600' },
     ];
+
+    const handleClearCache = () => {
+        Swal.fire({
+            title: 'Clear System Cache?',
+            text: "This will clear all application, view, and route caches. Temporary performance drop might occur during rebuild.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, optimize system!',
+            customClass: {
+                popup: 'rounded-[1.5rem]',
+                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3',
+                cancelButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.post(route('admin.dashboard.clear-cache'), {}, {
+                    onSuccess: () => {
+                        Swal.fire({
+                            title: 'Optimized!',
+                            text: 'System cache has been cleared successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#10b981',
+                            customClass: {
+                                popup: 'rounded-[1.5rem]',
+                                confirmButton: 'rounded-xl font-black uppercase tracking-widest text-xs px-6 py-3'
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
 
     const RecentTable = ({ title, data, type, viewAllHref }) => (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
@@ -96,9 +131,10 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                         <p className="text-gray-500 font-medium">Monitoring platform health and user transactions.</p>
                     </div>
                     <div className="flex space-x-2">
-                        <span className="px-4 py-2 bg-white rounded-xl border border-gray-100 text-xs font-black text-gray-400 uppercase tracking-widest shadow-sm">
+                        <button onClick={handleClearCache} className="px-4 py-2 bg-white hover:bg-emerald-50 rounded-xl border border-gray-100 text-xs font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest shadow-sm transition-all flex items-center">
+                            <span className="material-icons-outlined text-sm mr-2">cleaning_services</span>
                             System Optimized
-                        </span>
+                        </button>
                     </div>
                 </div>
 

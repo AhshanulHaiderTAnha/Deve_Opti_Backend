@@ -36,6 +36,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/logout',        [AdminAuthController::class, 'logout'])->name('logout');
         Route::get('/dashboard',      [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/clear-cache', [DashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
         // User management
         Route::get('/users',          [UserController::class, 'index'])->name('users.index');
         Route::get('/users/export',   [UserController::class, 'export'])->name('users.export');
