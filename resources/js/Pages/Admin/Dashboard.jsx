@@ -4,6 +4,8 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import Swal from 'sweetalert2';
 
 export default function Dashboard({ stats, recentActivity, recentDeposits, recentWithdrawals, recentPendingTasks, recentCompletedTasks }) {
+    const [isOptimizing, setIsOptimizing] = React.useState(false);
+
     const statCards = [
         { label: 'Total Users', value: stats.total_users, icon: 'people', color: 'bg-orange-500' },
         { label: 'Total Sellers', value: stats.total_sellers, icon: 'storefront', color: 'bg-purple-500' },
@@ -47,7 +49,9 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                setIsOptimizing(true);
                 router.post(route('admin.dashboard.clear-cache'), {}, {
+                    onFinish: () => setIsOptimizing(false),
                     onSuccess: () => {
                         Swal.fire({
                             title: 'Optimized!',
@@ -131,9 +135,25 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                         <p className="text-gray-500 font-medium">Monitoring platform health and user transactions.</p>
                     </div>
                     <div className="flex space-x-2">
-                        <button onClick={handleClearCache} className="px-4 py-2 bg-white hover:bg-emerald-50 rounded-xl border border-gray-100 text-xs font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest shadow-sm transition-all flex items-center">
-                            <span className="material-icons-outlined text-sm mr-2">cleaning_services</span>
-                            System Optimized
+                        <button
+                            onClick={handleClearCache}
+                            disabled={isOptimizing}
+                            className={`px-4 py-2 bg-white hover:bg-emerald-50 rounded-xl border border-gray-100 text-xs font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest shadow-sm transition-all flex items-center ${isOptimizing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isOptimizing ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Optimizing...
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-icons-outlined text-sm mr-2">cleaning_services</span>
+                                    System Optimized
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

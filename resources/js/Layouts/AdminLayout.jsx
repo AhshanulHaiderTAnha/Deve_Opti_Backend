@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 
 export default function AdminLayout({ children }) {
     const { auth, settings } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [openSubmenus, setOpenSubmenus] = useState({});
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [globalLoading, setGlobalLoading] = useState(false);
     const dropdownRef = useRef(null);
 
     useEffect(() => {
@@ -14,8 +15,16 @@ export default function AdminLayout({ children }) {
                 setIsProfileDropdownOpen(false);
             }
         };
+
+        const unbindStart = router.on('start', () => setGlobalLoading(true));
+        const unbindFinish = router.on('finish', () => setGlobalLoading(false));
+
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            unbindStart();
+            unbindFinish();
+        };
     }, []);
 
     const toggleSubmenu = (name) => {
@@ -77,18 +86,47 @@ export default function AdminLayout({ children }) {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 flex relative">
+            {/* Global Loading Overlay */}
+            {globalLoading && (
+                <div className="fixed inset-0 z-[9999] bg-white/20 backdrop-blur-[2px] flex items-center justify-center transition-all">
+                    <div className="bg-white p-4 rounded-2xl shadow-xl shadow-gray-200/50 flex items-center space-x-3 border border-gray-100">
+                        <svg className="animate-spin h-5 w-5 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span className="text-xs font-black text-gray-900 uppercase tracking-widest">Processing...</span>
+                    </div>
+                </div>
+            )}
+
             {/* Sidebar */}
             <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shadow-sm z-20`}>
                 <div className="h-16 flex items-center px-6 border-b border-gray-100 overflow-hidden">
                     {settings?.site_logo ? (
-                        <img
-                            src={settings.site_logo}
-                            alt={settings.system_name}
-                            className={`transition-all ${isSidebarOpen ? 'h-8' : 'h-6'}`}
-                        />
+                        <div className="flex items-center">
+                            <img
+                                src={`/storage/${settings.site_logo}`}
+                                alt={settings.system_name}
+                                className={`transition-all object-contain ${isSidebarOpen ? 'h-8' : 'h-10'}`}
+                            />
+                            {isSidebarOpen && (
+                                <span className="ml-3 text-lg font-black text-gray-900 tracking-tighter uppercase">
+                                    {settings.system_name || 'DEVE OPTI'}
+                                </span>
+                            )}
+                        </div>
                     ) : (
-                        <span className="text-orange-500 font-black text-xl tracking-tighter shrink-0">{isSidebarOpen ? settings?.system_name || 'DEVE OPTI' : (settings?.system_name?.[0] || 'D')}</span>
+                        <div className="flex items-center">
+                            <div className="h-10 w-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-200">
+                                <span className="material-icons-outlined text-white text-2xl">rocket_launch</span>
+                            </div>
+                            {isSidebarOpen && (
+                                <span className="ml-3 text-lg font-black text-gray-900 tracking-tighter uppercase whitespace-nowrap">
+                                    DEVE <span className="text-orange-500">OPTI</span>
+                                </span>
+                            )}
+                        </div>
                     )}
                 </div>
 
