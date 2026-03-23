@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard',      [DashboardController::class, 'index'])->name('dashboard');
         // User management
         Route::get('/users',          [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/export',   [UserController::class, 'export'])->name('users.export');
         Route::get('/users/search-ajax', [UserController::class, 'searchAjax'])->name('users.search-ajax');
         Route::post('/users',         [UserController::class, 'store'])->name('users.store');
         Route::get('/users/{id}',     [UserController::class, 'show'])->name('users.show');

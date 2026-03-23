@@ -57,6 +57,10 @@ export default function UserIndex({ users, filters }) {
         }
     };
 
+    const applyFilters = (newFilters) => {
+        router.get(route('admin.users.index'), { ...filters, ...newFilters }, { preserveState: true });
+    };
+
     return (
         <AdminLayout>
             <Head title="Users Management" />
@@ -77,18 +81,51 @@ export default function UserIndex({ users, filters }) {
                 </div>
 
                 {/* Filters & Search */}
-                <div className="bg-white p-2 rounded-2xl border border-slate-100 flex items-center shadow-sm">
-                    <div className="relative flex-1 group">
+                <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex flex-col xl:flex-row items-center gap-4">
+                    <div className="relative flex-1 group w-full xl:w-auto">
                         <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 group-focus-within:text-orange-500 transition-colors">
                             <span className="material-icons-outlined text-xl">search</span>
                         </span>
                         <input
                             type="text"
-                            className="block w-full pl-12 pr-4 py-3 bg-slate-50/50 border-0 rounded-xl text-slate-900 font-medium placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none"
-                            placeholder="Search by name, email, or ID..."
+                            className="block w-full pl-12 pr-4 py-3 bg-slate-50 border-0 rounded-xl text-slate-900 font-bold placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none text-sm"
+                            placeholder="Search by name or email..."
                             defaultValue={filters.search}
-                            onKeyUp={(e) => e.key === 'Enter' && router.get(route('admin.users.index'), { search: e.target.value }, { preserveState: true })}
+                            onKeyUp={(e) => e.key === 'Enter' && applyFilters({ search: e.target.value })}
                         />
+                    </div>
+                    
+                    <div className="flex items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
+                        <select 
+                            className="py-3 px-4 bg-slate-50 border-0 rounded-xl text-slate-700 font-black tracking-wide focus:ring-2 focus:ring-orange-500/20 outline-none text-xs uppercase"
+                            defaultValue={filters.date_filter || ''}
+                            onChange={(e) => applyFilters({ date_filter: e.target.value })}
+                        >
+                            <option value="">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="last_7_days">Last 7 Days</option>
+                            <option value="last_30_days">Last 30 Days</option>
+                            <option value="this_month">This Month</option>
+                        </select>
+
+                        <select 
+                            className="py-3 px-4 bg-slate-50 border-0 rounded-xl text-slate-700 font-black tracking-wide focus:ring-2 focus:ring-orange-500/20 outline-none text-xs uppercase"
+                            defaultValue={filters.sort_by || ''}
+                            onChange={(e) => applyFilters({ sort_by: e.target.value })}
+                        >
+                            <option value="">Newest First</option>
+                            <option value="highest_earning">Highest Earning</option>
+                            <option value="highest_deposit">Highest Deposits</option>
+                            <option value="highest_withdrawal">Highest Withdraws</option>
+                        </select>
+
+                        <a
+                            href={route('admin.users.export', filters)}
+                            className="flex items-center justify-center shrink-0 px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 font-black tracking-widest uppercase text-xs rounded-xl transition-all h-full"
+                        >
+                            <span className="material-icons-outlined text-sm mr-2">download</span>
+                            Export CSV
+                        </a>
                     </div>
                 </div>
 
