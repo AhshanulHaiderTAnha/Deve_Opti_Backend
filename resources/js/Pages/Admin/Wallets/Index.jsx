@@ -14,6 +14,41 @@ export default function WalletIndex({ wallets }) {
                     </div>
                 </div>
 
+                <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between">
+                    <div className="relative w-full xl:max-w-md">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
+                        <input
+                            type="text"
+                            placeholder="Search by name or email..."
+                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
+                            defaultValue={filters?.search || ''}
+                            onKeyUp={e => e.key === 'Enter' && router.get(route('admin.wallets.index'), { ...filters, search: e.target.value }, { preserveState: true })}
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
+                        <input
+                            type="date"
+                            className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                            defaultValue={filters?.start_date || ''}
+                            onChange={e => router.get(route('admin.wallets.index'), { ...filters, start_date: e.target.value }, { preserveState: true })}
+                        />
+                        <span className="text-gray-400 font-black text-[10px] tracking-widest">TO</span>
+                        <input
+                            type="date"
+                            className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                            defaultValue={filters?.end_date || ''}
+                            onChange={e => router.get(route('admin.wallets.index'), { ...filters, end_date: e.target.value }, { preserveState: true })}
+                        />
+                        <a
+                            href={route('admin.wallets.index', { ...filters, export: 1 })}
+                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            CSV
+                        </a>
+                    </div>
+                </div>
+
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                     <table className="w-full border-collapse text-left">
                         <thead>
@@ -40,7 +75,7 @@ export default function WalletIndex({ wallets }) {
                                     </td>
                                     <td className="px-10 py-5 text-right text-xs font-bold text-gray-400">
                                         {new Date(wallet.updated_at).toLocaleDateString('en-US', {
-                                            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'
+                                            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                                         })}
                                     </td>
                                 </tr>

@@ -19,6 +19,13 @@ class DepositController extends Controller
     {
         $query = DepositRequest::with(['user', 'depositPlan', 'paymentMethod'])->latest();
 
+        if ($request->filled('search')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%");
+            })->orWhere('transaction_id', 'like', "%{$request->search}%");
+        }
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
@@ -33,7 +40,7 @@ class DepositController extends Controller
 
         return Inertia::render('Admin/Deposits/Index', [
             'deposits' => $query->paginate(20)->withQueryString(),
-            'filters' => $request->only(['start_date', 'end_date', 'status'])
+            'filters' => $request->only(['search', 'start_date', 'end_date', 'status'])
         ]);
     }
 

@@ -18,6 +18,14 @@ class WithdrawalController extends Controller
     {
         $query = WithdrawalRequest::with('user')->latest();
 
+        if ($request->filled('search')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%");
+            })->orWhere('admin_transaction_id', 'like', "%{$request->search}%")
+              ->orWhere('payment_gateway_info', 'like', "%{$request->search}%");
+        }
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
@@ -32,7 +40,7 @@ class WithdrawalController extends Controller
 
         return Inertia::render('Admin/Withdrawals/Index', [
             'withdrawals' => $query->paginate(20)->withQueryString(),
-            'filters' => $request->only(['start_date', 'end_date', 'status'])
+            'filters' => $request->only(['search', 'start_date', 'end_date', 'status'])
         ]);
     }
 
