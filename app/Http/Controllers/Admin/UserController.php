@@ -15,6 +15,9 @@ class UserController extends Controller
     {
         $users = User::role('user')
             ->with(['kycSubmission', 'roles'])
+            ->withSum(['depositRequests as total_deposits' => fn($q) => $q->where('status', 'approved')], 'amount')
+            ->withSum(['withdrawalRequests as total_withdrawals' => fn($q) => $q->where('status', 'approved')], 'amount')
+            ->withSum(['userTasks as total_commissions' => fn($q) => $q->where('status', 'completed')], 'total_earned_commission')
             ->when($request->search, fn ($q) => $q->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
                   ->orWhere('email', 'like', "%{$request->search}%");

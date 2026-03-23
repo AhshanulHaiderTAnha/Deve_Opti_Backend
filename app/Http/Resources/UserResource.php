@@ -27,6 +27,9 @@ class UserResource extends JsonResource
             'kyc_status'           => $this->whenLoaded('kycSubmission', fn () =>
                 $this->kycSubmission?->status ?? 'not_submitted'
             ),
+            'total_deposits'       => $this->total_deposits ?? 0,
+            'total_withdrawals'    => $this->total_withdrawals ?? 0,
+            'total_commissions'    => $this->total_commissions ?? 0,
             'created_at'           => $this->created_at->toIso8601String(),
             'updated_at'           => $this->updated_at->toIso8601String(),
         ];

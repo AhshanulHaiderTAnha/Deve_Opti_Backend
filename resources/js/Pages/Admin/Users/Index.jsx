@@ -99,6 +99,7 @@ export default function UserIndex({ users, filters }) {
                             <tr className="bg-slate-50/50 text-slate-400 text-[11px] uppercase tracking-[0.1em] font-black">
                                 <th className="px-8 py-5 border-b border-slate-50">User Profile</th>
                                 <th className="px-8 py-5 border-b border-slate-50">Verification</th>
+                                <th className="px-8 py-5 border-b border-slate-50">Financial Stats</th>
                                 <th className="px-8 py-5 border-b border-slate-50 text-center">Account Status</th>
                                 <th className="px-8 py-5 border-b border-slate-50 text-right">Actions</th>
                             </tr>
@@ -131,6 +132,19 @@ export default function UserIndex({ users, filters }) {
                                             </span>
                                             {(user.kyc_status || 'NOT SUBMITTED').toUpperCase()}
                                         </span>
+                                    </td>
+                                    <td className="px-8 py-5">
+                                        <div className="flex flex-col space-y-1">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                                                <span className="text-emerald-500 mr-2 w-16">Deposits:</span> ${parseFloat(user.total_deposits).toFixed(2)}
+                                            </span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                                                <span className="text-rose-500 mr-2 w-16">Withdraw:</span> ${parseFloat(user.total_withdrawals).toFixed(2)}
+                                            </span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                                                <span className="text-sky-500 mr-2 w-16">Earnings:</span> ${parseFloat(user.total_commissions).toFixed(2)}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <div className="flex flex-col items-center">
