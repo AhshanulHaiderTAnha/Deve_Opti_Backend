@@ -16,6 +16,11 @@ use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Admin\DepositController;
 use App\Http\Controllers\Admin\WithdrawalController;
+use App\Http\Controllers\Admin\CommissionTierController;
+use App\Http\Controllers\Admin\OrderTaskController;
+use App\Http\Controllers\Admin\UserTaskController;
+use App\Http\Controllers\Admin\UserActivityLogController;
+use App\Http\Controllers\Admin\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -57,11 +62,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Deposit Plans Management
         Route::resource('deposit-plans', DepositPlanController::class)->except(['create', 'edit', 'show']);
         // Commission Tiers Management
-        Route::resource('commission-tiers', \App\Http\Controllers\Admin\CommissionTierController::class)->except(['create', 'edit', 'show']);
+        Route::resource('commission-tiers', CommissionTierController::class)->except(['create', 'edit', 'show']);
         // Order Tasks System
-        Route::resource('order-tasks', \App\Http\Controllers\Admin\OrderTaskController::class)->except(['create', 'edit', 'show']);
-        Route::resource('user-tasks', \App\Http\Controllers\Admin\UserTaskController::class)->only(['index', 'store', 'destroy']);
-        
+        Route::resource('order-tasks', OrderTaskController::class)->except(['create', 'edit', 'show']);
+        Route::resource('user-tasks', UserTaskController::class)->only(['index', 'store', 'destroy']);
         // Support Tickets
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
         Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
@@ -83,12 +87,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
         // Logs
-        Route::get('activity-logs', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'index'])->name('activity-logs.index');
-        Route::delete('activity-logs/{userActivityLog}', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
-        Route::post('activity-logs/clear-old', [\App\Http\Controllers\Admin\UserActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
-        
+        Route::get('activity-logs', [UserActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::delete('activity-logs/{userActivityLog}', [UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+        Route::post('activity-logs/clear-old', [UserActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
         // Announcements
-        Route::resource('announcements', \App\Http\Controllers\Admin\AnnouncementController::class)->except(['create', 'edit', 'show']);
+        Route::resource('announcements', AnnouncementController::class)->except(['create', 'edit', 'show']);
     });
 });
 

@@ -94,9 +94,9 @@ export default function UserIndex({ users, filters }) {
                             onKeyUp={(e) => e.key === 'Enter' && applyFilters({ search: e.target.value })}
                         />
                     </div>
-                    
+
                     <div className="flex items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
-                        <select 
+                        <select
                             className="py-3 px-4 bg-slate-50 border-0 rounded-xl text-slate-700 font-black tracking-wide focus:ring-2 focus:ring-orange-500/20 outline-none text-xs uppercase"
                             defaultValue={filters.date_filter || ''}
                             onChange={(e) => applyFilters({ date_filter: e.target.value })}
@@ -108,7 +108,7 @@ export default function UserIndex({ users, filters }) {
                             <option value="this_month">This Month</option>
                         </select>
 
-                        <select 
+                        <select
                             className="py-3 px-4 bg-slate-50 border-0 rounded-xl text-slate-700 font-black tracking-wide focus:ring-2 focus:ring-orange-500/20 outline-none text-xs uppercase"
                             defaultValue={filters.sort_by || ''}
                             onChange={(e) => applyFilters({ sort_by: e.target.value })}
