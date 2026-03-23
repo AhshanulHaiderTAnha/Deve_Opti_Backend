@@ -2,7 +2,7 @@ import React from 'react';
 import { Head } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function Dashboard({ stats, recentActivity, recentDeposits, recentWithdrawals }) {
+export default function Dashboard({ stats, recentActivity, recentDeposits, recentWithdrawals, recentPendingTasks, recentCompletedTasks }) {
     const statCards = [
         { label: 'Total Users', value: stats.total_users, icon: 'people', color: 'bg-orange-500' },
         { label: 'Total Sellers', value: stats.total_sellers, icon: 'storefront', color: 'bg-purple-500' },
@@ -50,13 +50,21 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4">
                                     <span className="font-semibold text-gray-900 block text-sm">{item.user_name}</span>
-                                    {item.user_email && <span className="text-xs text-gray-500">{item.user_email}</span>}
+                                    {item.task_name ? (
+                                        <span className="text-xs text-sky-600 font-medium truncate max-w-xs">{item.task_name}</span>
+                                    ) : (
+                                        item.user_email && <span className="text-xs text-gray-500">{item.user_email}</span>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     {type === 'kyc' ? (
                                         <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border border-amber-100">
                                             {item.status}
                                         </span>
+                                    ) : type === 'task_progress' ? (
+                                        <span className="font-black text-sky-600 text-sm">{item.progress}</span>
+                                    ) : type === 'task_completed' ? (
+                                        <span className="font-black text-emerald-600 text-sm">+${parseFloat(item.commission).toFixed(2)}</span>
                                     ) : (
                                         <span className="font-black text-gray-800 text-sm">
                                             ${parseFloat(item.amount).toFixed(2)}
@@ -128,28 +136,46 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                 </div>
 
                 <div className="space-y-8">
+                    {/* Tasks Container */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <RecentTable
+                            title="Recent Pending Users Task"
+                            data={recentPendingTasks}
+                            type="task_progress"
+                            viewAllHref={route('admin.user-tasks.index')}
+                        />
+                        <RecentTable
+                            title="Recent Completed Tasks"
+                            data={recentCompletedTasks}
+                            type="task_completed"
+                            viewAllHref={route('admin.user-tasks.index')}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Pending Deposits */}
+                        <RecentTable
+                            title="Recent Pending Deposits"
+                            data={recentDeposits}
+                            type="money"
+                            viewAllHref={route('admin.deposits.index')}
+                        />
+
+                        {/* pending Withdrawals */}
+                        <RecentTable
+                            title="Recent Pending Withdrawals"
+                            data={recentWithdrawals}
+                            type="money"
+                            viewAllHref={route('admin.withdrawals.index')}
+                        />
+                    </div>
+
                     {/* KYC Activity (Full Width) */}
                     <RecentTable
                         title="Recent KYC Pending"
                         data={recentActivity.filter(i => i.status === 'pending').slice(0, 5)}
                         type="kyc"
                         viewAllHref={route('admin.kyc.index')}
-                    />
-
-                    {/* Pending Deposits (Full Width) */}
-                    <RecentTable
-                        title="Recent Pending Deposits"
-                        data={recentDeposits}
-                        type="money"
-                        viewAllHref={route('admin.deposits.index')}
-                    />
-
-                    {/* Pending Withdrawals (Full Width) */}
-                    <RecentTable
-                        title="Recent Pending Withdrawals"
-                        data={recentWithdrawals}
-                        type="money"
-                        viewAllHref={route('admin.withdrawals.index')}
                     />
                 </div>
             </div>

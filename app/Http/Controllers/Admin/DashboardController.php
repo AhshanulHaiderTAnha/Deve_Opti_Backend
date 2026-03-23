@@ -83,6 +83,34 @@ class DashboardController extends Controller
                 'submitted'  => $w->created_at->diffForHumans(),
             ]);
 
-        return Inertia::render('Admin/Dashboard', compact('stats', 'recentActivity', 'recentDeposits', 'recentWithdrawals'));
+        $recentPendingTasks = UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders'])
+            ->where('status', 'in_progress')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($t) => [
+                'id'         => $t->id,
+                'user_name'  => $t->user->name,
+                'user_email' => $t->user->email,
+                'task_name'  => $t->orderTask->title,
+                'progress'   => "{$t->completed_orders} / {$t->orderTask->required_orders}",
+                'submitted'  => $t->created_at->diffForHumans(),
+            ]);
+
+        $recentCompletedTasks = UserTask::with(['user:id,name,email', 'orderTask:id,title'])
+            ->where('status', 'completed')
+            ->latest('updated_at')
+            ->take(5)
+            ->get()
+            ->map(fn ($t) => [
+                'id'         => $t->id,
+                'user_name'  => $t->user->name,
+                'user_email' => $t->user->email,
+                'task_name'  => $t->orderTask->title,
+                'commission' => $t->total_earned_commission,
+                'submitted'  => $t->updated_at->diffForHumans(),
+            ]);
+
+        return Inertia::render('Admin/Dashboard', compact('stats', 'recentActivity', 'recentDeposits', 'recentWithdrawals', 'recentPendingTasks', 'recentCompletedTasks'));
     }
 }
