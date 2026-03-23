@@ -57,7 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('dashboard/performance-overview', [UserDashboardController::class, 'performanceOverview']);
         Route::get('dashboard/weekly-earnings', [UserDashboardController::class, 'weeklyEarnings']);
         Route::get('dashboard/stats', [UserDashboardController::class, 'stats']);
-
+        Route::get('dashboard/analytics', [UserDashboardController::class, 'analytics']);
         Route::get('profile',           [AuthController::class, 'me']);
         Route::post('kyc-submit',       [UserKycController::class, 'submit']);
         Route::get('kyc-status',        [UserKycController::class, 'status']);

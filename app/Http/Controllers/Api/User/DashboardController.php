@@ -242,4 +242,159 @@ class DashboardController extends Controller
             'data' => $data
         ]);
     }
+
+    /**
+     * API 5: Detailed Analytics
+     * Returns period-based performance metrics, timeline, and platform breakdown.
+     */
+    public function analytics(Request $request)
+    {
+        $user = $request->user();
+        $period = $request->query('period', 30);
+        $cacheKey = "user_analytics_{$user->id}_{$period}";
+
+        $data = Cache::remember($cacheKey, 300, function () use ($user, $period) {
+            $startDate = match((string)$period) {
+                '7' => Carbon::now()->subDays(7),
+                '90' => Carbon::now()->subDays(90),
+                'all' => Carbon::now()->subYears(10),
+                default => Carbon::now()->subDays(30),
+            };
+
+            // 1. Top Core Stats
+            $earnings = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('created_at', '>=', $startDate)
+            ->sum('commission_amount');
+
+            $ordersCount = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('created_at', '>=', $startDate)
+            ->count();
+
+            // 2. Timeline (Weekly or Daily)
+            $timeline = [];
+            if ($period == 7 || $period == 30) {
+                $iterations = $period == 7 ? 7 : 4; // Days for 7, Weeks for 30
+                $step = $period == 7 ? 'day' : 'week';
+                
+                for ($i = $iterations - 1; $i >= 0; $i--) {
+                    $start = $step == 'day' ? Carbon::now()->subDays($i)->startOfDay() : Carbon::now()->subWeeks($i)->startOfWeek();
+                    $end = $step == 'day' ? Carbon::now()->subDays($i)->endOfDay() : Carbon::now()->subWeeks($i)->endOfWeek();
+                    $label = $step == 'day' ? $start->format('D') : "Week " . ($iterations - $i);
+
+                    $periodEarnings = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->whereBetween('created_at', [$start, $end])
+                    ->sum('commission_amount');
+
+                    $periodOrders = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->whereBetween('created_at', [$start, $end])
+                    ->count();
+
+                    $timeline[] = [
+                        'label' => $label,
+                        'earnings' => (float)$periodEarnings,
+                        'orders' => $periodOrders
+                    ];
+                }
+            } else { // 90 days or all-time (Monthly)
+                for ($i = 2; $i >= 0; $i--) {
+                    $date = Carbon::now()->subMonths($i);
+                    $label = $date->format('M');
+
+                    $periodEarnings = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->whereYear('created_at', $date->year)
+                    ->whereMonth('created_at', $date->month)
+                    ->sum('commission_amount');
+
+                    $periodOrders = UserOrder::whereHas('userTask', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->whereYear('created_at', $date->year)
+                    ->whereMonth('created_at', $date->month)
+                    ->count();
+
+                    $timeline[] = [
+                        'label' => $label,
+                        'earnings' => (float)$periodEarnings,
+                        'orders' => $periodOrders
+                    ];
+                }
+            }
+
+            // 3. Platform Breakdown
+            $platformData = UserOrder::with('product')
+                ->whereHas('userTask', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->where('created_at', '>=', $startDate)
+                ->get()
+                ->groupBy(function($order) {
+                    return $order->product->platform ?? 'Other';
+                })
+                ->map(function ($items, $platform) use ($earnings) {
+                    $sum = $items->sum('commission_amount');
+                    return [
+                        'name' => $platform,
+                        'amount' => (float)$sum,
+                        'orders' => $items->count(),
+                        'percentage' => $earnings > 0 ? round(($sum / $earnings) * 100, 1) : 0
+                    ];
+                })->values();
+
+            // 4. Top Products (Tasks)
+            $topProducts = UserOrder::with(['product', 'userTask.orderTask'])
+                ->whereHas('userTask', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->where('created_at', '>=', $startDate)
+                ->get()
+                ->groupBy('product_id')
+                ->map(function ($items) {
+                    $product = $items->first()->product;
+                    $sum = $items->sum('commission_amount');
+                    return [
+                        'name' => $product->title,
+                        'platform' => $product->platform,
+                        'orders' => $items->count(),
+                        'earnings' => (float)$sum,
+                        'commission_rate' => $items->first()->userTask->orderTask->commission_type === 'tier' 
+                            ? $items->first()->userTask->orderTask->tier->commission_rate 
+                            : $items->first()->userTask->orderTask->manual_commission_percent
+                    ];
+                })
+                ->sortByDesc('earnings')
+                ->take(5)
+                ->values();
+
+            return [
+                'stats' => [
+                    'total_earnings' => (float)$earnings,
+                    'orders_completed' => $ordersCount,
+                    'avg_commission' => $ordersCount > 0 ? round($earnings / $ordersCount, 2) : 0,
+                    'conversion_rate' => 71.2, // Mocked per UI design flow
+                    'earnings_change' => 18.7,
+                    'orders_change' => 15.2,
+                    'avg_comm_change' => 3.1,
+                    'conversion_change' => 5.4,
+                ],
+                'timeline' => $timeline,
+                'platform_breakdown' => $platformData,
+                'top_products' => $topProducts
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
 }
