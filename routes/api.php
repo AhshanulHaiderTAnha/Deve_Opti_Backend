@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\User\WithdrawalController;
 use App\Http\Controllers\Api\User\AnnouncementController;
 use App\Http\Controllers\Api\User\ActivityLogController;
 use App\Http\Controllers\Api\User\CommissionTierController;
+use App\Http\Controllers\Api\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\Api\User\UserTaskController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -49,8 +50,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('auth/profile', [AuthController::class, 'updateProfile']);
     Route::patch('auth/change-password', [AuthController::class, 'changePassword']);
     Route::post('auth/profile-image', [AuthController::class, 'updateProfileImage']);
+
     // User Routes
     Route::prefix('user')->middleware('role:user')->group(function () {
+        Route::get('dashboard/session-status', [UserDashboardController::class, 'sessionStatus']);
+        Route::get('dashboard/performance-overview', [UserDashboardController::class, 'performanceOverview']);
+        Route::get('dashboard/weekly-earnings', [UserDashboardController::class, 'weeklyEarnings']);
+        Route::get('dashboard/stats', [UserDashboardController::class, 'stats']);
+
         Route::get('profile',           [AuthController::class, 'me']);
         Route::post('kyc-submit',       [UserKycController::class, 'submit']);
         Route::get('kyc-status',        [UserKycController::class, 'status']);
