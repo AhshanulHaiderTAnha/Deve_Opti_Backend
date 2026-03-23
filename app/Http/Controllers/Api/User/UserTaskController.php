@@ -153,9 +153,11 @@ class UserTaskController extends Controller
             $wallet = $request->user()->wallet;
             
             WalletTransaction::create([
+                'user_id' => $request->user()->id,
                 'wallet_id' => $wallet->id,
                 'type' => 'credit',
                 'amount' => $userTask->total_earned_commission,
+                'balance_after' => $wallet->balance + $userTask->total_earned_commission,
                 'description' => "Commission earned from task completion: {$userTask->orderTask->title}",
                 'status' => 'completed'
             ]);

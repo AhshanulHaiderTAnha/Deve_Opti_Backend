@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const { data, setData, post, patch, processing, errors, reset, clearErrors } = useForm({
         title: '',
@@ -34,6 +35,7 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
             reset();
         }
         clearErrors();
+        setIsDropdownOpen(false);
         setIsModalOpen(true);
     };
 
@@ -217,55 +219,77 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex justify-between">
                                     <span>Select Products for this Task Pool</span>
                                     <span className="text-blue-500 font-black">{data.product_ids.length} selected</span>
                                 </label>
-                                <p className="text-[10px] text-gray-400 mb-1">Click the items below to add or remove them from the task.</p>
                                 
-                                <div className="w-full bg-white border border-gray-200 rounded-xl h-[18rem] overflow-y-auto custom-scrollbar shadow-inner">
-                                    <div className="p-2 space-y-1">
-                                        {products.map(product => {
-                                            const isSelected = data.product_ids.includes(product.id);
-                                            return (
-                                                <label 
-                                                    key={product.id} 
-                                                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border ${
-                                                        isSelected 
-                                                        ? 'bg-orange-50 border-orange-200 text-orange-900' 
-                                                        : 'bg-transparent border-transparent hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                                >
-                                                    <div className="flex-shrink-0 mr-3">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            className="form-checkbox h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500 transition-all"
-                                                            checked={isSelected}
-                                                            onChange={(e) => {
-                                                                if (e.target.checked) {
-                                                                    setData('product_ids', [...data.product_ids, product.id]);
-                                                                } else {
-                                                                    setData('product_ids', data.product_ids.filter(id => id !== product.id));
-                                                                }
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-bold truncate">{product.title}</p>
-                                                        <p className="text-xs text-gray-500 truncate flex items-center mt-0.5">
-                                                            <span className="font-black text-gray-900 mr-2">${product.price}</span>
-                                                            <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[9px] font-bold uppercase tracking-wider">{product.platform}</span>
-                                                        </p>
-                                                    </div>
-                                                </label>
-                                            );
-                                        })}
-                                        {products.length === 0 && (
-                                            <div className="p-4 text-center text-sm text-gray-500">No products available.</div>
-                                        )}
-                                    </div>
+                                <div 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 min-h-[50px] cursor-pointer flex flex-wrap gap-2 items-center"
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                >
+                                    {data.product_ids.length === 0 ? (
+                                        <span className="text-gray-400 text-sm font-medium">Click to select products...</span>
+                                    ) : (
+                                        data.product_ids.map(id => {
+                                            const p = products.find(prod => prod.id === id);
+                                            return p ? (
+                                                <span key={id} className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md text-xs font-bold flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                                    {p.title}
+                                                    <button type="button" onClick={(e) => { e.stopPropagation(); setData('product_ids', data.product_ids.filter(pid => pid !== id)); }} className="hover:text-red-500 flex items-center justify-center">
+                                                        <span className="material-icons-outlined text-[14px]">close</span>
+                                                    </button>
+                                                </span>
+                                            ) : null;
+                                        })
+                                    )}
                                 </div>
+                                
+                                {isDropdownOpen && (
+                                    <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl max-h-[18rem] overflow-y-auto shadow-xl" style={{ top: "100%", marginTop: "0.5rem" }}>
+                                        <div className="p-2 space-y-1">
+                                            {products.map(product => {
+                                                const isSelected = data.product_ids.includes(product.id);
+                                                return (
+                                                    <label 
+                                                        key={product.id} 
+                                                        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border ${
+                                                            isSelected 
+                                                            ? 'bg-orange-50 border-orange-200 text-orange-900' 
+                                                            : 'bg-transparent border-transparent hover:bg-gray-50 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex-shrink-0 mr-3">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                className="form-checkbox h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500 transition-all"
+                                                                checked={isSelected}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked) {
+                                                                        setData('product_ids', [...data.product_ids, product.id]);
+                                                                    } else {
+                                                                        setData('product_ids', data.product_ids.filter(id => id !== product.id));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-bold truncate">{product.title}</p>
+                                                            <p className="text-xs text-gray-500 truncate flex items-center mt-0.5">
+                                                                <span className="font-black text-gray-900 mr-2">${product.price}</span>
+                                                                <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[9px] font-bold uppercase tracking-wider">{product.platform}</span>
+                                                            </p>
+                                                        </div>
+                                                    </label>
+                                                );
+                                            })}
+                                            {products.length === 0 && (
+                                                <div className="p-4 text-center text-sm text-gray-500">No products available.</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                                 {errors.product_ids && <p className="text-red-500 text-xs font-bold">{errors.product_ids}</p>}
                             </div>
 
