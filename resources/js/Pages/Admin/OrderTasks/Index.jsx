@@ -222,19 +222,50 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                                     <span>Select Products for this Task Pool</span>
                                     <span className="text-blue-500 font-black">{data.product_ids.length} selected</span>
                                 </label>
-                                <p className="text-[10px] text-gray-400 mb-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple products.</p>
-                                <select 
-                                    multiple 
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm h-48 custom-scrollbar" 
-                                    value={data.product_ids} 
-                                    onChange={handleProductSelect}
-                                >
-                                    {products.map(product => (
-                                        <option key={product.id} value={product.id} className="py-1 px-2 mb-1 rounded hover:bg-gray-200">
-                                            {product.title} - ${product.price} ({product.platform})
-                                        </option>
-                                    ))}
-                                </select>
+                                <p className="text-[10px] text-gray-400 mb-1">Click the items below to add or remove them from the task.</p>
+                                
+                                <div className="w-full bg-white border border-gray-200 rounded-xl h-[18rem] overflow-y-auto custom-scrollbar shadow-inner">
+                                    <div className="p-2 space-y-1">
+                                        {products.map(product => {
+                                            const isSelected = data.product_ids.includes(product.id);
+                                            return (
+                                                <label 
+                                                    key={product.id} 
+                                                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border ${
+                                                        isSelected 
+                                                        ? 'bg-orange-50 border-orange-200 text-orange-900' 
+                                                        : 'bg-transparent border-transparent hover:bg-gray-50 text-gray-700'
+                                                    }`}
+                                                >
+                                                    <div className="flex-shrink-0 mr-3">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            className="form-checkbox h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500 transition-all"
+                                                            checked={isSelected}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setData('product_ids', [...data.product_ids, product.id]);
+                                                                } else {
+                                                                    setData('product_ids', data.product_ids.filter(id => id !== product.id));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-bold truncate">{product.title}</p>
+                                                        <p className="text-xs text-gray-500 truncate flex items-center mt-0.5">
+                                                            <span className="font-black text-gray-900 mr-2">${product.price}</span>
+                                                            <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[9px] font-bold uppercase tracking-wider">{product.platform}</span>
+                                                        </p>
+                                                    </div>
+                                                </label>
+                                            );
+                                        })}
+                                        {products.length === 0 && (
+                                            <div className="p-4 text-center text-sm text-gray-500">No products available.</div>
+                                        )}
+                                    </div>
+                                </div>
                                 {errors.product_ids && <p className="text-red-500 text-xs font-bold">{errors.product_ids}</p>}
                             </div>
 
