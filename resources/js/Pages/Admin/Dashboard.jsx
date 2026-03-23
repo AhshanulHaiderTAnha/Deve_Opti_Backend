@@ -18,6 +18,18 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
         { label: 'This Month Withdrawals', value: '$' + (parseFloat(stats.this_month_withdrawals) || 0).toFixed(2), icon: 'trending_down', color: 'bg-rose-400' },
     ];
 
+    const taskStats = [
+        { label: 'Today Paid Commissions', value: '$' + (parseFloat(stats.today_commission) || 0).toFixed(2), icon: 'payments', color: 'bg-emerald-500' },
+        { label: 'Total Running Tasks', value: stats.running_tasks, icon: 'directions_run', color: 'bg-blue-500' },
+        { label: 'Total Completed Tasks', value: stats.completed_tasks, icon: 'task_alt', color: 'bg-indigo-500' },
+        { label: 'Today Running', value: stats.today_running_tasks, icon: 'today', color: 'bg-sky-400' },
+        { label: 'Today Completed', value: stats.today_completed_tasks, icon: 'event_available', color: 'bg-violet-400' },
+        { label: 'Weekly Running', value: stats.weekly_running_tasks, icon: 'date_range', color: 'bg-sky-500' },
+        { label: 'Weekly Completed', value: stats.weekly_completed_tasks, icon: 'event_note', color: 'bg-violet-500' },
+        { label: 'Monthly Running', value: stats.monthly_running_tasks, icon: 'calendar_month', color: 'bg-sky-600' },
+        { label: 'Monthly Completed', value: stats.monthly_completed_tasks, icon: 'fact_check', color: 'bg-violet-600' },
+    ];
+
     const RecentTable = ({ title, data, type, viewAllHref }) => (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -82,7 +94,7 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                     </div>
                 </div>
 
-                {/* Stats Grid */}
+                {/* Main Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {statCards.map((stat) => (
                         <div key={stat.label} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-all group">
@@ -95,6 +107,24 @@ export default function Dashboard({ stats, recentActivity, recentDeposits, recen
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Task Performance Metrics */}
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-4 px-2">Task & Order Performance</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {taskStats.map((stat) => (
+                            <div key={stat.label} className="bg-white p-5 rounded-3xl shadow-sm border border-gray-200 flex items-center space-x-4 hover:border-gray-300 transition-colors">
+                                <div className={`${stat.color} p-3 rounded-xl text-white`}>
+                                    <span className="material-icons-outlined text-xl">{stat.icon}</span>
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">{stat.label}</p>
+                                    <p className="text-lg font-black text-gray-900">{stat.value}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="space-y-8">

@@ -13,6 +13,7 @@ use App\Models\WithdrawalRequest;
 use App\Models\SupportTicket;
 use App\Models\Product;
 use App\Models\Seller;
+use App\Models\UserTask;
 
 class DashboardController extends Controller
 {
@@ -35,6 +36,15 @@ class DashboardController extends Controller
             'pending_support_tickets' => SupportTicket::where('status', 'open')->count(),
             'total_products' => Product::count(),
             'total_sellers' => Seller::count(),
+            'running_tasks' => UserTask::where('status', 'in_progress')->count(),
+            'completed_tasks' => UserTask::where('status', 'completed')->count(),
+            'today_running_tasks' => UserTask::where('status', 'in_progress')->whereDate('created_at', today())->count(),
+            'today_completed_tasks' => UserTask::where('status', 'completed')->whereDate('updated_at', today())->count(),
+            'weekly_running_tasks' => UserTask::where('status', 'in_progress')->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'weekly_completed_tasks' => UserTask::where('status', 'completed')->whereBetween('updated_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'monthly_running_tasks' => UserTask::where('status', 'in_progress')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+            'monthly_completed_tasks' => UserTask::where('status', 'completed')->whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year)->count(),
+            'today_commission' => UserTask::where('status', 'completed')->whereDate('updated_at', today())->sum('total_earned_commission'),
         ];
 
         $recentActivity = KycSubmission::with('user')
