@@ -40,7 +40,14 @@ class SupportTicketController extends Controller
 
     public function export(Request $request)
     {
-        $query = SupportTicket::with(['user']);
+        $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now()->subDays(15);
+        $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date) : now();
+
+        if ($startDate->diffInDays($endDate) > 15) {
+            return back()->with('error', 'Export date range cannot exceed 15 days.');
+        }
+
+        $query = SupportTicket::with(['user'])->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
 
         if ($request->search) {
             $query->where(function($q) use ($request) {

@@ -21,6 +21,51 @@ class AnnouncementController extends Controller
         ]);
     }
 
+    public function export(Request $request)
+    {
+        $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now()->subDays(15);
+        $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date) : now();
+
+        if ($startDate->diffInDays($endDate) > 15) {
+            return back()->with('error', 'Export date range cannot exceed 15 days.');
+        }
+
+        $query = Announcement::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])->latest();
+        
+        if ($request->search) {
+            $query->where('title', 'like', "%{$request->search}%");
+        }
+
+        $announcements = $query->get();
+
+        $filename = "announcements_" . now()->format('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        $columns = ['ID', 'Title', 'Type', 'Status', 'Pinned', 'Created At'];
+
+        $callback = function() use($announcements, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($announcements as $a) {
+                fputcsv($file, [
+                    $a->id,
+                    $a->title,
+                    $a->type,
+                    $a->status,
+                    $a->is_pinned ? 'Yes' : 'No',
+                    $a->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

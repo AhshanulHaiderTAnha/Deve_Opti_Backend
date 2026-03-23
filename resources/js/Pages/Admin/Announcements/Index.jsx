@@ -91,9 +91,34 @@ export default function AnnouncementIndex({ announcements, filters }) {
         });
     };
 
+    const defaultStartDate = new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0];
+    const defaultEndDate = new Date().toISOString().split('T')[0];
+    const [startDate, setStartDate] = useState(filters?.start_date || defaultStartDate);
+    const [endDate, setEndDate] = useState(filters?.end_date || defaultEndDate);
+
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.announcements.index'), { search: searchQuery }, { preserveState: true });
+        router.get(route('admin.announcements.index'), { search: searchQuery, start_date: startDate, end_date: endDate }, { preserveState: true });
+    };
+
+    const handleExport = (e) => {
+        e.preventDefault();
+        if (!startDate || !endDate) {
+            Swal.fire('Error', 'Please select both start and end dates for export.', 'error');
+            return;
+        }
+        const diffTime = new Date(endDate).getTime() - new Date(startDate).getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 15 || diffDays < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date Range',
+                text: 'Export date range cannot exceed 15 days.',
+                customClass: { confirmButton: 'bg-orange-500 rounded-xl px-6 py-2 text-white font-bold' }
+            });
+            return;
+        }
+        window.location.href = route('admin.announcements.export', { search: searchQuery, start_date: startDate, end_date: endDate });
     };
 
     const types = [
@@ -114,7 +139,7 @@ export default function AnnouncementIndex({ announcements, filters }) {
                         <h1 className="text-2xl font-black tracking-tight text-gray-900">Announcements & News</h1>
                         <p className="text-gray-500 font-medium">Push platform updates, maintenance notices, and news to users.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => openModal()}
                         className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold flex items-center shadow-lg transition-all hover:-translate-y-0.5"
                     >
@@ -123,16 +148,44 @@ export default function AnnouncementIndex({ announcements, filters }) {
                     </button>
                 </div>
 
-                <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <form onSubmit={handleSearch} className="relative w-full md:w-96">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
-                        <input 
-                            type="text"
-                            placeholder="Search news..."
-                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                        />
+                <div className="bg-white p-4 flex flex-col xl:flex-row gap-4 xl:items-center justify-between rounded-3xl shadow-sm border border-gray-100">
+                    <form onSubmit={handleSearch} className="flex flex-1 gap-2 flex-col md:flex-row w-full">
+                        <div className="relative flex-1">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
+                            <input
+                                type="text"
+                                placeholder="Search news..."
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                            <input
+                                type="date"
+                                className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                            />
+                            <span className="text-gray-400 font-black text-[10px] tracking-widest px-1">TO</span>
+                            <input
+                                type="date"
+                                className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                            />
+                            <button type="submit" className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all whitespace-nowrap">
+                                Filter
+                            </button>
+                            <button
+                                onClick={handleExport}
+                                type="button"
+                                className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                            >
+                                <span className="material-icons-outlined mr-2 text-sm">download</span>
+                                CSV
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -187,11 +240,10 @@ export default function AnnouncementIndex({ announcements, filters }) {
                                 key={i}
                                 onClick={() => router.visit(link.url)}
                                 disabled={!link.url || link.active}
-                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                                    link.active ? 'bg-gray-900 text-white' : 
-                                    !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
-                                    'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
-                                }`}
+                                className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active ? 'bg-gray-900 text-white' :
+                                        !link.url ? 'text-gray-300 opacity-50 cursor-not-allowed' :
+                                            'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-600'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
@@ -217,7 +269,7 @@ export default function AnnouncementIndex({ announcements, filters }) {
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Type</label>
-                                    <select 
+                                    <select
                                         className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                         value={data.type}
                                         onChange={e => setData('type', e.target.value)}
@@ -227,7 +279,7 @@ export default function AnnouncementIndex({ announcements, filters }) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Status</label>
-                                    <select 
+                                    <select
                                         className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                         value={data.status}
                                         onChange={e => setData('status', e.target.value)}
@@ -240,8 +292,8 @@ export default function AnnouncementIndex({ announcements, filters }) {
 
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Title</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold"
                                     value={data.title}
                                     onChange={e => setData('title', e.target.value)}
@@ -252,7 +304,7 @@ export default function AnnouncementIndex({ announcements, filters }) {
 
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Content</label>
-                                <textarea 
+                                <textarea
                                     className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium h-32 resize-none"
                                     value={data.content}
                                     onChange={e => setData('content', e.target.value)}
@@ -262,8 +314,8 @@ export default function AnnouncementIndex({ announcements, filters }) {
                             </div>
 
                             <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-2xl">
-                                <input 
-                                    type="checkbox" 
+                                <input
+                                    type="checkbox"
                                     id="is_pinned"
                                     className="h-5 w-5 rounded text-orange-500 focus:ring-orange-500/20 border-gray-300"
                                     checked={data.is_pinned}

@@ -41,12 +41,39 @@ export default function SupportTicketIndex({ tickets, filters }) {
         }
     };
 
+    const defaultStartDate = new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0];
+    const defaultEndDate = new Date().toISOString().split('T')[0];
+    const [startDate, setStartDate] = useState(filters?.start_date || defaultStartDate);
+    const [endDate, setEndDate] = useState(filters?.end_date || defaultEndDate);
+
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.support-tickets.index'), {
             search: searchQuery,
-            status: statusFilter
+            status: statusFilter,
+            start_date: startDate,
+            end_date: endDate
         }, { preserveState: true });
+    };
+
+    const handleExport = (e) => {
+        e.preventDefault();
+        if (!startDate || !endDate) {
+            Swal.fire('Error', 'Please select both start and end dates for export.', 'error');
+            return;
+        }
+        const diffTime = new Date(endDate).getTime() - new Date(startDate).getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if (diffDays > 15 || diffDays < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date Range',
+                text: 'Export date range cannot exceed 15 days.',
+                customClass: { confirmButton: 'bg-orange-500 rounded-xl px-6 py-2 text-white font-bold' }
+            });
+            return;
+        }
+        window.location.href = route('admin.support-tickets.export', { search: searchQuery, status: statusFilter, start_date: startDate, end_date: endDate });
     };
 
     const getStatusColor = (status) => {
@@ -114,9 +141,9 @@ export default function SupportTicketIndex({ tickets, filters }) {
                     </button>
                 </div>
 
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
+                <div className="bg-white p-4 flex flex-col xl:flex-row gap-4 xl:items-center justify-between rounded-3xl shadow-sm border border-gray-100">
+                    <form onSubmit={handleSearch} className="flex flex-1 gap-4 flex-col md:flex-row w-full flex-wrap">
+                        <div className="relative flex-1 min-w-[200px]">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
                             <input
                                 type="text"
@@ -127,7 +154,7 @@ export default function SupportTicketIndex({ tickets, filters }) {
                             />
                         </div>
                         <select
-                            className="px-6 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs uppercase tracking-widest"
+                            className="px-6 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs uppercase tracking-widest min-w-[140px]"
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value)}
                         >
@@ -137,16 +164,34 @@ export default function SupportTicketIndex({ tickets, filters }) {
                             <option value="resolved">Resolved</option>
                             <option value="closed">Closed</option>
                         </select>
-                        <button type="submit" className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all">
-                            Filter
-                        </button>
-                        <a
-                            href={route('admin.support-tickets.index', { search: searchQuery, status: statusFilter, export: 1 })}
-                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
-                        >
-                            <span className="material-icons-outlined mr-2 text-sm">download</span>
-                            CSV
-                        </a>
+                        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                            <input
+                                type="date"
+                                className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                            />
+                            <span className="text-gray-400 font-black text-[10px] tracking-widest px-1">TO</span>
+                            <input
+                                type="date"
+                                className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs text-gray-700"
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button type="submit" className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all whitespace-nowrap">
+                                Filter
+                            </button>
+                            <button
+                                onClick={handleExport}
+                                type="button"
+                                className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                            >
+                                <span className="material-icons-outlined mr-2 text-sm">download</span>
+                                CSV
+                            </button>
+                        </div>
                     </form>
                 </div>
 

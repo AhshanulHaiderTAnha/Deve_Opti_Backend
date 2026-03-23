@@ -94,10 +94,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
         Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
         // Logs
+        Route::get('activity-logs/export', [UserActivityLogController::class, 'export'])->name('activity-logs.export');
         Route::get('activity-logs', [UserActivityLogController::class, 'index'])->name('activity-logs.index');
         Route::delete('activity-logs/{userActivityLog}', [UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
         Route::post('activity-logs/clear-old', [UserActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
         // Announcements
+        Route::get('announcements/export', [AnnouncementController::class, 'export'])->name('announcements.export');
         Route::resource('announcements', AnnouncementController::class)->except(['create', 'edit', 'show']);
     });
 });
