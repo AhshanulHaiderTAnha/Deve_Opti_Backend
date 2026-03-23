@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function Login() {
@@ -8,9 +8,21 @@ export default function Login() {
         remember: false,
     });
 
+    const [captcha, setCaptcha] = useState({ n1: 0, n2: 0 });
+    const [captchaAnswer, setCaptchaAnswer] = useState('');
+
+    useEffect(() => {
+        setCaptcha({
+            n1: Math.floor(Math.random() * 9) + 1,
+            n2: Math.floor(Math.random() * 9) + 1
+        });
+    }, []);
+
+    const isCaptchaCorrect = parseInt(captchaAnswer) === (captcha.n1 + captcha.n2);
+
     const submit = (e) => {
         e.preventDefault();
-        // The 'route' function is now globally available via ziggy-js in app.jsx
+        if (!isCaptchaCorrect) return;
         post(window.route ? window.route('admin.login.store') : '/admin/login');
     };
 
@@ -70,6 +82,18 @@ export default function Login() {
                             </div>
                             {errors.password && <p className="text-rose-500 text-xs mt-2 ml-1 font-semibold">{errors.password}</p>}
                         </div>
+
+                        <div className="pt-2">
+                            <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Captcha: {captcha.n1} + {captcha.n2} = ?</label>
+                            <input
+                                type="number"
+                                value={captchaAnswer}
+                                onChange={e => setCaptchaAnswer(e.target.value)}
+                                className="block w-full px-4 py-3 bg-slate-50 border-0 rounded-xl text-slate-900 font-black placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none text-center text-lg"
+                                placeholder="Enter result"
+                                required
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between px-1">
@@ -83,14 +107,13 @@ export default function Login() {
                             />
                             <label htmlFor="remember" className="ml-2 block text-sm text-slate-600 font-semibold cursor-pointer select-none">Remember me</label>
                         </div>
-                        <a href="#" className="text-sm font-bold text-orange-500 hover:text-orange-600 transition-all">Forgot?</a>
                     </div>
 
                     <div className="pt-2">
                         <button
                             type="submit"
-                            disabled={processing}
-                            className={`group relative w-full flex justify-center py-4 px-6 border-0 text-md font-black rounded-2xl text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500/30 transition-all shadow-lg shadow-orange-200/50 ${processing ? 'opacity-70 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+                            disabled={processing || !isCaptchaCorrect}
+                            className={`group relative w-full flex justify-center py-4 px-6 border-0 text-md font-black rounded-2xl text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500/30 transition-all shadow-lg shadow-orange-200/50 ${(processing || !isCaptchaCorrect) ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}`}
                         >
                             {processing ? (
                                 <span className="flex items-center font-bold">
@@ -117,7 +140,7 @@ export default function Login() {
 
             {/* Footer */}
             <p className="absolute bottom-8 left-0 right-0 text-center text-slate-400 text-sm font-medium">
-                &copy; 2026 DEVE OPTI System. Built with Premium Performance.
+                &copy; 2026 DEVE OPTI System. Dev Name : Ahshanul Haider
             </p>
         </div>
     );
