@@ -3,7 +3,7 @@ import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Swal from 'sweetalert2';
 
-export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
+export default function OrderTaskIndex({ tasks, commissionTiers, products, filters = {} }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -95,13 +95,44 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                         <h1 className="text-2xl font-black text-gray-900">Task Templates</h1>
                         <p className="text-gray-500 font-medium text-sm text-neutral-400">Manage batches of product orders that users can grab and process.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={() => openModal()}
                         className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold flex items-center shadow-lg transition-all hover:-translate-y-0.5"
                     >
                         <span className="material-icons-outlined mr-2">add</span>
                         Create Task Template
                     </button>
+                </div>
+
+                <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between">
+                    <div className="relative w-full xl:max-w-md">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
+                        <input
+                            type="text"
+                            placeholder="Search by title..."
+                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
+                            defaultValue={filters?.search || ''}
+                            onKeyUp={e => e.key === 'Enter' && router.get(route('admin.order-tasks.index'), { ...filters, search: e.target.value }, { preserveState: true })}
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
+                        <select
+                            className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs uppercase tracking-wider text-gray-700 appearance-none min-w-[120px]"
+                            defaultValue={filters?.status || ''}
+                            onChange={e => router.get(route('admin.order-tasks.index'), { ...filters, status: e.target.value }, { preserveState: true })}
+                        >
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <a
+                            href={route('admin.order-tasks.index', { ...filters, export: 1 })}
+                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            CSV
+                        </a>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -154,7 +185,7 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                             </div>
                         </div>
                     ))}
-                    
+
                     {tasks.length === 0 && (
                         <div className="col-span-full bg-white p-12 text-center rounded-2xl border border-gray-100 border-dashed">
                             <span className="material-icons-outlined text-4xl text-gray-300 mb-3 block">inventory_2</span>
@@ -224,8 +255,8 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                                     <span>Select Products for this Task Pool</span>
                                     <span className="text-blue-500 font-black">{data.product_ids.length} selected</span>
                                 </label>
-                                
-                                <div 
+
+                                <div
                                     className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 min-h-[50px] cursor-pointer flex flex-wrap gap-2 items-center"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 >
@@ -245,24 +276,23 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products }) {
                                         })
                                     )}
                                 </div>
-                                
+
                                 {isDropdownOpen && (
                                     <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-xl max-h-[18rem] overflow-y-auto shadow-xl" style={{ top: "100%", marginTop: "0.5rem" }}>
                                         <div className="p-2 space-y-1">
                                             {products.map(product => {
                                                 const isSelected = data.product_ids.includes(product.id);
                                                 return (
-                                                    <label 
-                                                        key={product.id} 
-                                                        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border ${
-                                                            isSelected 
-                                                            ? 'bg-orange-50 border-orange-200 text-orange-900' 
-                                                            : 'bg-transparent border-transparent hover:bg-gray-50 text-gray-700'
-                                                        }`}
+                                                    <label
+                                                        key={product.id}
+                                                        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border ${isSelected
+                                                                ? 'bg-orange-50 border-orange-200 text-orange-900'
+                                                                : 'bg-transparent border-transparent hover:bg-gray-50 text-gray-700'
+                                                            }`}
                                                     >
                                                         <div className="flex-shrink-0 mr-3">
-                                                            <input 
-                                                                type="checkbox" 
+                                                            <input
+                                                                type="checkbox"
                                                                 className="form-checkbox h-5 w-5 text-orange-500 rounded border-gray-300 focus:ring-orange-500 transition-all"
                                                                 checked={isSelected}
                                                                 onChange={(e) => {

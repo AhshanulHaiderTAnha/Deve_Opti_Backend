@@ -66,7 +66,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Commission Tiers Management
         Route::resource('commission-tiers', CommissionTierController::class)->except(['create', 'edit', 'show']);
         // Order Tasks System
+        Route::get('order-tasks/export', [OrderTaskController::class, 'export'])->name('order-tasks.export');
         Route::resource('order-tasks', OrderTaskController::class)->except(['create', 'edit', 'show']);
+        Route::get('user-tasks/export', [UserTaskController::class, 'export'])->name('user-tasks.export');
         Route::resource('user-tasks', UserTaskController::class)->only(['index', 'store', 'destroy']);
         // Support Tickets
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');

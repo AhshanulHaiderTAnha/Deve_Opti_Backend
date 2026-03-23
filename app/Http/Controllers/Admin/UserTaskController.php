@@ -13,15 +13,79 @@ use App\Mail\TaskAssignedUser;
 
 class UserTaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type']);
+
+        if ($request->filled('search')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%");
+            });
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        }
+
         return Inertia::render('Admin/OrderTasks/UserAssignments', [
-            'assignments' => UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type'])
-                ->latest()
-                ->paginate(15),
+            'assignments' => $query->latest()->paginate(15)->withQueryString(),
             'users' => User::role('user')->get(['id', 'name', 'email']),
-            'tasks' => OrderTask::where('status', 'active')->get(['id', 'title', 'required_orders', 'commission_type'])
+            'tasks' => OrderTask::where('status', 'active')->get(['id', 'title', 'required_orders', 'commission_type']),
+            'filters' => $request->only(['search', 'status', 'start_date', 'end_date'])
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $query = UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type']);
+
+        if ($request->filled('search')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('email', 'like', "%{$request->search}%");
+            });
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        }
+
+        $assignments = $query->latest()->get();
+
+        $filename = "user_tasks_report_" . now()->format('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        $columns = ['ID', 'User Name', 'User Email', 'Task Title', 'Completed', 'Required', 'Earned ($)', 'Status', 'Date Assigned'];
+
+        $callback = function() use($assignments, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($assignments as $a) {
+                fputcsv($file, [
+                    $a->id,
+                    $a->user->name ?? 'N/A',
+                    $a->user->email ?? 'N/A',
+                    $a->orderTask->title ?? 'N/A',
+                    $a->completed_orders,
+                    $a->orderTask->required_orders ?? 0,
+                    $a->total_earned_commission,
+                    $a->status,
+                    $a->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 
     public function store(Request $request)

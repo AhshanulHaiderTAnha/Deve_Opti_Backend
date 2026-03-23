@@ -12,13 +12,68 @@ use Illuminate\Support\Facades\DB;
 
 class OrderTaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = OrderTask::with(['tier', 'products:id,title']);
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', "%{$request->search}%");
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $query->latest();
+
         return Inertia::render('Admin/OrderTasks/Index', [
-            'tasks' => OrderTask::with(['tier', 'products:id,title'])->latest()->get(),
+            'tasks' => $query->get(),
             'commissionTiers' => CommissionTier::where('status', 'active')->orderBy('sort_order')->get(),
-            'products' => Product::where('status', 'published')->get(['id', 'title', 'price', 'platform'])
+            'products' => Product::where('status', 'published')->get(['id', 'title', 'price', 'platform']),
+            'filters' => $request->only(['search', 'status'])
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $query = OrderTask::with(['tier']);
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $tasks = $query->latest()->get();
+
+        $filename = "order_tasks_report_" . now()->format('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        $columns = ['ID', 'Title', 'Commission Type', 'Tier/Rate', 'Required Orders', 'Status', 'Created At'];
+
+        $callback = function() use($tasks, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($tasks as $t) {
+                fputcsv($file, [
+                    $t->id,
+                    $t->title,
+                    $t->commission_type,
+                    $t->commission_type === 'tier' ? ($t->tier->name ?? 'N/A') : $t->manual_commission_percent . '%',
+                    $t->required_orders,
+                    $t->status,
+                    $t->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 
     public function store(Request $request)
