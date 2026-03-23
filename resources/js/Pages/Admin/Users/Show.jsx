@@ -80,49 +80,56 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
 
                         {/* Recent Activity Log */}
                         <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-50 overflow-hidden">
-                            <div className="p-10 border-b border-slate-50">
-                                <h3 className="text-xl font-black text-slate-900 tracking-tight">Login & Activity Logs</h3>
-                                <p className="text-slate-400 text-xs font-medium mt-1">Showing the latest 5 registration and login entries.</p>
+                            <div className="p-10 border-b border-slate-50 bg-slate-50/30">
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight">Timeline & Activity Logs</h3>
+                                <p className="text-slate-400 text-xs font-medium mt-1">Showing the latest 5 account events and actions.</p>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead>
-                                        <tr className="bg-slate-50/50 border-b border-slate-50">
-                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Event</th>
-                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">IP Address</th>
-                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">User Agent</th>
-                                            <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Timestamp</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {activities?.length > 0 ? activities.map((log) => (
-                                            <tr key={log.id} className="hover:bg-slate-50/30 transition-colors">
-                                                <td className="px-10 py-5">
-                                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${log.action === 'register' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                                                        }`}>
-                                                        {log.action}
-                                                    </span>
-                                                </td>
-                                                <td className="px-10 py-5 font-bold text-slate-700 text-sm tracking-tight">{log.ip_address}</td>
-                                                <td className="px-10 py-5 max-w-[200px] truncate text-slate-400 text-[10px] font-medium" title={log.user_agent}>
-                                                    {log.user_agent}
-                                                </td>
-                                                <td className="px-10 py-5 text-slate-400 text-[10px] font-bold">
-                                                    {new Date(log.created_at).toLocaleString()}
-                                                </td>
-                                            </tr>
-                                        )) : (
-                                            <tr>
-                                                <td colSpan="4" className="px-10 py-20 text-center">
-                                                    <div className="flex flex-col items-center">
-                                                        <span className="material-icons-outlined text-slate-200 text-5xl mb-4">history_toggle_off</span>
-                                                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No recent activity found</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                            <div className="p-10 pl-12 space-y-8 relative">
+                                {activities?.length > 0 && <div className="absolute top-10 bottom-10 left-[4.25rem] w-px bg-slate-100"></div>}
+                                {activities?.length > 0 ? activities.map((log, index) => (
+                                    <div key={log.id} className="flex gap-6 relative z-10 w-full group">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border-4 border-white shadow-sm transition-transform group-hover:scale-110 ${log.action.toLowerCase().includes('task') ? 'bg-sky-50 text-sky-500' :
+                                                log.action.toLowerCase().includes('register') ? 'bg-indigo-50 text-indigo-500' :
+                                                    log.action.toLowerCase().includes('login') ? 'bg-emerald-50 text-emerald-500' :
+                                                        log.action.toLowerCase().includes('deposit') ? 'bg-teal-50 text-teal-500' :
+                                                            'bg-orange-50 text-orange-500'
+                                            }`}>
+                                            <span className="material-icons-outlined text-2xl">
+                                                {log.action.toLowerCase().includes('task') ? 'assignment' :
+                                                    log.action.toLowerCase().includes('register') ? 'person_add' :
+                                                        log.action.toLowerCase().includes('login') ? 'login' :
+                                                            log.action.toLowerCase().includes('deposit') ? 'account_balance_wallet' :
+                                                                'history'}
+                                            </span>
+                                        </div>
+                                        <div className="flex-1 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group-hover:border-slate-200">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                                                <h4 className="font-bold text-slate-800 text-sm tracking-tight capitalize">{log.action || 'System Event'}</h4>
+                                                <span className="text-[10px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full whitespace-nowrap">
+                                                    {new Date(log.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                                </span>
+                                            </div>
+                                            {(log.details || log.user_agent) && (
+                                                <p className="text-[11px] text-slate-500 font-medium leading-relaxed mb-3 bg-slate-50/50 p-3 rounded-xl border border-slate-50">
+                                                    {log.details || log.user_agent}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-2">
+                                                <span className="flex items-center text-[9px] font-black uppercase tracking-wider text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
+                                                    <span className="material-icons-outlined text-[12px] mr-1.5 opacity-70">language</span>
+                                                    {log.ip_address}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="py-10 text-center">
+                                        <div className="flex flex-col items-center">
+                                            <span className="material-icons-outlined text-slate-200 text-5xl mb-4">history_toggle_off</span>
+                                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No recent activity found</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
