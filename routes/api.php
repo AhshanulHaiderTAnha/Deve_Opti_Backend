@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 
 // Public Resources (Cached)
 Route::prefix('public')->group(function () {
+    Route::get('settings', [PublicController::class, 'settings']);
     Route::get('success-stories', [PublicController::class, 'successStories']);
     Route::get('faqs', [PublicController::class, 'faqs']);
     Route::post('subscribe', [PublicController::class, 'subscribe']);

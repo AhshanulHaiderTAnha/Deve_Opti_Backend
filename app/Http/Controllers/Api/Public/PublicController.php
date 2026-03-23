@@ -56,10 +56,42 @@ class PublicController extends Controller
                 ->get()
                 ->toArray();
         });
-
+ 
         return response()->json([
             'status' => 'success',
             'data' => $faqs
+        ]);
+    }
+
+    public function settings()
+    {
+        $settings = Cache::remember('public_site_settings', 3600, function () {
+            $keys = [
+                'system_name',
+                'site_logo',
+                'site_favicon',
+                'google_analytics_id',
+                'meta_title',
+                'meta_description',
+                'meta_keywords'
+            ];
+            
+            $data = \App\Models\Setting::whereIn('key', $keys)->pluck('value', 'key')->toArray();
+
+            // Format image URLs
+            if (isset($data['site_logo']) && !str_starts_with($data['site_logo'], 'http')) {
+                $data['site_logo'] = asset('storage/' . ltrim($data['site_logo'], '/'));
+            }
+            if (isset($data['site_favicon']) && !str_starts_with($data['site_favicon'], 'http')) {
+                $data['site_favicon'] = asset('storage/' . ltrim($data['site_favicon'], '/'));
+            }
+
+            return $data;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $settings
         ]);
     }
 }
