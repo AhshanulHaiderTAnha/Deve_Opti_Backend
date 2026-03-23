@@ -13,7 +13,7 @@ Great news! A new batch of orders has been assigned to your account. You can now
 Complete all {{ $userTask->orderTask->required_orders }} orders to unlock your commission payload!
 </x-mail::panel>
 
-<x-mail::button :url="config('app.frontend_url') . '/my-orders'">
+<x-mail::button :url="config('app.frontend_url') . '/orders'">
 Start Processing Now
 </x-mail::button>
 
