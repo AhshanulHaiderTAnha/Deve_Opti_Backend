@@ -38,6 +38,55 @@ class SupportTicketController extends Controller
         ]);
     }
 
+    public function export(Request $request)
+    {
+        $query = SupportTicket::with(['user']);
+
+        if ($request->search) {
+            $query->where(function($q) use ($request) {
+                $q->where('ticket_id', 'like', "%{$request->search}%")
+                  ->orWhere('subject', 'like', "%{$request->search}%")
+                  ->orWhereHas('user', function($u) use ($request) {
+                      $u->where('name', 'like', "%{$request->search}%");
+                  });
+            });
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $tickets = $query->latest('last_reply_at')->get();
+
+        $filename = "support_tickets_report_" . now()->format('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        $columns = ['Ticket ID', 'User Name', 'User Email', 'Subject', 'Priority', 'Status', 'Last Reply At'];
+
+        $callback = function() use($tickets, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($tickets as $t) {
+                fputcsv($file, [
+                    $t->ticket_id,
+                    $t->user->name ?? 'N/A',
+                    $t->user->email ?? 'N/A',
+                    $t->subject,
+                    $t->priority,
+                    $t->status,
+                    $t->last_reply_at ? \Carbon\Carbon::parse($t->last_reply_at)->format('Y-m-d H:i:s') : 'N/A'
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function show(SupportTicket $supportTicket)
     {
         return Inertia::render('Admin/SupportTickets/Show', [

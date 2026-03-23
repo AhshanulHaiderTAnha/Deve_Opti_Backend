@@ -71,6 +71,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('user-tasks/export', [UserTaskController::class, 'export'])->name('user-tasks.export');
         Route::resource('user-tasks', UserTaskController::class)->only(['index', 'store', 'destroy']);
         // Support Tickets
+        Route::get('support-tickets/export', [AdminSupportTicketController::class, 'export'])->name('support-tickets.export');
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');
         Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
         Route::get('support-tickets/{support_ticket}', [AdminSupportTicketController::class, 'show'])->name('support-tickets.show');
@@ -78,7 +79,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('support-tickets/{support_ticket}/close', [AdminSupportTicketController::class, 'close'])->name('support-tickets.close');
         // Success Stories & FAQ
         Route::resource('success-stories', SuccessStoryController::class)->except(['create', 'edit', 'show']);
+        Route::get('faqs/export', [FaqController::class, 'export'])->name('faqs.export');
         Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
+        Route::get('subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
         Route::resource('subscribers',SubscriberController::class)->only(['index', 'destroy']);
         // Wallet System
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');

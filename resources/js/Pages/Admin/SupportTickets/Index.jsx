@@ -140,6 +140,13 @@ export default function SupportTicketIndex({ tickets, filters }) {
                         <button type="submit" className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all">
                             Filter
                         </button>
+                        <a
+                            href={route('admin.support-tickets.index', { search: searchQuery, status: statusFilter, export: 1 })}
+                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            CSV
+                        </a>
                     </form>
                 </div>
 

@@ -16,6 +16,38 @@ class FaqController extends Controller
         ]);
     }
 
+    public function export()
+    {
+        $faqs = Faq::orderBy('position')->get();
+
+        $filename = "faqs_export_" . now()->format('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        $columns = ['ID', 'Question', 'Answer', 'Position', 'Status', 'Created At'];
+
+        $callback = function() use($faqs, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($faqs as $f) {
+                fputcsv($file, [
+                    $f->id,
+                    $f->question,
+                    strip_tags($f->answer),
+                    $f->position,
+                    $f->status,
+                    $f->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

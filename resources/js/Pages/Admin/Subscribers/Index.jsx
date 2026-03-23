@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Swal from 'sweetalert2';
 
-export default function SubscriberIndex({ subscribers }) {
+export default function SubscriberIndex({ subscribers, filters = {} }) {
     const deleteSubscriber = (id) => {
         Swal.fire({
             title: 'Remove Subscriber?',
@@ -43,10 +43,29 @@ export default function SubscriberIndex({ subscribers }) {
             <Head title="Newsletter Subscribers" />
 
             <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <div>
+                <div className="flex justify-between items-center p-4 bg-white rounded-3xl shadow-sm border border-gray-100 flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-auto">
                         <h1 className="text-2xl font-black text-gray-900 tracking-tight">Newsletter Audience</h1>
                         <p className="text-gray-500 font-medium">Manage your "Stay in the loop" subscription list.</p>
+                    </div>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <div className="relative flex-1 md:w-64">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
+                            <input
+                                type="text"
+                                placeholder="Search email..."
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
+                                defaultValue={filters?.search || ''}
+                                onKeyUp={e => e.key === 'Enter' && router.get(route('admin.subscribers.index'), { search: e.target.value }, { preserveState: true })}
+                            />
+                        </div>
+                        <a
+                            href={route('admin.subscribers.index', { search: filters?.search || '', export: 1 })}
+                            className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px]"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            CSV
+                        </a>
                     </div>
                 </div>
 

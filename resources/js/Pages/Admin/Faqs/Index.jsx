@@ -94,13 +94,22 @@ export default function FaqIndex({ faqs }) {
                         <h1 className="text-2xl font-black text-gray-900 tracking-tight">FAQ Management</h1>
                         <p className="text-gray-500 font-medium">Manage frequently asked questions for your users.</p>
                     </div>
-                    <button
-                        onClick={openCreateModal}
-                        className="px-6 py-3 bg-gray-900 text-white rounded-2xl font-bold flex items-center hover:bg-black transition-all shadow-lg shadow-gray-200"
-                    >
-                        <span className="material-icons-outlined mr-2">add</span>
-                        Create FAQ
-                    </button>
+                    <div className="flex gap-3">
+                        <a
+                            href={route('admin.faqs.export')}
+                            className="px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-black rounded-2xl transition-all uppercase tracking-widest text-[#10px] flex items-center justify-center"
+                        >
+                            <span className="material-icons-outlined mr-2 text-sm">download</span>
+                            CSV
+                        </a>
+                        <button
+                            onClick={openCreateModal}
+                            className="px-6 py-3 bg-gray-900 text-white rounded-2xl font-bold flex items-center hover:bg-black transition-all shadow-lg shadow-gray-200"
+                        >
+                            <span className="material-icons-outlined mr-2">add</span>
+                            Create FAQ
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
