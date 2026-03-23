@@ -147,16 +147,17 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${assignment.status === 'completed'
-                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                                    : 'bg-amber-50 text-amber-600 border-amber-100'
+                                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                                : 'bg-amber-50 text-amber-600 border-amber-100'
                                                 }`}>
                                                 {assignment.status.replace('_', ' ')}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             {assignment.status === 'in_progress' ? (
-                                                <button onClick={() => deleteAssignment(assignment.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Cancel Assignment">
-                                                    <span className="material-icons-outlined text-[20px]">cancel</span>
+                                                <button onClick={() => deleteAssignment(assignment.id)} className="inline-flex items-center px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider" title="Delete Assignment">
+                                                    <span className="material-icons-outlined text-[16px] mr-1">delete</span>
+                                                    Delete
                                                 </button>
                                             ) : (
                                                 <span className="text-gray-400 text-xs italic">Done</span>
