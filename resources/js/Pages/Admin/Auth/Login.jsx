@@ -140,7 +140,7 @@ export default function Login() {
 
             {/* Footer */}
             <p className="absolute bottom-8 left-0 right-0 text-center text-slate-400 text-sm font-medium">
-                &copy; 2026 DEVE OPTI System. Dev Name : Ahshanul Haider
+                &copy; 2026 DEVE OPTI System
             </p>
         </div>
     );
