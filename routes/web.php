@@ -104,7 +104,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('announcements/export', [AnnouncementController::class, 'export'])->name('announcements.export');
         Route::resource('announcements', AnnouncementController::class)->except(['create', 'edit', 'show']);
         // Social Media
-        Route::resource('social-media', SocialMediaController::class)->except(['create', 'edit', 'show']);
+        Route::resource('social-media', SocialMediaController::class)->parameters(['social-media' => 'socialMedia'])->except(['create', 'edit', 'show']);
     });
 });
 
