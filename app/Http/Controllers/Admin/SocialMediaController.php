@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SocialMedia;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request as HttpRequest;
 use Inertia\Inertia;
 
 class SocialMediaController extends Controller
@@ -15,7 +15,7 @@ class SocialMediaController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(HttpRequest $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -30,7 +30,7 @@ class SocialMediaController extends Controller
         return back()->with('success', 'Social media added successfully.');
     }
 
-    public function update(Request $request, SocialMedia $socialMedia)
+    public function update(HttpRequest $request, SocialMedia $socialMedia)
     {
         $request->validate([
             'name' => 'required|string|max:255',
