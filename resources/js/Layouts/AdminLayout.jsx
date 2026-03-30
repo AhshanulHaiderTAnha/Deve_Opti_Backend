@@ -79,6 +79,7 @@ export default function AdminLayout({ children }) {
             current: route().current('admin.announcements.*') || route().current('admin.activity-logs.*') || route().current('admin.settings.*'),
             children: [
                 { name: 'Announcements', href: route('admin.announcements.index'), current: route().current('admin.announcements.*'), icon: 'campaign' },
+                { name: 'Social Media', href: route('admin.social-media.index'), current: route().current('admin.social-media.*'), icon: 'share' },
                 { name: 'Activity Logs', href: route('admin.activity-logs.index'), current: route().current('admin.activity-logs.*'), icon: 'history' },
                 { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
             ]
@@ -112,7 +113,7 @@ export default function AdminLayout({ children }) {
                             />
                             {isSidebarOpen && (
                                 <span className="ml-3 text-lg font-black text-gray-900 tracking-tighter uppercase">
-                                    {settings.system_name || 'DEVE OPTI'}
+                                    {settings.system_name || 'Stockrevive'}
                                 </span>
                             )}
                         </div>
@@ -123,7 +124,7 @@ export default function AdminLayout({ children }) {
                             </div>
                             {isSidebarOpen && (
                                 <span className="ml-3 text-lg font-black text-gray-900 tracking-tighter uppercase whitespace-nowrap">
-                                    DEVE <span className="text-orange-500">OPTI</span>
+                                    Stockrevive <span className="text-orange-500"></span>
                                 </span>
                             )}
                         </div>

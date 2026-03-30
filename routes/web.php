@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\OrderTaskController;
 use App\Http\Controllers\Admin\UserTaskController;
 use App\Http\Controllers\Admin\UserActivityLogController;
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\SocialMediaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -102,6 +103,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Announcements
         Route::get('announcements/export', [AnnouncementController::class, 'export'])->name('announcements.export');
         Route::resource('announcements', AnnouncementController::class)->except(['create', 'edit', 'show']);
+        // Social Media
+        Route::resource('social-media', SocialMediaController::class)->except(['create', 'edit', 'show']);
     });
 });
 

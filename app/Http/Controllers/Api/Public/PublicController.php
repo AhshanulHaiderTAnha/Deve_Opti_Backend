@@ -94,4 +94,18 @@ class PublicController extends Controller
             'data' => $settings
         ]);
     }
+    public function socialMediaLinks()
+    {
+        $links = Cache::remember('public_social_links', 3600, function () {
+            return \App\Models\SocialMedia::where('status', 'active')
+                ->orderBy('position')
+                ->get()
+                ->toArray();
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $links
+        ]);
+    }
 }

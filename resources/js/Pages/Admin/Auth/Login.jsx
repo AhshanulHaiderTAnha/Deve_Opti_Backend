@@ -39,7 +39,7 @@ export default function Login() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl shadow-lg shadow-orange-200 mb-4 group transition-all hover:scale-105">
                         <span className="material-icons-outlined text-white text-3xl">admin_panel_settings</span>
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">DEVE <span className="text-orange-500">OPTI</span></h2>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Stockrevive <span className="text-orange-500"></span></h2>
                     <p className="mt-2 text-slate-500 text-sm font-medium">
                         Secure Administration Access
                     </p>
@@ -58,7 +58,7 @@ export default function Login() {
                                     value={data.email}
                                     onChange={e => setData('email', e.target.value)}
                                     className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-0 rounded-xl text-slate-900 font-medium placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none text-sm"
-                                    placeholder="admin@deveopti.com"
+                                    placeholder="admin@admin.com"
                                     required
                                 />
                             </div>
@@ -140,7 +140,7 @@ export default function Login() {
 
             {/* Footer */}
             <p className="absolute bottom-8 left-0 right-0 text-center text-slate-400 text-sm font-medium">
-                &copy; 2026 DEVE OPTI System
+                &copy; 2026 Stockrevive System
             </p>
         </div>
     );

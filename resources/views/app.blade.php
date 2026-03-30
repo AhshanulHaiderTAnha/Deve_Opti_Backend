@@ -101,7 +101,7 @@
                  </svg>
              </div>
              <div class="loader-bar"></div>
-             <p style="margin-top: 15px; font-weight: 800; color: #1e293b; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">DEVE OPTI</p>
+             <p style="margin-top: 15px; font-weight: 800; color: #1e293b; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">Stockrevive</p>
         </div>
         @inertia
 
