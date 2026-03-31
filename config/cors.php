@@ -20,8 +20,10 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:3000',   // React customer frontend
-        'http://localhost:8000',   // Laravel Inertia admin (same origin)
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'https://stockrevive.com',
+        'https://www.stockrevive.com',
         env('FRONTEND_URL', 'http://localhost:3000'),
     ],
 
