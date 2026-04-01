@@ -63,10 +63,11 @@ export default function AdminLayout({ children }) {
         {
             name: 'Tasks & Orders',
             icon: 'assignment',
-            current: route().current('admin.order-tasks.*') || route().current('admin.user-tasks.*'),
+            current: route().current('admin.order-tasks.*') || route().current('admin.user-tasks.*') || route().current('admin.order-requests.*'),
             children: [
                 { name: 'Task Templates', href: route('admin.order-tasks.index'), current: route().current('admin.order-tasks.*'), icon: 'format_list_bulleted' },
                 { name: 'User Assignments', href: route('admin.user-tasks.index'), current: route().current('admin.user-tasks.*'), icon: 'assignment_ind' },
+                { name: 'Order Requests', href: route('admin.order-requests.index'), current: route().current('admin.order-requests.*'), icon: 'shopping_basket' },
             ]
         },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },

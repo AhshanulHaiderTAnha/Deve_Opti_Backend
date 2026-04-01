@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\User\ActivityLogController;
 use App\Http\Controllers\Api\User\CommissionTierController;
 use App\Http\Controllers\Api\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\Api\User\UserTaskController;
+use App\Http\Controllers\Api\User\OrderRequestController as UserOrderRequestController;
+use App\Http\Controllers\Api\Admin\OrderRequestController as AdminOrderRequestController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -95,6 +97,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('announcements/{id}/read', [AnnouncementController::class, 'markAsRead']);
         // Activity Logs
         Route::get('activity-logs', [ActivityLogController::class, 'index']);
+        // Order Requests
+        Route::get('order-requests', [UserOrderRequestController::class, 'index']);
+        // POST for store
+        Route::post('order-requests', [UserOrderRequestController::class, 'store']);
+        // POST for cancel
+        Route::post('order-requests/{id}/cancel', [UserOrderRequestController::class, 'cancel']);
     });
 
     // Admin Routes
@@ -109,6 +117,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('kyc/{id}',          [AdminKycController::class, 'show']);
         Route::post('kyc-approve/{id}', [AdminKycController::class, 'approve']);
         Route::post('kyc-reject/{id}',  [AdminKycController::class, 'reject']);
+        // Order Request management
+        Route::get('order-requests',          [AdminOrderRequestController::class, 'index']);
+        Route::patch('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus']);
         // Secure KYC document download
         Route::get('kyc/{id}/document/{type}', function (int $id, string $type) {
             $kyc  = \App\Models\KycSubmission::findOrFail($id);
