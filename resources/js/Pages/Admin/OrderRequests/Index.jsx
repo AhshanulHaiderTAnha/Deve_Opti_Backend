@@ -24,11 +24,11 @@ export default function Index({ orderRequests }) {
     return (
         <AdminLayout>
             <Head title="Order Requests" />
-            
+
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight underline decoration-orange-500/30 decoration-4 underline-offset-8">ORDER REQUESTS</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">ORDER REQUESTS</h1>
                         <p className="text-slate-500 font-medium mt-3">Review and manage incoming order requests from customers.</p>
                     </div>
                 </div>
@@ -66,11 +66,10 @@ export default function Index({ orderRequests }) {
                                         </td>
                                         <td className="px-8 py-6 text-center">
                                             <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] border-2 shadow-sm ${getStatusColor(request.status)}`}>
-                                                <span className={`h-1.5 w-1.5 rounded-full mr-2 ${
-                                                    request.status === 'pending' ? 'bg-amber-400' : 
-                                                    request.status === 'approved' ? 'bg-emerald-400' : 
-                                                    request.status === 'rejected' ? 'bg-rose-400' : 'bg-slate-300'
-                                                }`}></span>
+                                                <span className={`h-1.5 w-1.5 rounded-full mr-2 ${request.status === 'pending' ? 'bg-amber-400' :
+                                                    request.status === 'approved' ? 'bg-emerald-400' :
+                                                        request.status === 'rejected' ? 'bg-rose-400' : 'bg-slate-300'
+                                                    }`}></span>
                                                 {request.status}
                                             </span>
                                         </td>
@@ -125,11 +124,10 @@ export default function Index({ orderRequests }) {
                                 <Link
                                     key={i}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
-                                        link.active 
-                                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
-                                            : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${link.active
+                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
+                                        : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

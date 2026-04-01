@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Controllers\Controller;
 use App\Models\OrderRequest;
 use App\Models\UserActivityLog;
+use App\Mail\OrderRequestAdminMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderRequestController extends Controller
 {
@@ -40,6 +42,12 @@ class OrderRequestController extends Controller
             'ip_address' => $request->ip()
         ]);
 
+        // Send Email to Admin
+        $adminEmail = env('ADMIN_EMAIL');
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new OrderRequestAdminMail($orderRequest, auth()->user(), 'created'));
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Order request submitted successfully',
@@ -68,6 +76,12 @@ class OrderRequestController extends Controller
             'details' => "Cancelled order request #{$id}",
             'ip_address' => request()->ip()
         ]);
+
+        // Send Email to Admin
+        $adminEmail = env('ADMIN_EMAIL');
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new OrderRequestAdminMail($orderRequest, auth()->user(), 'cancelled'));
+        }
 
         return response()->json([
             'status' => 'success',
