@@ -1,14 +1,34 @@
 import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, router } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 
 export default function Index({ orderRequests }) {
     const { data: requests, links } = orderRequests;
 
     const handleUpdateStatus = (id, status) => {
-        if (confirm(`Are you sure you want to ${status} this order request?`)) {
-            router.patch(route('admin.order-requests.status', id), { status });
-        }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to ${status} this order request?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: `Yes, ${status} it!`,
+            cancelButtonText: 'No, cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.patch(route('admin.order-requests.status', id), { status }, {
+                    onSuccess: () => {
+                        Swal.fire(
+                            'Updated!',
+                            `Order request has been ${status}.`,
+                            'success'
+                        );
+                    }
+                });
+            }
+        });
     };
 
     const getStatusColor = (status) => {
