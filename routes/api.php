@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\User\DashboardController as UserDashboardController
 use App\Http\Controllers\Api\User\UserTaskController;
 use App\Http\Controllers\Api\User\OrderRequestController as UserOrderRequestController;
 use App\Http\Controllers\Api\Admin\OrderRequestController as AdminOrderRequestController;
+use App\Http\Controllers\Api\User\WithdrawalPasswordController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -103,6 +104,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('order-requests', [UserOrderRequestController::class, 'store']);
         // POST for cancel
         Route::post('order-requests/{id}/cancel', [UserOrderRequestController::class, 'cancel']);
+        // Withdrawal Password
+        Route::post('withdrawal-password/set', [WithdrawalPasswordController::class, 'set']);
+        Route::post('withdrawal-password/change', [WithdrawalPasswordController::class, 'change']);
     });
 
     // Admin Routes
