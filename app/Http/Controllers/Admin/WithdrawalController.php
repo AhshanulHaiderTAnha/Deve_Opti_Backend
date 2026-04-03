@@ -47,7 +47,7 @@ class WithdrawalController extends Controller
     public function approve(Request $request, WithdrawalRequest $withdrawal)
     {
         $request->validate([
-            'admin_transaction_id' => 'required|string'
+            'admin_transaction_id' => 'nullable|string'
         ]);
 
         if ($withdrawal->status !== 'pending') {
@@ -64,9 +64,11 @@ class WithdrawalController extends Controller
                 $wallet->balance -= $withdrawal->amount;
                 $wallet->save();
 
+                $trxId = $request->admin_transaction_id ?: 'PAID_IN_WALLET';
+
                 $withdrawal->update([
                     'status' => 'approved',
-                    'admin_transaction_id' => $request->admin_transaction_id,
+                    'admin_transaction_id' => $trxId,
                     'reviewed_by' => auth()->id(),
                     'reviewed_at' => now(),
                 ]);
@@ -78,7 +80,7 @@ class WithdrawalController extends Controller
                     'balance_after' => $wallet->balance,
                     'reference_type' => 'withdrawal_requests',
                     'reference_id' => $withdrawal->id,
-                    'description' => 'Withdrawal approved. Trx: ' . $request->admin_transaction_id,
+                    'description' => 'Withdrawal approved. Trx: ' . $trxId,
                 ]);
             });
 
