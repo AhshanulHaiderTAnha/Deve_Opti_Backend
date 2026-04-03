@@ -23,8 +23,12 @@ class ProductController extends Controller
             });
         }
 
-        if ($request->platform) {
-            $query->where('platform', $request->platform);
+        if ($request->min_price) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->max_price) {
+            $query->where('price', '<=', $request->max_price);
         }
 
         return $query;
@@ -34,7 +38,7 @@ class ProductController extends Controller
     {
         return Inertia::render('Admin/Products/Index', [
             'products' => $this->getFilteredProductsQuery($request)->latest()->paginate(10)->withQueryString(),
-            'filters' => $request->only(['search', 'platform'])
+            'filters' => $request->only(['search', 'platform', 'min_price', 'max_price'])
         ]);
     }
 

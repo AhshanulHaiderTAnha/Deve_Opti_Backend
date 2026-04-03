@@ -7,6 +7,8 @@ export default function ProductIndex({ products, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [minPrice, setMinPrice] = useState(filters.min_price || '');
+    const [maxPrice, setMaxPrice] = useState(filters.max_price || '');
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         title: '',
@@ -98,7 +100,12 @@ export default function ProductIndex({ products, filters }) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.products.index'), { search: searchQuery }, { preserveState: true });
+        router.get(route('admin.products.index'), {
+            ...filters,
+            search: searchQuery,
+            min_price: minPrice,
+            max_price: maxPrice
+        }, { preserveState: true });
     };
 
     return (
@@ -121,20 +128,58 @@ export default function ProductIndex({ products, filters }) {
                 </div>
 
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <form onSubmit={handleSearch} className="relative w-full md:max-w-md">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
-                        <input
-                            type="text"
-                            placeholder="Search by title, keyword, or SKU..."
-                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                        />
+                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 items-center w-full">
+                        <div className="relative flex-1 w-full">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-gray-400">search</span>
+                            <input
+                                type="text"
+                                placeholder="Search by title, keyword, or SKU..."
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <div className="relative flex-1 md:w-32">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 uppercase tracking-widest">$</span>
+                                <input
+                                    type="number"
+                                    placeholder="Min"
+                                    className="w-full pl-7 pr-3 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-sm"
+                                    value={minPrice}
+                                    onChange={e => setMinPrice(e.target.value)}
+                                />
+                            </div>
+                            <span className="text-gray-300 font-bold">-</span>
+                            <div className="relative flex-1 md:w-32">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 uppercase tracking-widest">$</span>
+                                <input
+                                    type="number"
+                                    placeholder="Max"
+                                    className="w-full pl-7 pr-3 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-sm"
+                                    value={maxPrice}
+                                    onChange={e => setMaxPrice(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="p-3 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all flex items-center justify-center"
+                            >
+                                <span className="material-icons-outlined text-xl">filter_list</span>
+                            </button>
+                        </div>
                     </form>
                     <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                         <select
                             className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-xs appearance-none uppercase tracking-wider text-gray-700"
-                            onChange={e => router.get(route('admin.products.index'), { ...filters, platform: e.target.value }, { preserveState: true })}
+                            onChange={e => router.get(route('admin.products.index'), {
+                                ...filters,
+                                platform: e.target.value,
+                                search: searchQuery,
+                                min_price: minPrice,
+                                max_price: maxPrice
+                            }, { preserveState: true })}
                             value={filters.platform || ''}
                         >
                             <option value="">All Platforms</option>
@@ -144,7 +189,12 @@ export default function ProductIndex({ products, filters }) {
                             <option value="Other">Other</option>
                         </select>
                         <a
-                            href={route('admin.products.export', filters)}
+                            href={route('admin.products.export', {
+                                ...filters,
+                                search: searchQuery,
+                                min_price: minPrice,
+                                max_price: maxPrice
+                            })}
                             className="shrink-0 flex items-center justify-center px-6 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold rounded-2xl transition-all uppercase tracking-wider text-xs"
                         >
                             <span className="material-icons-outlined mr-2 text-sm">download</span>
