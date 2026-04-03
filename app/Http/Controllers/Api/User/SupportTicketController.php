@@ -91,6 +91,12 @@ class SupportTicketController extends Controller
             ->with(['messages.user'])
             ->firstOrFail();
 
+        // Mark admin messages as read
+        $ticket->messages()
+            ->where('is_admin_reply', true)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         return response()->json([
             'status' => 'success',
             'data' => $ticket
@@ -145,6 +151,60 @@ class SupportTicketController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Reply sent successfully'
+        ]);
+    }
+
+    public function updateMessage(Request $request, $message_id)
+    {
+        $message = SupportMessage::where('id', $message_id)
+            ->where('user_id', auth()->id())
+            ->where('is_admin_reply', false)
+            ->firstOrFail();
+
+        if ($message->read_at) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot edit a message after it has been seen.'
+            ], 403);
+        }
+
+        $request->validate([
+            'message' => 'required|string'
+        ]);
+
+        $message->update([
+            'message' => $request->message
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Message updated successfully'
+        ]);
+    }
+
+    public function deleteMessage($message_id)
+    {
+        $message = SupportMessage::where('id', $message_id)
+            ->where('user_id', auth()->id())
+            ->where('is_admin_reply', false)
+            ->firstOrFail();
+
+        if ($message->read_at) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete a message after it has been seen.'
+            ], 403);
+        }
+
+        if ($message->attachment_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($message->attachment_path);
+        }
+
+        $message->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Message deleted successfully'
         ]);
     }
 }

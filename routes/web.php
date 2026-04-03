@@ -79,6 +79,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('support-tickets', [AdminSupportTicketController::class, 'store'])->name('support-tickets.store');
         Route::get('support-tickets/{support_ticket}', [AdminSupportTicketController::class, 'show'])->name('support-tickets.show');
         Route::post('support-tickets/{support_ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('support-tickets.reply');
+        Route::post('support-tickets/messages/{supportMessage}', [AdminSupportTicketController::class, 'updateMessage'])->name('support-tickets.message.update');
+        Route::delete('support-tickets/messages/{supportMessage}', [AdminSupportTicketController::class, 'deleteMessage'])->name('support-tickets.message.delete');
         Route::patch('support-tickets/{support_ticket}/close', [AdminSupportTicketController::class, 'close'])->name('support-tickets.close');
         // Success Stories & FAQ
         Route::resource('success-stories', SuccessStoryController::class)->except(['create', 'edit', 'show']);

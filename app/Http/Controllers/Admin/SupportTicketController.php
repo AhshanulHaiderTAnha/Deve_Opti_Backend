@@ -96,6 +96,12 @@ class SupportTicketController extends Controller
 
     public function show(SupportTicket $supportTicket)
     {
+        // Mark user messages as read
+        $supportTicket->messages()
+            ->where('is_admin_reply', false)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         return Inertia::render('Admin/SupportTickets/Show', [
             'ticket' => $supportTicket->load(['user', 'messages.user']),
         ]);
@@ -178,5 +184,45 @@ class SupportTicketController extends Controller
         Mail::to($supportTicket->user->email)->send(new TicketClosedUserMail($supportTicket));
 
         return back()->with('success', 'Ticket closed successfully.');
+    }
+
+    public function updateMessage(Request $request, SupportMessage $supportMessage)
+    {
+        if (!$supportMessage->is_admin_reply || $supportMessage->user_id !== auth()->id()) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        if ($supportMessage->read_at) {
+            return back()->with('error', 'Cannot edit message after it has been seen.');
+        }
+
+        $request->validate([
+            'message' => 'required|string',
+        ]);
+
+        $supportMessage->update([
+            'message' => $request->message,
+        ]);
+
+        return back()->with('success', 'Message updated successfully.');
+    }
+
+    public function deleteMessage(SupportMessage $supportMessage)
+    {
+        if (!$supportMessage->is_admin_reply || $supportMessage->user_id !== auth()->id()) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        if ($supportMessage->read_at) {
+            return back()->with('error', 'Cannot delete message after it has been seen.');
+        }
+
+        if ($supportMessage->attachment_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($supportMessage->attachment_path);
+        }
+
+        $supportMessage->delete();
+
+        return back()->with('success', 'Message deleted successfully.');
     }
 }

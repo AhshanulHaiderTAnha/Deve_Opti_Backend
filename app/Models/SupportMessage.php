@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SupportMessage extends Model
 {
     protected $fillable = [
-        'support_ticket_id', 'user_id', 'message', 'attachment_path', 'is_admin_reply'
+        'support_ticket_id', 'user_id', 'message', 'attachment_path', 'is_admin_reply', 'read_at'
     ];
 
     protected $appends = ['attachment_url'];

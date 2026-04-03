@@ -84,6 +84,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('support-tickets',        [SupportTicketController::class, 'store']);
         Route::get('support-tickets/{ticket_id}', [SupportTicketController::class, 'show']);
         Route::post('support-tickets/{ticket_id}/reply', [SupportTicketController::class, 'reply']);
+        Route::post('support-tickets/messages/{message_id}', [SupportTicketController::class, 'updateMessage']);
+        Route::delete('support-tickets/messages/{message_id}', [SupportTicketController::class, 'deleteMessage']);
         // Wallet System
         Route::get('wallet',                  [WalletController::class, 'show']);
         Route::get('wallet/transactions',     [WalletController::class, 'transactions']);
@@ -115,7 +117,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // User management
         Route::get('users',             [AdminUserController::class, 'index']);
         Route::get('users/{id}',        [AdminUserController::class, 'show']);
-        Route::patch('users/{id}/status', [AdminUserController::class, 'updateStatus']);
+        Route::post('users/{id}/status', [AdminUserController::class, 'updateStatus']);
         // KYC management
         Route::get('kyc-list',          [AdminKycController::class, 'index']);
         Route::get('kyc/{id}',          [AdminKycController::class, 'show']);
@@ -123,7 +125,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('kyc-reject/{id}',  [AdminKycController::class, 'reject']);
         // Order Request management
         Route::get('order-requests',          [AdminOrderRequestController::class, 'index']);
-        Route::patch('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus']);
+        Route::post('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus']);
         // Secure KYC document download
         Route::get('kyc/{id}/document/{type}', function (int $id, string $type) {
             $kyc  = \App\Models\KycSubmission::findOrFail($id);
