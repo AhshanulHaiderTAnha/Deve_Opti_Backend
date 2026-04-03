@@ -154,7 +154,7 @@ export default function WithdrawalIndex({ withdrawals, filters }) {
                             </h2>
                             <p className="text-sm text-gray-500 mb-6">
                                 {actionData.type === 'approve' 
-                                    ? `Enter the transaction ID to confirm you have paid $${actionData.withdrawal.amount}. The user's wallet will be deducted immediately.`
+                                    ? `Confirm you have paid $${actionData.withdrawal.amount}. You can optionally enter a transaction ID, otherwise it will be marked as 'PAID_IN_WALLET'.`
                                     : 'Please provide a reason to the user for rejecting this withdrawal. The funds will remain in their wallet.'}
                             </p>
 
@@ -166,8 +166,8 @@ export default function WithdrawalIndex({ withdrawals, filters }) {
                                             type="text"
                                             className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm"
                                             value={data.admin_transaction_id}
+                                            placeholder="Optional: Paid in wallet"
                                             onChange={e => setData('admin_transaction_id', e.target.value)}
-                                            required
                                         />
                                         {errors.admin_transaction_id && <p className="text-red-500 text-xs">{errors.admin_transaction_id}</p>}
                                     </div>
