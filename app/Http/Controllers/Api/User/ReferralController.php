@@ -80,4 +80,20 @@ class ReferralController extends Controller
             'data'   => $earnings,
         ]);
     }
+
+    /**
+     * GET /api/user/referral/team-income
+     * 
+     * Returns a breakdown of income generated from each member in the 3-level team.
+     */
+    public function teamIncome(Request $request): JsonResponse
+    {
+        $filters = $request->only(['search', 'per_page']);
+        $teamIncome = $this->referralService->getMyTeamIncome($request->user(), $filters);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $teamIncome,
+        ]);
+    }
 }

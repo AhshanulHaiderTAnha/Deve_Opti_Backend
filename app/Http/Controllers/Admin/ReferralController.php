@@ -70,6 +70,7 @@ class ReferralController extends Controller
     {
         $user = User::findOrFail($userId);
         $details = $this->referralService->getAdminUserReferralDetails($user);
+        $performance = $this->referralService->getAgentTeamPerformance($user);
 
         // Paginated earnings
         $earnings = ReferralEarning::where('user_id', $userId)
@@ -79,6 +80,7 @@ class ReferralController extends Controller
 
         return Inertia::render('Admin/Referrals/Show', [
             'referralData' => $details,
+            'performance'  => $performance['team_performance'],
             'earnings'     => $earnings,
         ]);
     }

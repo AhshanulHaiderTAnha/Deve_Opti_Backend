@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function ReferralShow({ referralData, earnings }) {
+export default function ReferralShow({ referralData, performance, earnings }) {
     const { user, stats, referral_tree, recent_earnings } = referralData;
 
     const UserCard = ({ user, level }) => (
@@ -74,6 +74,54 @@ export default function ReferralShow({ referralData, earnings }) {
                     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                         <p className="text-xs font-black text-gray-400 uppercase tracking-widest">L2/L3 (3% & 1%)</p>
                         <p className="text-xl font-bold text-gray-900 mt-2">${(stats.level_2_earned + stats.level_3_earned).toFixed(2)}</p>
+                    </div>
+                </div>
+
+                {/* Team Performance Monitoring */}
+                <div className="bg-white rounded-[2.5rem] border border-orange-100 p-10 shadow-xl shadow-orange-50/50 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                            <span className="material-icons-outlined text-9xl text-orange-500">query_stats</span>
+                    </div>
+                    <h2 className="text-xl font-black text-slate-900 mb-8 flex items-center relative z-10">
+                        <span className="material-icons-outlined mr-3 text-orange-500">monitoring</span>
+                        Team Performance Monitoring (3 Levels)
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+                        <div className="space-y-2">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Team Deposits</p>
+                            <p className="text-4xl font-black text-emerald-600 tracking-tight">${Number(performance.total_team_deposits).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                            <p className="text-xs text-slate-400">Total approved deposits across the entire network</p>
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Team Withdrawals</p>
+                            <p className="text-4xl font-black text-rose-600 tracking-tight">${Number(performance.total_team_withdrawals).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                            <p className="text-xs text-slate-400">Total processed withdrawals by team members</p>
+                        </div>
+                        <div className="space-y-2 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Net Team Profit</p>
+                            <p className={`text-4xl font-black tracking-tight ${performance.net_team_profit >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+                                ${Number(performance.net_team_profit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </p>
+                            <p className="text-xs text-slate-500 font-medium">Difference between team inflow and outflow</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-10 pt-8 border-t border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center space-x-6">
+                            <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Members: {performance.total_team_size}</span>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500 mr-2"></span>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Members: {performance.active_team_members}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center text-xs font-black text-orange-600 uppercase tracking-widest">
+                            <span className="material-icons-outlined text-sm mr-2">info</span>
+                            Real-time Network Audit
+                        </div>
                     </div>
                 </div>
 

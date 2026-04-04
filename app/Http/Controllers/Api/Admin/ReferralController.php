@@ -58,4 +58,20 @@ class ReferralController extends Controller
             'data'   => $details,
         ]);
     }
+
+    /**
+     * GET /api/admin/referrals/{user_id}/performance
+     * 
+     * Aggregate performance stats for an agent's entire 3-level team.
+     */
+    public function agentPerformance(int $userId): JsonResponse
+    {
+        $user = User::findOrFail($userId);
+        $performance = $this->referralService->getAgentTeamPerformance($user);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $performance,
+        ]);
+    }
 }

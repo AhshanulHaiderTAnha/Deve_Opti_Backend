@@ -264,6 +264,104 @@ class ReferralService
     }
 
     /**
+     * Get a breakdown of income generated from each member in the 3-level team.
+     */
+    public function getMyTeamIncome(User $user, array $filters = [])
+    {
+        // Get all members in the 3rd level tree
+        $level1Ids = User::where('referred_by', $user->id)->pluck('id');
+        $level2Ids = User::whereIn('referred_by', $level1Ids)->pluck('id');
+        $level3Ids = User::whereIn('referred_by', $level2Ids)->pluck('id');
+
+        $allMemberIds = $level1Ids->merge($level2Ids)->merge($level3Ids);
+
+        $query = User::whereIn('id', $allMemberIds)
+            ->select('id', 'name', 'email', 'status', 'referred_by', 'created_at');
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $members = $query->latest()->paginate($filters['per_page'] ?? 15);
+
+        $members->getCollection()->transform(function ($member) use ($user, $level1Ids, $level2Ids) {
+            $level = 3;
+            if ($level1Ids->contains($member->id)) {
+                $level = 1;
+            } elseif ($level2Ids->contains($member->id)) {
+                $level = 2;
+            }
+
+            $member->level = $level;
+            $member->total_income_generated = round(
+                ReferralEarning::where('user_id', $user->id)
+                    ->where('referred_user_id', $member->id)
+                    ->where('status', 'credited')
+                    ->sum('earned_amount'),
+                2
+            );
+            $member->joined_date = $member->created_at->format('Y-m-d');
+
+            return $member;
+        });
+
+        return $members;
+    }
+
+    /**
+     * Admin: Get aggregate performance stats for an agent's entire 3-level team.
+     */
+    public function getAgentTeamPerformance(User $agent): array
+    {
+        $level1Ids = User::where('referred_by', $agent->id)->pluck('id');
+        $level2Ids = User::whereIn('referred_by', $level1Ids)->pluck('id');
+        $level3Ids = User::whereIn('referred_by', $level2Ids)->pluck('id');
+
+        $allMemberIds = $level1Ids->merge($level2Ids)->merge($level3Ids);
+
+        $totalDeposits = DepositRequest::whereIn('user_id', $allMemberIds)
+            ->where('status', 'approved')
+            ->sum('amount');
+
+        $totalWithdrawals = \App\Models\WithdrawalRequest::whereIn('user_id', $allMemberIds)
+            ->where('status', 'approved')
+            ->sum('amount');
+
+        $totalCommissionPaidToAgent = ReferralEarning::where('user_id', $agent->id)
+            ->where('status', 'credited')
+            ->sum('earned_amount');
+
+        $activeTeamMembers = User::whereIn('id', $allMemberIds)
+            ->where('status', 'active')
+            ->count();
+
+        return [
+            'agent' => [
+                'id'    => $agent->id,
+                'name'  => $agent->name,
+                'email' => $agent->email,
+            ],
+            'team_performance' => [
+                'total_team_size'        => $allMemberIds->count(),
+                'active_team_members'    => $activeTeamMembers,
+                'total_team_deposits'    => round($totalDeposits, 2),
+                'total_team_withdrawals' => round($totalWithdrawals, 2),
+                'net_team_profit'        => round($totalDeposits - $totalWithdrawals, 2),
+                'total_agent_commission' => round($totalCommissionPaidToAgent, 2),
+            ],
+            'level_breakdown' => [
+                'level_1' => $level1Ids->count(),
+                'level_2' => $level2Ids->count(),
+                'level_3' => $level3Ids->count(),
+            ]
+        ];
+    }
+
+    /**
      * Admin: Get all users with referral stats for the referral report.
      */
     public function getAdminReferralReport(array $filters = [])

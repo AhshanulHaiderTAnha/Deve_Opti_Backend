@@ -117,6 +117,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('my-referrals', [ReferralController::class, 'myReferrals']);
             Route::get('my-referrals/deposits', [ReferralController::class, 'myReferralsDeposits']);
             Route::get('earnings', [ReferralController::class, 'earnings']);
+            Route::get('team-income', [ReferralController::class, 'teamIncome']);
         });
     });
 
@@ -138,6 +139,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Referral Report
         Route::get('referrals', [AdminReferralController::class, 'index']);
         Route::get('referrals/{user_id}', [AdminReferralController::class, 'show']);
+        Route::get('referrals/{user_id}/performance', [AdminReferralController::class, 'agentPerformance']);
         // Secure KYC document download
         Route::get('kyc/{id}/document/{type}', function (int $id, string $type) {
             $kyc  = \App\Models\KycSubmission::findOrFail($id);
