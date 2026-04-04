@@ -29,7 +29,25 @@ class WithdrawalController extends Controller
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'payment_gateway_info' => 'required|string',
+            'withdrawal_password' => 'required|string',
         ]);
+
+        $user = auth()->user();
+        $userWithdrawalPassword = \App\Models\UserWithdrawalPassword::where('user_id', $user->id)->first();
+
+        if (!$userWithdrawalPassword) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Please first setup the withdrawal password from the setting page.'
+            ], 400);
+        }
+
+        if ($userWithdrawalPassword->password !== $request->withdrawal_password) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password not match.'
+            ], 400);
+        }
 
         // Check if user has sufficient funds (balance - pending withdrawals)
         $wallet = Wallet::firstOrCreate(
