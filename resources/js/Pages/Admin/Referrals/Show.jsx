@@ -7,9 +7,8 @@ export default function ReferralShow({ referralData, earnings }) {
 
     const UserCard = ({ user, level }) => (
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center space-x-4">
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-white ${
-                level === 1 ? 'bg-blue-500' : level === 2 ? 'bg-indigo-500' : 'bg-purple-500'
-            }`}>
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-white ${level === 1 ? 'bg-blue-500' : level === 2 ? 'bg-indigo-500' : 'bg-purple-500'
+                }`}>
                 {user.name[0]}
             </div>
             <div>
@@ -17,9 +16,8 @@ export default function ReferralShow({ referralData, earnings }) {
                     {user.name}
                 </Link>
                 <p className="text-xs text-gray-400">{user.email}</p>
-                <span className={`inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold ${
-                    user.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
-                }`}>
+                <span className={`inline-flex items-center px-2 py-0.5 mt-1 rounded-full text-[10px] font-bold ${user.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
+                    }`}>
                     {user.status}
                 </span>
             </div>
@@ -85,7 +83,7 @@ export default function ReferralShow({ referralData, earnings }) {
                         <span className="material-icons-outlined mr-2 text-orange-500">account_tree</span>
                         Referral Network (3 Levels)
                     </h2>
-                    
+
                     <div className="flex space-x-12 min-w-max">
                         {/* Level 1 */}
                         <div className="w-80 space-y-4">
@@ -164,11 +162,10 @@ export default function ReferralShow({ referralData, earnings }) {
                                             <p className="text-xs text-gray-400">{earning.referred_user?.email}</p>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-black ${
-                                                earning.level === 1 ? 'bg-blue-50 text-blue-600' :
+                                            <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-black ${earning.level === 1 ? 'bg-blue-50 text-blue-600' :
                                                 earning.level === 2 ? 'bg-indigo-50 text-indigo-600' :
-                                                'bg-purple-50 text-purple-600'
-                                            }`}>
+                                                    'bg-purple-50 text-purple-600'
+                                                }`}>
                                                 L{earning.level}
                                             </span>
                                         </td>
@@ -204,10 +201,9 @@ export default function ReferralShow({ referralData, earnings }) {
                                     <Link
                                         key={i}
                                         href={link.url || '#'}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                                            link.active ? 'bg-orange-500 text-white' :
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${link.active ? 'bg-orange-500 text-white' :
                                             link.url ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'
-                                        }`}
+                                            }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

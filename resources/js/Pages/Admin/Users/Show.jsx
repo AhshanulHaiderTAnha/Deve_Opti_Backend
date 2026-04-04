@@ -62,7 +62,7 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                         <span className="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl text-sm font-mono font-black border border-orange-100">
                                             {user.referral_code}
                                         </span>
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 navigator.clipboard.writeText(user.referral_code);
                                                 alert('Referral code copied!');
@@ -72,7 +72,7 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                         >
                                             <span className="material-icons-outlined text-sm">content_copy</span>
                                         </button>
-                                        <Link 
+                                        <Link
                                             href={route('admin.referrals.show', user.id)}
                                             className="text-xs font-bold text-blue-600 hover:underline flex items-center"
                                         >
@@ -119,10 +119,10 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                 {activities?.length > 0 ? activities.map((log, index) => (
                                     <div key={log.id} className="flex gap-6 relative z-10 w-full group">
                                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border-4 border-white shadow-sm transition-transform group-hover:scale-110 ${log.action.toLowerCase().includes('task') ? 'bg-sky-50 text-sky-500' :
-                                                log.action.toLowerCase().includes('register') ? 'bg-indigo-50 text-indigo-500' :
-                                                    log.action.toLowerCase().includes('login') ? 'bg-emerald-50 text-emerald-500' :
-                                                        log.action.toLowerCase().includes('deposit') ? 'bg-teal-50 text-teal-500' :
-                                                            'bg-orange-50 text-orange-500'
+                                            log.action.toLowerCase().includes('register') ? 'bg-indigo-50 text-indigo-500' :
+                                                log.action.toLowerCase().includes('login') ? 'bg-emerald-50 text-emerald-500' :
+                                                    log.action.toLowerCase().includes('deposit') ? 'bg-teal-50 text-teal-500' :
+                                                        'bg-orange-50 text-orange-500'
                                             }`}>
                                             <span className="material-icons-outlined text-2xl">
                                                 {log.action.toLowerCase().includes('task') ? 'assignment' :
@@ -347,7 +347,7 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                             </div>
                             <h5 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1">User Identifier</h5>
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-tighter mb-4">UID: {user.id.toString().padStart(6, '0')}</p>
-                            
+
                             <div className="mb-4">
                                 <h5 className="font-black text-slate-900 uppercase tracking-widest text-[9px] mb-1">Referral Code</h5>
                                 <div className="flex items-center justify-center gap-2">
