@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
+use App\Services\ReferralService;
 
 class DepositController extends Controller
 {
@@ -74,6 +75,9 @@ class DepositController extends Controller
                 'reference_id' => $deposit->id,
                 'description' => 'Deposit approved for plan: ' . ($deposit->depositPlan->name ?? 'Custom'),
             ]);
+
+            // Distribute referral commissions (3-level MLM)
+            (new ReferralService())->distributeCommissions($deposit);
         });
 
         Mail::to($deposit->user->email)->send(new DepositApprovedMail($deposit));

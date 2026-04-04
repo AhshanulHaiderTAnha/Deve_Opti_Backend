@@ -56,6 +56,31 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                         {user.roles?.[0] || 'User'}
                                     </span>
                                 </div>
+                                <div className="col-span-2">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Referral Code</p>
+                                    <div className="flex items-center space-x-3">
+                                        <span className="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl text-sm font-mono font-black border border-orange-100">
+                                            {user.referral_code}
+                                        </span>
+                                        <button 
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(user.referral_code);
+                                                alert('Referral code copied!');
+                                            }}
+                                            className="h-10 w-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 hover:text-orange-500 hover:shadow-sm transition-all"
+                                            title="Copy to clipboard"
+                                        >
+                                            <span className="material-icons-outlined text-sm">content_copy</span>
+                                        </button>
+                                        <Link 
+                                            href={route('admin.referrals.show', user.id)}
+                                            className="text-xs font-bold text-blue-600 hover:underline flex items-center"
+                                        >
+                                            <span className="material-icons-outlined text-sm mr-1">account_tree</span>
+                                            View Network
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -75,6 +100,11 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                                 <span className="material-icons-outlined text-4xl mb-4 text-white/80">monetization_on</span>
                                 <h4 className="text-[10px] font-black tracking-widest uppercase mb-1 text-emerald-100">Task Earnings</h4>
                                 <div className="text-4xl font-black tracking-tighter">${parseFloat(taskStats?.earned_commission || 0).toFixed(2)}</div>
+                            </div>
+                            <div className="bg-orange-600 rounded-[2.5rem] p-8 text-white shadow-lg shadow-orange-100/50 flex flex-col justify-center items-center text-center">
+                                <span className="material-icons-outlined text-4xl mb-4 text-white/80">group_add</span>
+                                <h4 className="text-[10px] font-black tracking-widest uppercase mb-1 text-orange-100">Referral Earnings</h4>
+                                <div className="text-4xl font-black tracking-tighter">${parseFloat(user.total_referral_earnings || 0).toFixed(2)}</div>
                             </div>
                         </div>
 
@@ -317,6 +347,16 @@ export default function UserShow({ user: userWrap, activities, wallet, deposits,
                             </div>
                             <h5 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1">User Identifier</h5>
                             <p className="text-slate-400 text-[10px] font-black uppercase tracking-tighter mb-4">UID: {user.id.toString().padStart(6, '0')}</p>
+                            
+                            <div className="mb-4">
+                                <h5 className="font-black text-slate-900 uppercase tracking-widest text-[9px] mb-1">Referral Code</h5>
+                                <div className="flex items-center justify-center gap-2">
+                                    <p className="text-orange-600 text-xs font-black font-mono">{user.referral_code}</p>
+                                    <button onClick={() => navigator.clipboard.writeText(user.referral_code)} className="text-slate-300 hover:text-orange-500 transition-colors">
+                                        <span className="material-icons-outlined text-[14px]">content_copy</span>
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="pt-4 border-t border-slate-50 space-y-3">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Update KYC Status</p>

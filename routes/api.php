@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\User\UserTaskController;
 use App\Http\Controllers\Api\User\OrderRequestController as UserOrderRequestController;
 use App\Http\Controllers\Api\Admin\OrderRequestController as AdminOrderRequestController;
 use App\Http\Controllers\Api\User\WithdrawalPasswordController;
+use App\Http\Controllers\Api\User\ReferralController;
+use App\Http\Controllers\Api\Admin\ReferralController as AdminReferralController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -109,6 +111,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Withdrawal Password
         Route::post('withdrawal-password/set', [WithdrawalPasswordController::class, 'set']);
         Route::post('withdrawal-password/change', [WithdrawalPasswordController::class, 'change']);
+        // Referral System
+        Route::prefix('referral')->group(function () {
+            Route::get('dashboard', [ReferralController::class, 'dashboard']);
+            Route::get('my-referrals', [ReferralController::class, 'myReferrals']);
+            Route::get('my-referrals/deposits', [ReferralController::class, 'myReferralsDeposits']);
+            Route::get('earnings', [ReferralController::class, 'earnings']);
+        });
     });
 
     // Admin Routes
@@ -126,6 +135,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Order Request management
         Route::get('order-requests',          [AdminOrderRequestController::class, 'index']);
         Route::post('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus']);
+        // Referral Report
+        Route::get('referrals', [AdminReferralController::class, 'index']);
+        Route::get('referrals/{user_id}', [AdminReferralController::class, 'show']);
         // Secure KYC document download
         Route::get('kyc/{id}/document/{type}', function (int $id, string $type) {
             $kyc  = \App\Models\KycSubmission::findOrFail($id);

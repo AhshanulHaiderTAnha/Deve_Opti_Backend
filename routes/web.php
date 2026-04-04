@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UserActivityLogController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\OrderRequestController as AdminOrderRequestController;
+use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -111,6 +112,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus'])->name('order-requests.status');
         // Social Media
         Route::resource('social-media', SocialMediaController::class)->parameters(['social-media' => 'socialMedia'])->except(['create', 'edit', 'show']);
+        // Referral Management
+        Route::get('referrals/export', [AdminReferralController::class, 'export'])->name('referrals.export');
+        Route::get('referrals', [AdminReferralController::class, 'index'])->name('referrals.index');
+        Route::get('referrals/{user_id}', [AdminReferralController::class, 'show'])->name('referrals.show');
     });
 });
 

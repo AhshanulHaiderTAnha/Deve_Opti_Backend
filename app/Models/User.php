@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -31,7 +32,33 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_confirmed_at',
         'email_verified_at',
         'profile_image_path',
+        'referral_code',
+        'referred_by',
     ];
+
+    /**
+     * Auto-generate a unique referral code when creating a new user.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->referral_code)) {
+                $user->referral_code = static::generateUniqueReferralCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique referral code in REF-XXXXXXXX format.
+     */
+    public static function generateUniqueReferralCode(): string
+    {
+        do {
+            $code = 'REF-' . strtoupper(Str::random(8));
+        } while (static::where('referral_code', $code)->exists());
+
+        return $code;
+    }
 
     /**
      * Get the profile image URL.
@@ -89,6 +116,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function wallet()
     {
         return $this->hasOne(Wallet::class);
+    }
+
+    // Referral Relationships
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function directReferrals()
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    public function referralEarnings()
+    {
+        return $this->hasMany(ReferralEarning::class);
     }
 
     public function kycSubmission()

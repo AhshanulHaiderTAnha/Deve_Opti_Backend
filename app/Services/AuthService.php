@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Password;
+use App\Services\ReferralService;
 
 class AuthService
 {
@@ -26,6 +27,11 @@ class AuthService
         ]);
 
         $user->assignRole('user');
+
+        // Link referrer if referral code was provided
+        if (!empty($data['referral_code'])) {
+            (new ReferralService())->assignReferrer($user, $data['referral_code']);
+        }
 
         \App\Models\UserActivity::create([
             'user_id'    => $user->id,

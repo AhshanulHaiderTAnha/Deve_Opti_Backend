@@ -18,7 +18,8 @@ class RegisterRequest extends FormRequest
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed',
                            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'],
-            'phone'    => ['nullable', 'string', 'max:20'],
+            'phone'         => ['nullable', 'string', 'max:20'],
+            'referral_code' => ['nullable', 'string', 'max:20', 'exists:users,referral_code'],
         ];
     }
 
