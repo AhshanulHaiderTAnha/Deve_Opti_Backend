@@ -17,7 +17,9 @@ class UserTaskController extends Controller
      */
     public function getActiveTask(Request $request)
     {
-        $userTask = UserTask::with(['orderTask.products', 'orderTask.tier'])
+        $userTask = UserTask::with(['orderTask.products' => function ($q) {
+            $q->withPivot('custom_commission_percent', 'custom_commission_type', 'custom_commission_flat');
+        }, 'orderTask.tier'])
             ->where('user_id', $request->user()->id)
             ->where('status', 'in_progress')
             ->first();
@@ -25,40 +27,38 @@ class UserTaskController extends Controller
         if (!$userTask) {
             return response()->json([
                 'success' => true,
-                'data' => null,
+                'data'    => null,
                 'message' => 'No active tasks available.'
             ]);
         }
 
-        // Get a random product from the task's product pool
+        // Pick a random product from the task's product pool
         $nextProduct = $userTask->orderTask->products->random();
 
-        // Calculate estimated commission
-        $commissionPercent = $userTask->orderTask->commission_type === 'tier' 
-            ? ($userTask->orderTask->tier->commission_rate ?? 0)
-            : $userTask->orderTask->manual_commission_percent;
-
-        $commissionAmount = ($nextProduct->price * $commissionPercent) / 100;
+        // Resolve commission for this product
+        $commission = $this->resolveCommission($nextProduct, $userTask->orderTask);
 
         return response()->json([
             'success' => true,
-            'data' => [
+            'data'    => [
                 'task' => [
-                    'id' => $userTask->id,
-                    'title' => $userTask->orderTask->title,
-                    'completed_orders' => $userTask->completed_orders,
-                    'required_orders' => $userTask->orderTask->required_orders,
+                    'id'                      => $userTask->id,
+                    'title'                   => $userTask->orderTask->title,
+                    'completed_orders'        => $userTask->completed_orders,
+                    'required_orders'         => $userTask->orderTask->required_orders,
                     'total_earned_commission' => $userTask->total_earned_commission,
-                    'can_submit' => $userTask->completed_orders >= $userTask->orderTask->required_orders
+                    'can_submit'              => $userTask->completed_orders >= $userTask->orderTask->required_orders,
                 ],
                 'next_order' => $userTask->completed_orders < $userTask->orderTask->required_orders ? [
-                    'product_id' => $nextProduct->id,
-                    'name' => $nextProduct->title,
-                    'price' => $nextProduct->price,
-                    'image' => $nextProduct->image_path ? asset('storage/' . $nextProduct->image_path) : null,
-                    'platform' => $nextProduct->platform,
-                    'commission_percent' => $commissionPercent,
-                    'estimated_earn' => round($commissionAmount, 2)
+                    'product_id'          => $nextProduct->id,
+                    'name'                => $nextProduct->title,
+                    'price'               => $nextProduct->price,
+                    'image'               => $nextProduct->image_path ? asset('storage/' . $nextProduct->image_path) : null,
+                    'platform'            => $nextProduct->platform,
+                    'commission_type'     => $commission['type'],      // 'percent' | 'flat' | 'task_default'
+                    'commission_percent'  => $commission['percent'],   // null if flat
+                    'commission_flat'     => $commission['flat'],      // null if percent
+                    'estimated_earn'      => $commission['amount'],
                 ] : null
             ]
         ]);
@@ -73,7 +73,9 @@ class UserTaskController extends Controller
             'product_id' => 'required|exists:products,id'
         ]);
 
-        $userTask = UserTask::with(['orderTask.products', 'orderTask.tier'])
+        $userTask = UserTask::with(['orderTask.products' => function ($q) {
+            $q->withPivot('custom_commission_percent', 'custom_commission_type', 'custom_commission_flat');
+        }, 'orderTask.tier'])
             ->where('user_id', $request->user()->id)
             ->where('id', $id)
             ->where('status', 'in_progress')
@@ -87,48 +89,45 @@ class UserTaskController extends Controller
         }
 
         // Ensure the product belongs to the task's pool
-        if (!$userTask->orderTask->products->contains('id', $validated['product_id'])) {
+        $product = $userTask->orderTask->products->firstWhere('id', $validated['product_id']);
+        if (!$product) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid product for this task.'
             ], 403);
         }
 
-        $product = Product::findOrFail($validated['product_id']);
+        // Resolve commission (percent or flat override, or task default)
+        $commission = $this->resolveCommission($product, $userTask->orderTask);
 
-        $commissionPercent = $userTask->orderTask->commission_type === 'tier' 
-            ? ($userTask->orderTask->tier->commission_rate ?? 0)
-            : $userTask->orderTask->manual_commission_percent;
-
-        $commissionAmount = ($product->price * $commissionPercent) / 100;
-
-        DB::transaction(function () use ($userTask, $product, $commissionAmount) {
+        DB::transaction(function () use ($userTask, $product, $commission) {
             UserOrder::create([
-                'user_task_id' => $userTask->id,
-                'product_id' => $product->id,
-                'order_price' => $product->price,
-                'commission_amount' => $commissionAmount,
-                'status' => 'completed'
+                'user_task_id'      => $userTask->id,
+                'product_id'        => $product->id,
+                'order_price'       => $product->price,
+                'commission_amount' => $commission['amount'],
+                'status'            => 'completed'
             ]);
 
             $userTask->increment('completed_orders');
-            $userTask->total_earned_commission += $commissionAmount;
+            $userTask->total_earned_commission += $commission['amount'];
             $userTask->save();
         });
 
         return response()->json([
             'success' => true,
             'message' => 'Order processed successfully.',
-            'task' => [
-                'completed_orders' => $userTask->completed_orders,
+            'task'    => [
+                'completed_orders'        => $userTask->completed_orders,
                 'total_earned_commission' => $userTask->total_earned_commission,
-                'can_submit' => $userTask->completed_orders >= $userTask->orderTask->required_orders
+                'can_submit'              => $userTask->completed_orders >= $userTask->orderTask->required_orders,
             ]
         ]);
     }
 
     /**
      * Submit task and transfer earnings.
+     * Re-sums from user_orders for accuracy (handles per-product custom rates + flat amounts).
      */
     public function submitTask(Request $request, $id)
     {
@@ -146,40 +145,48 @@ class UserTaskController extends Controller
         }
 
         DB::transaction(function () use ($request, $userTask) {
-            // Update task status
-            $userTask->update(['status' => 'completed']);
+            // Re-sum from actual order records (accurate regardless of mixed percent/flat rates)
+            $finalEarned = UserOrder::where('user_task_id', $userTask->id)
+                ->sum('commission_amount');
+
+            // Update task status and confirmed commission total
+            $userTask->update([
+                'status'                  => 'completed',
+                'total_earned_commission' => $finalEarned,
+            ]);
 
             // Credit the wallet
             $wallet = $request->user()->wallet;
-            
+
             WalletTransaction::create([
-                'user_id' => $request->user()->id,
-                'wallet_id' => $wallet->id,
-                'type' => 'credit',
-                'amount' => $userTask->total_earned_commission,
-                'balance_after' => $wallet->balance + $userTask->total_earned_commission,
-                'description' => "Commission earned from task completion: {$userTask->orderTask->title}",
-                'status' => 'completed'
+                'user_id'       => $request->user()->id,
+                'wallet_id'     => $wallet->id,
+                'type'          => 'credit',
+                'amount'        => $finalEarned,
+                'balance_after' => $wallet->balance + $finalEarned,
+                'description'   => "Commission earned from task: {$userTask->orderTask->title}",
+                'status'        => 'completed'
             ]);
 
-            // Add straight to wallet balance
-            $wallet->increment('balance', $userTask->total_earned_commission);
-            
-            // Log user activity
+            $wallet->increment('balance', $finalEarned);
+
+            // Log activity
             \App\Models\UserActivityLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Task Completed',
-                'details' => "Completed task '{$userTask->orderTask->title}' and earned $" . number_format($userTask->total_earned_commission, 2),
+                'user_id'    => $request->user()->id,
+                'action'     => 'Task Completed',
+                'details'    => "Completed task '{$userTask->orderTask->title}' and earned $" . number_format($finalEarned, 2),
                 'ip_address' => $request->ip()
             ]);
 
-            // Dispatch Emails
+            // Dispatch emails
             try {
-                \Illuminate\Support\Facades\Mail::to($request->user()->email)->queue(new \App\Mail\TaskCompletedUser($userTask, $request->user()));
-                
+                \Illuminate\Support\Facades\Mail::to($request->user()->email)
+                    ->queue(new \App\Mail\TaskCompletedUser($userTask, $request->user()));
+
                 $admin = env('ADMIN_EMAIL');
                 if ($admin) {
-                     \Illuminate\Support\Facades\Mail::to($admin)->queue(new \App\Mail\TaskCompletedAdmin($userTask, $request->user()));
+                    \Illuminate\Support\Facades\Mail::to($admin)
+                        ->queue(new \App\Mail\TaskCompletedAdmin($userTask, $request->user()));
                 }
             } catch (\Exception $e) {
                 // Ignore mail errors
@@ -190,5 +197,62 @@ class UserTaskController extends Controller
             'success' => true,
             'message' => 'Task submitted successfully. Commissions have been added to your wallet.'
         ]);
+    }
+
+    /**
+     * Resolve the commission amount and metadata for a product in a task.
+     *
+     * Priority:
+     *  1. Product pivot: custom_commission_type = 'flat'    → commission = custom_commission_flat (fixed $)
+     *  2. Product pivot: custom_commission_type = 'percent' → commission = price * custom_commission_percent / 100
+     *  3. Task default                                      → commission = price * task_default_rate / 100
+     *
+     * Returns array: ['amount' => float, 'type' => string, 'percent' => float|null, 'flat' => float|null]
+     */
+    private function resolveCommission($product, $orderTask): array
+    {
+        $pivotType = $product->pivot->custom_commission_type ?? null;
+
+        if ($pivotType === 'flat') {
+            $flatAmount = (float) ($product->pivot->custom_commission_flat ?? 0);
+            return [
+                'amount'  => round($flatAmount, 2),
+                'type'    => 'flat',
+                'percent' => null,
+                'flat'    => $flatAmount,
+            ];
+        }
+
+        if ($pivotType === 'percent') {
+            $rate   = (float) ($product->pivot->custom_commission_percent ?? 0);
+            $amount = ($product->price * $rate) / 100;
+            return [
+                'amount'  => round($amount, 2),
+                'type'    => 'percent',
+                'percent' => $rate,
+                'flat'    => null,
+            ];
+        }
+
+        // Task-level default (always percent-based)
+        $defaultRate = $this->getTaskDefaultRate($orderTask);
+        $amount      = ($product->price * $defaultRate) / 100;
+        return [
+            'amount'  => round($amount, 2),
+            'type'    => 'task_default',
+            'percent' => $defaultRate,
+            'flat'    => null,
+        ];
+    }
+
+    /**
+     * Resolve the task-level default commission rate (always a percentage).
+     */
+    private function getTaskDefaultRate($orderTask): float
+    {
+        if ($orderTask->commission_type === 'tier') {
+            return (float) ($orderTask->tier->commission_rate ?? 0);
+        }
+        return (float) ($orderTask->manual_commission_percent ?? 0);
     }
 }
