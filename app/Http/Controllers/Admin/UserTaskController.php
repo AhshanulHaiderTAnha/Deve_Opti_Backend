@@ -15,7 +15,10 @@ class UserTaskController extends Controller
 {
     public function index(Request $request)
     {
-        $query = UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type']);
+        $query = UserTask::with(['user:id,name,email', 'orderTask' => function ($q) {
+            $q->select('id', 'title', 'required_orders', 'commission_type')
+              ->withSum('products', 'price');
+        }]);
 
         if ($request->filled('search')) {
             $query->whereHas('user', function($q) use ($request) {
@@ -40,7 +43,10 @@ class UserTaskController extends Controller
 
     public function export(Request $request)
     {
-        $query = UserTask::with(['user:id,name,email', 'orderTask:id,title,required_orders,commission_type']);
+        $query = UserTask::with(['user:id,name,email', 'orderTask' => function ($q) {
+            $q->select('id', 'title', 'required_orders', 'commission_type')
+              ->withSum('products', 'price');
+        }]);
 
         if ($request->filled('search')) {
             $query->whereHas('user', function($q) use ($request) {
@@ -65,7 +71,7 @@ class UserTaskController extends Controller
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
         ];
-        $columns = ['ID', 'User Name', 'User Email', 'Task Title', 'Completed', 'Required', 'Earned ($)', 'Status', 'Date Assigned'];
+        $columns = ['ID', 'User Name', 'User Email', 'Task Title', 'Completed', 'Required', 'Earned ($)', 'Current Order Price', 'Status', 'Date Assigned'];
 
         $callback = function() use($assignments, $columns) {
             $file = fopen('php://output', 'w');
@@ -79,6 +85,7 @@ class UserTaskController extends Controller
                     $a->completed_orders,
                     $a->orderTask->required_orders ?? 0,
                     $a->total_earned_commission,
+                    $a->orderTask->products_sum_price ?? 0,
                     $a->status,
                     $a->created_at->format('Y-m-d H:i:s')
                 ]);

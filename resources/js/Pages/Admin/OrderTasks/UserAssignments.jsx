@@ -117,6 +117,7 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Task Batch Name</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Progress</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Earned Commission</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Current Order Price</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
                                 </tr>
@@ -146,6 +147,9 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                             <span className="font-black text-green-600">${parseFloat(assignment.total_earned_commission).toFixed(2)}</span>
                                         </td>
                                         <td className="px-6 py-4">
+                                            <span className="font-bold text-gray-800">${parseFloat(assignment.order_task?.products_sum_price || 0).toFixed(2)}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${assignment.status === 'completed'
                                                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                                 : 'bg-amber-50 text-amber-600 border-amber-100'
@@ -167,7 +171,7 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                 ))}
                                 {assignments.data.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center">
+                                        <td colSpan="7" className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <span className="material-icons-outlined text-4xl text-gray-300 mb-2">assignment_ind</span>
                                                 <span className="text-gray-500 font-medium">No users assigned to tasks yet.</span>
