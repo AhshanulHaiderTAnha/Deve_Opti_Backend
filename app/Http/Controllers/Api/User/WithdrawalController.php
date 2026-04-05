@@ -9,6 +9,7 @@ use App\Mail\WithdrawalRequestAdminMail;
 use App\Mail\WithdrawalRequestUserMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\ModelsserWithdrawalPassword;
 
 class WithdrawalController extends Controller
 {
@@ -26,14 +27,22 @@ class WithdrawalController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        if (!$user->withdrawal_enable) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Withdrawals are temporarily disabled. Please contact with customer support.'
+            ], 403);
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'payment_gateway_info' => 'required|string',
             'withdrawal_password' => 'required|string',
         ]);
 
-        $user = auth()->user();
-        $userWithdrawalPassword = \App\Models\UserWithdrawalPassword::where('user_id', $user->id)->first();
+        $userWithdrawalPassword = UserWithdrawalPassword::where('user_id', $user->id)->first();
 
         if (!$userWithdrawalPassword) {
             return response()->json([
@@ -119,6 +128,13 @@ class WithdrawalController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Withdrawal request deleted successfully.'
+        ]);
+    }
+
+    public function checkSuspendStatus()
+    {
+        return response()->json([
+            'suspend' => !auth()->user()->withdrawal_enable
         ]);
     }
 }

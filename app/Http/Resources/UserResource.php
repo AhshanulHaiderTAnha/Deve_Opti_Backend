@@ -31,6 +31,7 @@ class UserResource extends JsonResource
             'total_withdrawals'    => $this->total_withdrawals ?? 0,
             'total_commissions'    => $this->total_commissions ?? 0,
             'referral_code'        => $this->referral_code,
+            'withdrawal_enable'    => $this->withdrawal_enable,
             'referred_by_name'     => $this->whenLoaded('referrer', fn () => $this->referrer?->name),
             'total_referral_earnings' => $this->total_referral_earned ?? 0,
             'created_at'           => $this->created_at->toIso8601String(),

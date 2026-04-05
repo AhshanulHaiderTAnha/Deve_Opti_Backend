@@ -177,17 +177,19 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', "unique:users,email,{$id}"],
-            'password' => ['nullable', 'string', 'min:8'],
-            'status'   => ['required', 'in:active,inactive,suspended'],
-            'role'     => ['required', 'in:admin,user'],
+            'name'              => ['required', 'string', 'max:255'],
+            'email'             => ['required', 'string', 'email', 'max:255', "unique:users,email,{$id}"],
+            'password'          => ['nullable', 'string', 'min:8'],
+            'status'            => ['required', 'in:active,inactive,suspended'],
+            'role'              => ['required', 'in:admin,user'],
+            'withdrawal_enable' => ['boolean'],
         ]);
 
         $user->update([
-            'name'   => $validated['name'],
-            'email'  => $validated['email'],
-            'status' => $validated['status'],
+            'name'              => $validated['name'],
+            'email'             => $validated['email'],
+            'status'            => $validated['status'],
+            'withdrawal_enable' => $validated['withdrawal_enable'] ?? true,
         ]);
 
         if (!empty($validated['password'])) {

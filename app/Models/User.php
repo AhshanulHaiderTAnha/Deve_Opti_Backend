@@ -34,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_image_path',
         'referral_code',
         'referred_by',
+        'withdrawal_enable',
     ];
 
     /**
@@ -99,6 +100,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at'      => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
             'password'               => 'hashed',
+            'withdrawal_enable'      => 'boolean',
         ];
     }
 

@@ -95,6 +95,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('deposits',               [DepositController::class, 'store']);
         Route::delete('deposits/{id}',        [DepositController::class, 'destroy']);
         Route::get('withdrawals',             [WithdrawalController::class, 'index']);
+        Route::get('withdrawals/check-suspend-status', [WithdrawalController::class, 'checkSuspendStatus']);
         Route::post('withdrawals',            [WithdrawalController::class, 'store']);
         Route::delete('withdrawals/{id}',     [WithdrawalController::class, 'destroy']);
         // Announcements

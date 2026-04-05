@@ -12,6 +12,7 @@ export default function UserIndex({ users, filters }) {
         password: '',
         status: 'active',
         role: 'user',
+        withdrawal_enable: true,
     });
 
     const openModal = (user = null) => {
@@ -23,6 +24,7 @@ export default function UserIndex({ users, filters }) {
                 password: '',
                 status: user.status,
                 role: user.role || 'user',
+                withdrawal_enable: user.withdrawal_enable ?? true,
             });
         } else {
             setEditingUser(null);
@@ -311,6 +313,22 @@ export default function UserIndex({ users, filters }) {
                                             {status}
                                         </button>
                                     ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-700 ml-1">WITHDRAWAL PERMISSION</label>
+                                <div className="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <button
+                                        type="button"
+                                        onClick={() => setData('withdrawal_enable', !data.withdrawal_enable)}
+                                        className={`w-14 h-7 rounded-full transition-all relative ${data.withdrawal_enable ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                                    >
+                                        <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${data.withdrawal_enable ? 'left-8' : 'left-1'}`}></div>
+                                    </button>
+                                    <span className={`text-[10px] font-black uppercase tracking-wider ${data.withdrawal_enable ? 'text-emerald-600' : 'text-rose-500'}`}>
+                                        {data.withdrawal_enable ? 'Withdrawals Enabled' : 'Withdrawals Suspended'}
+                                    </span>
                                 </div>
                             </div>
 
