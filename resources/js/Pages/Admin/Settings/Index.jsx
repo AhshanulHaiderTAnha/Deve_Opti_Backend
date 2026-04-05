@@ -20,7 +20,6 @@ export default function SettingIndex({ settings: groupedSettings }) {
         { id: 'general', label: 'General', icon: 'settings', desc: 'System name and core configs' },
         { id: 'branding', label: 'Branding', icon: 'auto_awesome', desc: 'Logo, icon and visual identity' },
         { id: 'seo', label: 'SEO & Meta', icon: 'language', desc: 'Search engine optimization' },
-        { id: 'email', label: 'Mail Setup', icon: 'alternate_email', desc: 'SMTP and sender configuration' },
     ];
 
     const submit = (e) => {
