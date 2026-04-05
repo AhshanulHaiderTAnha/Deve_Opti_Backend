@@ -16,22 +16,21 @@ class PaymentMethodSeeder extends Seeder
     {
         $methods = [
             [
-                'name' => 'Binance Pay',
+                'name' => 'BTC',
                 'details' => [
-                    ['label' => 'Binance ID', 'value' => '123456789', 'note' => 'Scan QR for faster processing.'],
+                    ['label' => 'Wallet address', 'value' => 'bc1qw6muvpsxawqcl9rzs0tnsefcmc7xjhkxh6sn43', 'note' => 'Scan QR for faster processing.'],
                 ]
             ],
             [
-                'name' => 'Crypto Wallets',
+                'name' => 'ETH',
                 'details' => [
-                    ['label' => 'BTC Address', 'value' => '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2', 'note' => 'Bitcoin network only.'],
-                    ['label' => 'ETH Address', 'value' => '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', 'note' => 'ERC20 network only.'],
+                    ['label' => 'Wallet address', 'value' => '0x3D6Bd6A2760f3035134033b64eCD2973f4873407', 'note' => 'ERC20 network only.'],
                 ]
             ],
             [
-                'name' => 'USDT (TRC20)',
+                'name' => 'USDT',
                 'details' => [
-                    ['label' => 'USDT Wallet', 'value' => 'TR7NHqjuSXPabTHH9RzN4WESrZw76H69', 'note' => 'Strictly TRC20 network.'],
+                    ['label' => 'Wallet address', 'value' => 'TW5aiPmdx8Mdi1wMV41xGVZd9KKiVSrXit', 'note' => 'Strictly TRC20 network.'],
                 ]
             ],
         ];
