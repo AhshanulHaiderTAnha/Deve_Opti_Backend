@@ -9,7 +9,7 @@ use App\Mail\WithdrawalRequestAdminMail;
 use App\Mail\WithdrawalRequestUserMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\ModelsserWithdrawalPassword;
+use App\Models\UserWithdrawalPassword;
 
 class WithdrawalController extends Controller
 {

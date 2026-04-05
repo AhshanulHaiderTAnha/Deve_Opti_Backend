@@ -100,7 +100,7 @@ class UserTaskController extends Controller
         // Resolve commission (percent or flat override, or task default)
         $commission = $this->resolveCommission($product, $userTask->orderTask);
 
-        DB::transaction(function () use ($userTask, $product, $commission) {
+        DB::transaction(function () use ($request, $userTask, $product, $commission) {
             UserOrder::create([
                 'user_task_id'      => $userTask->id,
                 'product_id'        => $product->id,
@@ -112,6 +112,29 @@ class UserTaskController extends Controller
             $userTask->increment('completed_orders');
             $userTask->total_earned_commission += $commission['amount'];
             $userTask->save();
+
+            // Instant wallet credit
+            $wallet = $request->user()->wallet;
+            
+            WalletTransaction::create([
+                'user_id'       => $request->user()->id,
+                'wallet_id'     => $wallet->id,
+                'type'          => 'credit',
+                'amount'        => $commission['amount'],
+                'balance_after' => $wallet->balance + $commission['amount'],
+                'description'   => "Commission earned from order: {$product->title} (Task: {$userTask->orderTask->title})",
+                'status'        => 'completed'
+            ]);
+
+            $wallet->increment('balance', $commission['amount']);
+
+            // Activity Log for per-order commission
+            \App\Models\UserActivityLog::create([
+                'user_id'    => $request->user()->id,
+                'action'     => 'Commission Earned',
+                'details'    => "Earned \$" . number_format($commission['amount'], 2) . " from order '{$product->title}'",
+                'ip_address' => $request->ip()
+            ]);
         });
 
         return response()->json([
@@ -155,26 +178,11 @@ class UserTaskController extends Controller
                 'total_earned_commission' => $finalEarned,
             ]);
 
-            // Credit the wallet
-            $wallet = $request->user()->wallet;
-
-            WalletTransaction::create([
-                'user_id'       => $request->user()->id,
-                'wallet_id'     => $wallet->id,
-                'type'          => 'credit',
-                'amount'        => $finalEarned,
-                'balance_after' => $wallet->balance + $finalEarned,
-                'description'   => "Commission earned from task: {$userTask->orderTask->title}",
-                'status'        => 'completed'
-            ]);
-
-            $wallet->increment('balance', $finalEarned);
-
-            // Log activity
+            // Log final task completion activity
             \App\Models\UserActivityLog::create([
                 'user_id'    => $request->user()->id,
                 'action'     => 'Task Completed',
-                'details'    => "Completed task '{$userTask->orderTask->title}' and earned $" . number_format($finalEarned, 2),
+                'details'    => "Completed task '{$userTask->orderTask->title}' (Total Earnings: $" . number_format($finalEarned, 2) . ")",
                 'ip_address' => $request->ip()
             ]);
 
@@ -195,8 +203,8 @@ class UserTaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Task submitted successfully. Commissions have been added to your wallet.'
-        ]);
+            'message' => 'Task submitted successfully.',
+       ]);
     }
 
     /**
