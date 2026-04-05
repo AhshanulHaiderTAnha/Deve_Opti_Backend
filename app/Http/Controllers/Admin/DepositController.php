@@ -73,7 +73,7 @@ class DepositController extends Controller
                 'balance_after' => $wallet->balance,
                 'reference_type' => 'deposit_requests',
                 'reference_id' => $deposit->id,
-                'description' => 'Deposit approved for plan: ' . ($deposit->depositPlan->name ?? 'Custom'),
+                'description' => $deposit->deposit_plan_id ? 'Deposit approved for plan: ' . $deposit->depositPlan->name : 'Deposit approved for manual fund adding',
             ]);
 
             // Distribute referral commissions (3-level MLM)

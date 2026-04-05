@@ -65,6 +65,56 @@ class UserTaskController extends Controller
     }
 
     /**
+     * API: Check balance shortage for the next order.
+     */
+    public function checkBalanceGap(Request $request)
+    {
+        $user = $request->user();
+        $wallet = $user->wallet;
+        $balance = $wallet ? (float)$wallet->balance : 0;
+
+        $userTask = UserTask::with(['orderTask.products'])
+            ->where('user_id', $user->id)
+            ->where('status', 'in_progress')
+            ->first();
+
+        if (!$userTask) {
+            return response()->json([
+                'success' => true,
+                'has_active_task' => false,
+                'shortage' => 0,
+                'has_enough' => true,
+                'message' => 'No active task assigned.'
+            ]);
+        }
+
+        // Check if fully completed
+        if ($userTask->completed_orders >= $userTask->orderTask->required_orders) {
+            return response()->json([
+                'success' => true,
+                'has_active_task' => true,
+                'shortage' => 0,
+                'has_enough' => true,
+                'message' => 'All orders completed for this task.'
+            ]);
+        }
+
+        // Get the total amount of all products in the task template
+        $totalTaskAmount = (float)$userTask->orderTask->products->sum('price');
+        $shortage = max(0, $totalTaskAmount - $balance);
+
+        return response()->json([
+            'success' => true,
+            'has_active_task' => true,
+            'wallet_balance' => $balance,
+            'total_task_amount' => round($totalTaskAmount, 2), // Full order amount
+            'shortage' => round($shortage, 2),
+            'has_enough' => $balance >= $totalTaskAmount,
+            'message' => $balance >= $totalTaskAmount ? 'Balance sufficient for this task.' : 'Insufficient balance to complete this task.'
+        ]);
+    }
+
+    /**
      * Process a single order click.
      */
     public function processOrder(Request $request, $id)

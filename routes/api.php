@@ -78,6 +78,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('deposit-plans/{slug}',  [DepositPlanController::class, 'show']);
         // Order Tasks
         Route::get('tasks/active', [UserTaskController::class, 'getActiveTask']);
+        Route::get('tasks/check-balance-gap', [UserTaskController::class, 'checkBalanceGap']);
         Route::post('tasks/{id}/process-order', [UserTaskController::class, 'processOrder']);
         Route::post('tasks/{id}/submit', [UserTaskController::class, 'submitTask']);
         Route::get('commission-tiers',      [CommissionTierController::class, 'index']);

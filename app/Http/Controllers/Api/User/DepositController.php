@@ -32,7 +32,7 @@ class DepositController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'deposit_plan_id' => 'required|exists:deposit_plans,id',
+            'deposit_plan_id' => 'nullable|exists:deposit_plans,id',
             'payment_method_id' => 'required|exists:payment_methods,id',
             'amount' => 'required|numeric|min:1',
             'transaction_id' => 'nullable|string',
@@ -40,16 +40,18 @@ class DepositController extends Controller
             'comments' => 'nullable|string'
         ]);
 
-        $isValidAmount = \App\Models\DepositPlanLevel::where('deposit_plan_id', $request->deposit_plan_id)
-            ->where('status', 'active')
-            ->where('amount', $request->amount)
-            ->exists();
+        if ($request->deposit_plan_id) {
+            $isValidAmount = \App\Models\DepositPlanLevel::where('deposit_plan_id', $request->deposit_plan_id)
+                ->where('status', 'active')
+                ->where('amount', $request->amount)
+                ->exists();
 
-        if (!$isValidAmount) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'The provided amount does not match any valid investment tier for the selected deposit plan.'
-            ], 422);
+            if (!$isValidAmount) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The provided amount does not match any valid investment tier for the selected deposit plan.'
+                ], 422);
+            }
         }
 
         $data = $request->except('screenshot');
@@ -62,10 +64,12 @@ class DepositController extends Controller
 
         $deposit = DepositRequest::create($data);
 
+        $planLabel = $request->deposit_plan_id ? "Plan #{$request->deposit_plan_id}" : "Manual Fund Adding";
+
         \App\Models\UserActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'Deposit Requested',
-            'details' => "Requested \${$request->amount} deposit via Plan #{$request->deposit_plan_id}",
+            'details' => "Requested \${$request->amount} deposit via {$planLabel}",
             'ip_address' => $request->ip()
         ]);
 
