@@ -15,8 +15,8 @@ import Swal from 'sweetalert2';
  */
 
 export default function OrderTaskIndex({ tasks, commissionTiers, products, filters = {} }) {
-    const [isModalOpen, setIsModalOpen]       = useState(false);
-    const [editingTask, setEditingTask]       = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     // Price filter state
@@ -29,13 +29,13 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
     const dropdownRef = useRef(null);
 
     const { data, setData, processing, errors, reset, clearErrors } = useForm({
-        title:                     '',
-        commission_type:           'tier',
-        commission_tier_id:        '',
+        title: '',
+        commission_type: 'tier',
+        commission_tier_id: '',
         manual_commission_percent: '',
-        required_orders:           25,
-        status:                    'active',
-        product_ids:               [],
+        required_orders: 25,
+        status: 'active',
+        product_ids: [],
     });
 
     // Close dropdown on outside click
@@ -60,20 +60,20 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
             task.products.forEach(p => {
                 const pivotType = p.pivot?.custom_commission_type ?? '';
                 overrides[p.id] = {
-                    type:    pivotType,
+                    type: pivotType,
                     percent: pivotType === 'percent' ? String(p.pivot.custom_commission_percent ?? '') : '',
-                    flat:    pivotType === 'flat'    ? String(p.pivot.custom_commission_flat    ?? '') : '',
+                    flat: pivotType === 'flat' ? String(p.pivot.custom_commission_flat ?? '') : '',
                 };
             });
             setProductOverrides(overrides);
             setData({
-                title:                     task.title,
-                commission_type:           task.commission_type,
-                commission_tier_id:        task.commission_tier_id || '',
+                title: task.title,
+                commission_type: task.commission_type,
+                commission_tier_id: task.commission_tier_id || '',
                 manual_commission_percent: task.manual_commission_percent || '',
-                required_orders:           task.required_orders,
-                status:                    task.status,
-                product_ids:               task.products.map(p => p.id),
+                required_orders: task.required_orders,
+                status: task.status,
+                product_ids: task.products.map(p => p.id),
             });
         } else {
             setEditingTask(null);
@@ -123,17 +123,17 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
 
     // Build payload for submission
     const buildPayload = () => {
-        const product_commissions      = {};
+        const product_commissions = {};
         const product_commission_types = {};
         const product_flat_commissions = {};
 
         Object.entries(productOverrides).forEach(([pid, ov]) => {
             if (ov.type === 'percent') {
                 product_commission_types[pid] = 'percent';
-                product_commissions[pid]      = ov.percent;
+                product_commissions[pid] = ov.percent;
             } else if (ov.type === 'flat') {
-                product_commission_types[pid]  = 'flat';
-                product_flat_commissions[pid]  = ov.flat;
+                product_commission_types[pid] = 'flat';
+                product_flat_commissions[pid] = ov.flat;
             }
             // type '' → no keys or null → backend treats as inherit default
         });
@@ -148,6 +148,17 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
 
     const submit = (e) => {
         e.preventDefault();
+
+        if (parseInt(data.required_orders) !== data.product_ids.length) {
+            Swal.fire({
+                title: 'Validation Error',
+                text: `The number of selected products (${data.product_ids.length}) must exactly match the Required Orders (${data.required_orders}).`,
+                icon: 'error',
+                confirmButtonColor: '#f59e0b',
+            });
+            return;
+        }
+
         const payload = buildPayload();
 
         if (editingTask) {
@@ -231,9 +242,8 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
                         type="button"
                         title="Inherit task default commission"
                         onClick={wrapClick(() => setOverrideType(productId, ''))}
-                        className={`px-1.5 py-1 transition-colors ${
-                            ov.type === '' ? 'bg-gray-700 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'
-                        }`}
+                        className={`px-1.5 py-1 transition-colors ${ov.type === '' ? 'bg-gray-700 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'
+                            }`}
                     >
                         DEF
                     </button>
@@ -241,9 +251,8 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
                         type="button"
                         title="Custom percentage commission"
                         onClick={wrapClick(() => setOverrideType(productId, 'percent'))}
-                        className={`px-1.5 py-1 transition-colors border-l border-gray-200 ${
-                            ov.type === 'percent' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400 hover:bg-orange-50'
-                        }`}
+                        className={`px-1.5 py-1 transition-colors border-l border-gray-200 ${ov.type === 'percent' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400 hover:bg-orange-50'
+                            }`}
                     >
                         %
                     </button>
@@ -251,9 +260,8 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
                         type="button"
                         title="Custom flat dollar commission"
                         onClick={wrapClick(() => setOverrideType(productId, 'flat'))}
-                        className={`px-1.5 py-1 transition-colors border-l border-gray-200 ${
-                            ov.type === 'flat' ? 'bg-blue-500 text-white' : 'bg-white text-gray-400 hover:bg-blue-50'
-                        }`}
+                        className={`px-1.5 py-1 transition-colors border-l border-gray-200 ${ov.type === 'flat' ? 'bg-blue-500 text-white' : 'bg-white text-gray-400 hover:bg-blue-50'
+                            }`}
                     >
                         $
                     </button>
@@ -608,11 +616,10 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
                                                 return (
                                                     <div
                                                         key={product.id}
-                                                        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border gap-3 ${
-                                                            isSelected
+                                                        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors border gap-3 ${isSelected
                                                                 ? 'bg-orange-50 border-orange-200'
                                                                 : 'bg-transparent border-transparent hover:bg-gray-50'
-                                                        }`}
+                                                            }`}
                                                         onClick={() => handleProductToggle(product.id, !isSelected)}
                                                     >
                                                         {/* Checkbox */}

@@ -89,7 +89,7 @@ class OrderTaskController extends Controller
             'manual_commission_percent'   => 'required_if:commission_type,manual|nullable|numeric|min:0|max:100',
             'required_orders'             => 'required|integer|min:1',
             'status'                      => 'required|in:active,inactive',
-            'product_ids'                 => 'required|array|min:1',
+            'product_ids'                 => ['required', 'array', 'size:' . $request->input('required_orders')],
             'product_ids.*'               => 'exists:products,id',
             // per-product overrides
             'product_commissions'         => 'nullable|array',
@@ -131,7 +131,7 @@ class OrderTaskController extends Controller
             'manual_commission_percent'   => 'required_if:commission_type,manual|nullable|numeric|min:0|max:100',
             'required_orders'             => 'required|integer|min:1',
             'status'                      => 'required|in:active,inactive',
-            'product_ids'                 => 'required|array|min:1',
+            'product_ids'                 => ['required', 'array', 'size:' . $request->input('required_orders')],
             'product_ids.*'               => 'exists:products,id',
             'product_commissions'         => 'nullable|array',
             'product_commissions.*'       => 'nullable|numeric|min:0|max:100',
