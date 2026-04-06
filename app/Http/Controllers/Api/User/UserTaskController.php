@@ -32,8 +32,11 @@ class UserTaskController extends Controller
             ]);
         }
 
-        // Pick a random product from the task's product pool
-        $nextProduct = $userTask->orderTask->products->random();
+        // Select the "next" product deterministically based on completion count
+        $products = $userTask->orderTask->products;
+        $productCount = $products->count();
+        $index = $userTask->completed_orders % $productCount;
+        $nextProduct = $products->get($index);
 
         // Resolve commission for this product
         $commission = $this->resolveCommission($nextProduct, $userTask->orderTask);
@@ -99,8 +102,12 @@ class UserTaskController extends Controller
             ]);
         }
 
-        // Get a random product from the task (same as getActiveTask)
-        $nextProduct = $userTask->orderTask->products->random();
+        // Select the "next" product deterministically based on completion count
+        $products = $userTask->orderTask->products;
+        $productCount = $products->count();
+        $index = $userTask->completed_orders % $productCount;
+        $nextProduct = $products->get($index);
+
         $productPrice = (float)$nextProduct->price;
         $shortage = max(0, $productPrice - $balance);
 
@@ -108,6 +115,7 @@ class UserTaskController extends Controller
             'success' => true,
             'has_active_task' => true,
             'wallet_balance' => $balance,
+            'product_id' => $nextProduct->id, // Frontend can use this to keep UI in sync
             'product_price' => round($productPrice, 2),
             'shortage' => round($shortage, 2),
             'has_enough' => $balance >= $productPrice,
