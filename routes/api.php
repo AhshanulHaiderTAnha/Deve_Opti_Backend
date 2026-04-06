@@ -111,6 +111,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // POST for cancel
         Route::post('order-requests/{id}/cancel', [UserOrderRequestController::class, 'cancel']);
         // Withdrawal Password
+        Route::get('withdrawal-password/status', [WithdrawalPasswordController::class, 'status']);
         Route::post('withdrawal-password/set', [WithdrawalPasswordController::class, 'set']);
         Route::post('withdrawal-password/change', [WithdrawalPasswordController::class, 'change']);
         // Referral System

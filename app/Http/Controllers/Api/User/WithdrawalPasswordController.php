@@ -10,6 +10,17 @@ use Illuminate\Support\Facades\Auth;
 class WithdrawalPasswordController extends Controller
 {
     /**
+     * Check if the user has a withdrawal password set.
+     */
+    public function status()
+    {
+        return response()->json([
+            'status' => 'success',
+            'is_set' => Auth::user()->withdrawalPassword()->exists()
+        ]);
+    }
+
+    /**
      * Set a new withdrawal password.
      */
     public function set(Request $request)
