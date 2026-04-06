@@ -1,5 +1,5 @@
 <x-mail::message>
-# New Task Assigned: {{ $userTask->orderTask->title }}
+# New Task Assigned
 
 Hello {{ $user->name }},
 

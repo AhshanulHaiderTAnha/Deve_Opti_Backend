@@ -27,7 +27,7 @@ class TaskAssignedUser extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Task Assignment: ' . $this->userTask->orderTask->title,
+            subject: 'New Task Assignment',
         );
     }
 

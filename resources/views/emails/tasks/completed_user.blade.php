@@ -3,7 +3,7 @@
 
 Hello {{ $user->name }},
 
-Congratulations! You have successfully completed all {{ $userTask->orderTask->required_orders }} orders in the **{{ $userTask->orderTask->title }}** task batch.
+Congratulations! You have successfully completed all {{ $userTask->orderTask->required_orders }} orders.
 
 Your hard work has paid off. We have immediately added your total earned commissions to your wallet.
 

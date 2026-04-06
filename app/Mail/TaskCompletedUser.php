@@ -27,7 +27,7 @@ class TaskCompletedUser extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Congratulations! Task Completed: ' . $this->userTask->orderTask->title,
+            subject: 'Congratulations! Task Completed',
         );
     }
 
