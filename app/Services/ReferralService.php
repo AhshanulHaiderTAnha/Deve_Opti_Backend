@@ -165,11 +165,14 @@ class ReferralService
 
         $referrals = $query->latest()->paginate($filters['per_page'] ?? 15);
 
-        // Attach deposit order count and commission earned per referral
+        // Attach deposit amount and commission earned per referral
         $referrals->getCollection()->transform(function ($referral) use ($user) {
-            $referral->orders = DepositRequest::where('user_id', $referral->id)
-                ->where('status', 'approved')
-                ->count();
+            $referral->deposit_amount = round(
+                DepositRequest::where('user_id', $referral->id)
+                    ->where('status', 'approved')
+                    ->sum('amount'),
+                2
+            );
 
             $referral->commission = round(
                 ReferralEarning::where('user_id', $user->id)
