@@ -99,18 +99,20 @@ class UserTaskController extends Controller
             ]);
         }
 
-        // Get the total amount of all products in the task template
-        $totalTaskAmount = (float)$userTask->orderTask->products->sum('price');
-        $shortage = max(0, $totalTaskAmount - $balance);
+        // Get a random product from the task (same as getActiveTask)
+        $nextProduct = $userTask->orderTask->products->random();
+        $productPrice = (float)$nextProduct->price;
+        $shortage = max(0, $productPrice - $balance);
 
         return response()->json([
             'success' => true,
             'has_active_task' => true,
             'wallet_balance' => $balance,
-            'total_task_amount' => round($totalTaskAmount, 2), // Full order amount
+            'product_price' => round($productPrice, 2),
             'shortage' => round($shortage, 2),
-            'has_enough' => $balance >= $totalTaskAmount,
-            'message' => $balance >= $totalTaskAmount ? 'Balance sufficient for this task.' : 'Insufficient balance to complete this task.'
+            'has_enough' => $balance >= $productPrice,
+            'product_name' => $nextProduct->title,
+            'message' => $balance >= $productPrice ? 'Balance sufficient for this order.' : 'Insufficient balance for this order.'
         ]);
     }
 
