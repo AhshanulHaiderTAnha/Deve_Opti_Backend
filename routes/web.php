@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\OrderRequestController as AdminOrderRequestController;
 use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
+use App\Http\Controllers\Admin\LegalDocumentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -116,6 +117,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('referrals/export', [AdminReferralController::class, 'export'])->name('referrals.export');
         Route::get('referrals', [AdminReferralController::class, 'index'])->name('referrals.index');
         Route::get('referrals/{user_id}', [AdminReferralController::class, 'show'])->name('referrals.show');
+        // Legal Documents
+        Route::resource('legal-documents', LegalDocumentController::class)->except(['create', 'edit', 'show']);
     });
 });
 

@@ -82,6 +82,7 @@ export default function AdminLayout({ children }) {
             children: [
                 { name: 'Announcements', href: route('admin.announcements.index'), current: route().current('admin.announcements.*'), icon: 'campaign' },
                 { name: 'Social Media', href: route('admin.social-media.index'), current: route().current('admin.social-media.*'), icon: 'share' },
+                { name: 'Legal Documents', href: route('admin.legal-documents.index'), current: route().current('admin.legal-documents.*'), icon: 'gavel' },
                 { name: 'Activity Logs', href: route('admin.activity-logs.index'), current: route().current('admin.activity-logs.*'), icon: 'history' },
                 { name: 'Settings', href: route('admin.settings.index'), current: route().current('admin.settings.*'), icon: 'settings' },
             ]

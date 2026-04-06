@@ -108,4 +108,28 @@ class PublicController extends Controller
             'data' => $links
         ]);
     }
+
+    public function legalDocuments($type)
+    {
+        $validTypes = ['terms', 'privacy', 'cookies'];
+        if (!in_array($type, $validTypes)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid document type.'
+            ], 400);
+        }
+
+        $docs = Cache::remember("public_legal_{$type}", 3600, function () use ($type) {
+            return \App\Models\LegalDocument::where('type', $type)
+                ->where('status', 'active')
+                ->orderBy('position')
+                ->get()
+                ->toArray();
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $docs
+        ]);
+    }
 }

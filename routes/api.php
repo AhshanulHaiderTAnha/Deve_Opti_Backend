@@ -34,6 +34,7 @@ Route::prefix('public')->group(function () {
     Route::post('subscribe', [PublicController::class, 'subscribe']);
     Route::get('commission-tiers', [CommissionTierController::class, 'index']);
     Route::get('social-links', [PublicController::class, 'socialMediaLinks']);
+    Route::get('legal/{type}', [PublicController::class, 'legalDocuments']);
 });
 
 // Public Auth Routes  (rate limited)
