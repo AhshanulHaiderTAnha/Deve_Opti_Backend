@@ -117,7 +117,7 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Task Batch Name</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Progress</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Earned Commission</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Current Order Price</th>
+                                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Next Product</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                                     <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
                                 </tr>
@@ -147,7 +147,10 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                             <span className="font-black text-green-600">${parseFloat(assignment.total_earned_commission).toFixed(2)}</span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="font-bold text-gray-800">${parseFloat(assignment.order_task?.products_sum_price || 0).toFixed(2)}</span>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-gray-800 text-[11px] truncate max-w-[150px]" title={assignment.next_product_name}>{assignment.next_product_name}</span>
+                                                <span className="font-black text-gray-900 text-xs">${parseFloat(assignment.next_product_price || 0).toFixed(2)}</span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${assignment.status === 'completed'

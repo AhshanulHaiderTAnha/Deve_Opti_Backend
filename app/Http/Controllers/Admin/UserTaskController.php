@@ -17,7 +17,8 @@ class UserTaskController extends Controller
     {
         $query = UserTask::with(['user:id,name,email', 'orderTask' => function ($q) {
             $q->select('id', 'title', 'required_orders', 'commission_type')
-              ->withSum('products', 'price');
+              ->withSum('products', 'price')
+              ->with('products:id,title,price');
         }]);
 
         if ($request->filled('search')) {
@@ -33,8 +34,21 @@ class UserTaskController extends Controller
             $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
 
+        $assignments = $query->latest()->paginate(15)->through(function ($assignment) {
+            $nextProduct = null;
+            if ($assignment->orderTask && $assignment->orderTask->products->isNotEmpty() && $assignment->status !== 'completed') {
+                $products = $assignment->orderTask->products;
+                $index = $assignment->completed_orders % $products->count();
+                $nextProduct = $products->get($index);
+            }
+
+            $assignment->next_product_name = $nextProduct ? $nextProduct->title : ($assignment->status === 'completed' ? 'Completed' : 'N/A');
+            $assignment->next_product_price = $nextProduct ? (float)$nextProduct->price : 0;
+            return $assignment;
+        });
+
         return Inertia::render('Admin/OrderTasks/UserAssignments', [
-            'assignments' => $query->latest()->paginate(15)->withQueryString(),
+            'assignments' => $assignments->withQueryString(),
             'users' => User::role('user')->get(['id', 'name', 'email']),
             'tasks' => OrderTask::where('status', 'active')->get(['id', 'title', 'required_orders', 'commission_type']),
             'filters' => $request->only(['search', 'status', 'start_date', 'end_date'])
@@ -45,7 +59,8 @@ class UserTaskController extends Controller
     {
         $query = UserTask::with(['user:id,name,email', 'orderTask' => function ($q) {
             $q->select('id', 'title', 'required_orders', 'commission_type')
-              ->withSum('products', 'price');
+              ->withSum('products', 'price')
+              ->with('products:id,title,price');
         }]);
 
         if ($request->filled('search')) {
@@ -71,12 +86,21 @@ class UserTaskController extends Controller
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
         ];
-        $columns = ['ID', 'User Name', 'User Email', 'Task Title', 'Completed', 'Required', 'Earned ($)', 'Current Order Price', 'Status', 'Date Assigned'];
+        $columns = ['ID', 'User Name', 'User Email', 'Task Title', 'Completed', 'Required', 'Earned ($)', 'Next Product Name', 'Next Product Price', 'Status', 'Date Assigned'];
 
         $callback = function() use($assignments, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             foreach ($assignments as $a) {
+                $nextProduct = null;
+                if ($a->orderTask && $a->orderTask->products->isNotEmpty() && $a->status !== 'completed') {
+                    $products = $a->orderTask->products;
+                    $index = $a->completed_orders % $products->count();
+                    $nextProduct = $products->get($index);
+                }
+                $nextName = $nextProduct ? $nextProduct->title : ($a->status === 'completed' ? 'Completed' : 'N/A');
+                $nextPrice = $nextProduct ? (float)$nextProduct->price : 0;
+
                 fputcsv($file, [
                     $a->id,
                     $a->user->name ?? 'N/A',
@@ -85,7 +109,8 @@ class UserTaskController extends Controller
                     $a->completed_orders,
                     $a->orderTask->required_orders ?? 0,
                     $a->total_earned_commission,
-                    $a->orderTask->products_sum_price ?? 0,
+                    $nextName,
+                    $nextPrice,
                     $a->status,
                     $a->created_at->format('Y-m-d H:i:s')
                 ]);

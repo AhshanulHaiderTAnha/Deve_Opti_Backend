@@ -18,7 +18,8 @@ class OrderTask extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'order_task_products')
-                    ->withPivot('custom_commission_percent', 'custom_commission_type', 'custom_commission_flat')
+                    ->withPivot('id', 'custom_commission_percent', 'custom_commission_type', 'custom_commission_flat')
+                    ->orderByPivot('id')
                     ->withTimestamps();
     }
 
