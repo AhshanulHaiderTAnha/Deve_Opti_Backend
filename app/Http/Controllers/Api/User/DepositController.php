@@ -40,7 +40,7 @@ class DepositController extends Controller
             'comments' => 'nullable|string'
         ]);
 
-        if ($request->deposit_plan_id) {
+        if ($request->filled('deposit_plan_id')) {
             $isValidAmount = \App\Models\DepositPlanLevel::where('deposit_plan_id', $request->deposit_plan_id)
                 ->where('status', 'active')
                 ->where('amount', $request->amount)
@@ -58,13 +58,18 @@ class DepositController extends Controller
         $data['user_id'] = auth()->id();
         $data['status'] = 'pending';
 
+        // Ensure deposit_plan_id is explicitly null if not filled
+        if (!$request->filled('deposit_plan_id')) {
+            $data['deposit_plan_id'] = null;
+        }
+
         if ($request->hasFile('screenshot')) {
             $data['screenshot_path'] = $request->file('screenshot')->store('deposits', 'public');
         }
 
         $deposit = DepositRequest::create($data);
 
-        $planLabel = $request->deposit_plan_id ? "Plan #{$request->deposit_plan_id}" : "Manual Fund Adding";
+        $planLabel = $deposit->deposit_plan_id ? "Plan #{$deposit->deposit_plan_id}" : "Manual Fund Adding";
 
         \App\Models\UserActivityLog::create([
             'user_id' => auth()->id(),
