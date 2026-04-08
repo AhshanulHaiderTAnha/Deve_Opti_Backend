@@ -92,6 +92,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('subscribers',SubscriberController::class)->only(['index', 'destroy']);
         // Wallet System
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
+        Route::post('wallets/deposit', [WalletController::class, 'deposit'])->name('wallets.deposit');
         // Deposit
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');

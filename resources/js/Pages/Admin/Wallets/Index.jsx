@@ -1,8 +1,36 @@
-import React from 'react';
-import { Head, router } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function WalletIndex({ wallets, filters = {} }) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedWallet, setSelectedWallet] = useState(null);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        user_id: '',
+        amount: '',
+        description: '',
+    });
+
+    const openDepositModal = (wallet) => {
+        setSelectedWallet(wallet);
+        setData('user_id', wallet.user_id);
+        setIsModalOpen(true);
+    };
+
+    const closeDepositModal = () => {
+        setIsModalOpen(false);
+        setSelectedWallet(null);
+        reset();
+    };
+
+    const submitDeposit = (e) => {
+        e.preventDefault();
+        post(route('admin.wallets.deposit'), {
+            onSuccess: () => closeDepositModal(),
+        });
+    };
+
     return (
         <AdminLayout>
             <Head title="User Wallets" />
@@ -55,7 +83,7 @@ export default function WalletIndex({ wallets, filters = {} }) {
                             <tr className="bg-gray-50/50">
                                 <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">User</th>
                                 <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Available Balance</th>
-                                <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Last Updated</th>
+                                <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -73,27 +101,95 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                     <td className="px-10 py-5 text-right font-black text-emerald-600 text-xl tracking-tight">
                                         ${parseFloat(wallet.balance).toFixed(2)}
                                     </td>
-                                    <td className="px-10 py-5 text-right text-xs font-bold text-gray-400">
-                                        {new Date(wallet.updated_at).toLocaleDateString('en-US', {
-                                            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                                        })}
+                                    <td className="px-10 py-5 text-right">
+                                        <button
+                                            onClick={() => openDepositModal(wallet)}
+                                            className="inline-flex items-center px-4 py-2 bg-orange-50 text-orange-600 hover:bg-orange-100 font-black rounded-xl transition-all uppercase tracking-widest text-[9px]"
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-xs">add_circle</span>
+                                            Deposit
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
-                            {wallets.data.length === 0 && (
-                                <tr>
-                                    <td colSpan="3" className="px-10 py-20 text-center">
-                                        <div className="flex flex-col items-center justify-center space-y-3">
-                                            <span className="material-icons-outlined text-4xl text-gray-200">account_balance_wallet</span>
-                                            <p className="text-gray-400 font-bold text-sm tracking-tight uppercase">No wallets found</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
+                    {wallets.data.length === 0 && (
+                        <div className="px-10 py-20 text-center">
+                            <div className="flex flex-col items-center justify-center space-y-3">
+                                <span className="material-icons-outlined text-4xl text-gray-200">account_balance_wallet</span>
+                                <p className="text-gray-400 font-bold text-sm tracking-tight uppercase">No wallets found</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {/* Deposit Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-lg shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-start mb-8">
+                            <div>
+                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Manual Deposit</h3>
+                                <p className="text-gray-500 font-medium text-sm">Add funds to {selectedWallet?.user?.name}'s wallet.</p>
+                            </div>
+                            <button onClick={closeDepositModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                <span className="material-icons-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <form onSubmit={submitDeposit} className="space-y-6">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Deposit Amount ($)</label>
+                                <div className="relative">
+                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 font-black text-gray-400">$</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        className="w-full pl-12 pr-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-orange-500/20 font-black text-lg"
+                                        placeholder="0.00"
+                                        value={data.amount}
+                                        onChange={e => setData('amount', e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                {errors.amount && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{errors.amount}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Transaction Note</label>
+                                <textarea
+                                    className="w-full px-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm min-h-[120px]"
+                                    placeholder="Enter reason for direct deposit..."
+                                    value={data.description}
+                                    onChange={e => setData('description', e.target.value)}
+                                    required
+                                />
+                                {errors.description && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{errors.description}</p>}
+                                <p className="mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider italic">* This note will be visible to the user.</p>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={closeDepositModal}
+                                    className="flex-1 py-5 bg-gray-100 text-gray-500 hover:bg-gray-200 font-black rounded-3xl transition-all uppercase tracking-widest text-xs"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="flex-[2] py-5 bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-500/30 font-black rounded-3xl transition-all uppercase tracking-widest text-xs disabled:opacity-50"
+                                >
+                                    {processing ? 'Processing...' : 'Confirm Deposit'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 }
