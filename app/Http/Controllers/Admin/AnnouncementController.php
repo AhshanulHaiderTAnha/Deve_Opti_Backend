@@ -21,6 +21,18 @@ class AnnouncementController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/Announcements/Create');
+    }
+
+    public function edit(Announcement $announcement)
+    {
+        return Inertia::render('Admin/Announcements/Edit', [
+            'announcement' => $announcement
+        ]);
+    }
+
     public function export(Request $request)
     {
         $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now()->subDays(15);

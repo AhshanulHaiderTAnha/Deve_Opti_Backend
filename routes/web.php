@@ -108,7 +108,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('activity-logs/clear-old', [UserActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
         // Announcements
         Route::get('announcements/export', [AnnouncementController::class, 'export'])->name('announcements.export');
-        Route::resource('announcements', AnnouncementController::class)->except(['create', 'edit', 'show']);
+        Route::resource('announcements', AnnouncementController::class)->except(['show']);
         // Order Request management
         Route::get('order-requests', [AdminOrderRequestController::class, 'index'])->name('order-requests.index');
         Route::patch('order-requests/{id}/status', [AdminOrderRequestController::class, 'updateStatus'])->name('order-requests.status');
