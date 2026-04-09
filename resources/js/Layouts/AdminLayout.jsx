@@ -100,6 +100,7 @@ export default function AdminLayout({ children }) {
         },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
         { name: 'Referrals', href: route('admin.referrals.index'), current: route().current('admin.referrals.*'), icon: 'group_add' },
+        { name: 'Blogs', href: '/admin/blogs', current: window.location.pathname.startsWith('/admin/blogs'), icon: 'article' },
         { name: 'Success Stories', href: route('admin.success-stories.index'), current: route().current('admin.success-stories.*'), icon: 'auto_awesome' },
         { name: 'FAQs', href: route('admin.faqs.index'), current: route().current('admin.faqs.*'), icon: 'quiz' },
         { name: 'Subscribers', href: route('admin.subscribers.index'), current: route().current('admin.subscribers.*'), icon: 'mail' },
@@ -184,26 +185,31 @@ export default function AdminLayout({ children }) {
                                     {(openSubmenus[item.name] || item.current) && isSidebarOpen && (
                                         <div className="ml-4 mt-2 space-y-1 border-l-2 border-orange-100 pl-2">
                                             {item.children.map((child) => (
-                                                <Link
-                                                    key={child.name}
-                                                    href={child.href}
-                                                    className={`flex items-center p-2 rounded-lg text-sm transition-colors ${child.current ? 'text-orange-600 font-bold' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50'}`}
-                                                >
-                                                    <span className="material-icons-outlined text-lg mr-3">{child.icon}</span>
-                                                    {child.name}
-                                                </Link>
+                                                child.href ? (
+                                                    <Link
+                                                        key={child.name}
+                                                        href={child.href}
+                                                        className={`flex items-center p-2 rounded-lg text-sm transition-colors ${child.current ? 'text-orange-600 font-bold' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50'}`}
+                                                    >
+                                                        <span className="material-icons-outlined text-lg mr-3">{child.icon}</span>
+                                                        {child.name}
+                                                    </Link>
+                                                ) : null
                                             ))}
                                         </div>
                                     )}
                                 </>
                             ) : (
-                                <Link
-                                    href={item.href}
-                                    className={`flex items-center p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                                >
-                                    <span className="material-icons-outlined text-xl">{item.icon}</span>
-                                    {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
-                                </Link>
+                                item.href ? (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={`flex items-center p-3 rounded-lg transition-colors ${item.current ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                                    >
+                                        <span className="material-icons-outlined text-xl">{item.icon}</span>
+                                        {isSidebarOpen && <span className="ml-3 font-medium">{item.name}</span>}
+                                    </Link>
+                                ) : null
                             )}
                         </div>
                     ))}

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\User\DepositPlanController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\SupportTicketController;
 use App\Http\Controllers\Api\Public\PublicController;
+use App\Http\Controllers\Api\Public\BlogController as PublicBlogController;
 use App\Http\Controllers\Api\User\WalletController;
 use App\Http\Controllers\Api\User\DepositController;
 use App\Http\Controllers\Api\User\WithdrawalController;
@@ -35,6 +36,8 @@ Route::prefix('public')->group(function () {
     Route::get('commission-tiers', [CommissionTierController::class, 'index']);
     Route::get('social-links', [PublicController::class, 'socialMediaLinks']);
     Route::get('legal/{type}', [PublicController::class, 'legalDocuments']);
+    Route::get('blogs', [PublicBlogController::class, 'index']);
+    Route::get('blogs/{slug}', [PublicBlogController::class, 'show']);
 });
 
 // Public Auth Routes  (rate limited)

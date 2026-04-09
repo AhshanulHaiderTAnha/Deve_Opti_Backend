@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\OrderRequestController as AdminOrderRequestController;
 use App\Http\Controllers\Admin\ReferralController as AdminReferralController;
 use App\Http\Controllers\Admin\LegalDocumentController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -120,6 +121,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('referrals/{user_id}', [AdminReferralController::class, 'show'])->name('referrals.show');
         // Legal Documents
         Route::resource('legal-documents', LegalDocumentController::class)->except(['create', 'edit', 'show']);
+        // Blog Management
+        // Blog Management
+        Route::get('blogs', [AdminBlogController::class, 'index'])->name('blogs.index');
+        Route::get('blogs/create', [AdminBlogController::class, 'create'])->name('blogs.create');
+        Route::post('blogs', [AdminBlogController::class, 'store'])->name('blogs.store');
+        Route::get('blogs/{blog}/edit', [AdminBlogController::class, 'edit'])->name('blogs.edit');
+        Route::put('blogs/{blog}', [AdminBlogController::class, 'update'])->name('blogs.update');
+        Route::delete('blogs/{blog}', [AdminBlogController::class, 'destroy'])->name('blogs.destroy');
+        Route::get('blogs/{blog}', [AdminBlogController::class, 'show'])->name('blogs.show');
     });
 });
 
