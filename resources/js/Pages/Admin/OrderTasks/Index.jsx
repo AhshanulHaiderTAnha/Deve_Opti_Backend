@@ -22,6 +22,7 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
     // Price filter state
     const [priceMin, setPriceMin] = useState('');
     const [priceMax, setPriceMax] = useState('');
+    const [sortBy, setSortBy] = useState(''); // 'low' or 'high'
 
     // Per-product overrides
     const [productOverrides, setProductOverrides] = useState({});
@@ -53,6 +54,7 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
     const openModal = (task = null) => {
         setPriceMin('');
         setPriceMax('');
+        setSortBy('');
 
         if (task) {
             setEditingTask(task);
@@ -200,13 +202,19 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
         });
     };
 
-    // Price-filtered products for the dropdown
-    const filteredProducts = products.filter(p => {
-        const price = parseFloat(p.price);
-        if (priceMin !== '' && price < parseFloat(priceMin)) return false;
-        if (priceMax !== '' && price > parseFloat(priceMax)) return false;
-        return true;
-    });
+    // Price-filtered and sorted products for the dropdown
+    const filteredProducts = products
+        .filter(p => {
+            const price = parseFloat(p.price);
+            if (priceMin !== '' && price < parseFloat(priceMin)) return false;
+            if (priceMax !== '' && price > parseFloat(priceMax)) return false;
+            return true;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'low') return parseFloat(a.price) - parseFloat(b.price);
+            if (sortBy === 'high') return parseFloat(b.price) - parseFloat(a.price);
+            return 0;
+        });
 
     /** Renders the commission badge on a product in the card list */
     const CommissionBadge = ({ pivot }) => {
@@ -593,6 +601,20 @@ export default function OrderTaskIndex({ tasks, commissionTiers, products, filte
                                                     value={priceMax}
                                                     onChange={e => setPriceMax(e.target.value)}
                                                 />
+                                            </div>
+
+                                            {/* Sort Dropdown */}
+                                            <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1">
+                                                <span className="material-icons-outlined text-gray-400 text-[14px]">sort</span>
+                                                <select
+                                                    className="text-[10px] font-bold border-none outline-none bg-transparent text-gray-700 cursor-pointer"
+                                                    value={sortBy}
+                                                    onChange={e => setSortBy(e.target.value)}
+                                                >
+                                                    <option value="">Sort</option>
+                                                    <option value="low">Price: Low-High</option>
+                                                    <option value="high">Price: High-Low</option>
+                                                </select>
                                             </div>
                                             {(priceMin || priceMax) && (
                                                 <button

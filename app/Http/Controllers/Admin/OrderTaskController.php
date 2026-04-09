@@ -32,7 +32,7 @@ class OrderTaskController extends Controller
         return Inertia::render('Admin/OrderTasks/Index', [
             'tasks'           => $query->get(),
             'commissionTiers' => CommissionTier::where('status', 'active')->orderBy('sort_order')->get(),
-            'products'        => Product::where('status', 'published')->get(['id', 'title', 'price', 'platform']),
+            'products'        => Product::where('status', 'published')->orderBy('title', 'asc')->get(['id', 'title', 'price', 'platform']),
             'filters'         => $request->only(['search', 'status'])
         ]);
     }
