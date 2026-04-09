@@ -12,7 +12,7 @@ export default function ProductIndex({ products, filters }) {
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         title: '',
-        platform: 'Amazon',
+        platform: 'Walmart',
         product_url: '',
         target_keyword: '',
         price: '',
@@ -183,7 +183,7 @@ export default function ProductIndex({ products, filters }) {
                             value={filters.platform || ''}
                         >
                             <option value="">All Platforms</option>
-                            <option value="Amazon">Amazon</option>
+                            <option value="Walmart">Walmart</option>
                             <option value="eBay">eBay</option>
                             <option value="AliExpress">AliExpress</option>
                             <option value="Other">Other</option>
@@ -237,7 +237,7 @@ export default function ProductIndex({ products, filters }) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${product.platform === 'Amazon' ? 'bg-orange-50 text-orange-600' :
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${product.platform === 'Walmart' ? 'bg-orange-50 text-orange-600' :
                                                 product.platform === 'eBay' ? 'bg-blue-50 text-blue-600' :
                                                     product.platform === 'AliExpress' ? 'bg-rose-50 text-rose-600' :
                                                         'bg-gray-100 text-gray-600'
@@ -331,7 +331,7 @@ export default function ProductIndex({ products, filters }) {
                                                     value={data.platform}
                                                     onChange={e => setData('platform', e.target.value)}
                                                 >
-                                                    <option value="Amazon">Amazon</option>
+                                                    <option value="Walmart">Walmart</option>
                                                     <option value="eBay">eBay</option>
                                                     <option value="AliExpress">AliExpress</option>
                                                     <option value="Other">Other</option>

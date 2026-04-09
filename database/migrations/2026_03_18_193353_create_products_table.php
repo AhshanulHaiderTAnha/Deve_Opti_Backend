@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,10 +14,10 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->enum('platform', ['Amazon', 'eBay', 'AliExpress', 'Other'])->default('Other');
+            $table->enum('platform', ['Walmart', 'eBay', 'AliExpress', 'Other'])->default('Other');
             $table->text('product_url')->nullable();
             $table->string('target_keyword')->nullable();
-            
+
             // Ecommerce Fields
             $table->decimal('price', 15, 2)->default(0);
             $table->decimal('compare_at_price', 15, 2)->nullable();
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->integer('stock_quantity')->default(0);
             $table->text('description')->nullable();
             $table->string('image_path')->nullable();
-            
+
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });

@@ -16,10 +16,10 @@ class ProductController extends Controller
         $query = Product::query();
 
         if ($request->search) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
-                  ->orWhere('target_keyword', 'like', "%{$request->search}%")
-                  ->orWhere('sku', 'like', "%{$request->search}%");
+                    ->orWhere('target_keyword', 'like', "%{$request->search}%")
+                    ->orWhere('sku', 'like', "%{$request->search}%");
             });
         }
 
@@ -29,6 +29,10 @@ class ProductController extends Controller
 
         if ($request->max_price) {
             $query->where('price', '<=', $request->max_price);
+        }
+
+        if ($request->platform) {
+            $query->where('platform', $request->platform);
         }
 
         return $query;
@@ -47,16 +51,16 @@ class ProductController extends Controller
         $products = $this->getFilteredProductsQuery($request)->latest()->get();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=products_export_" . date('Y-m-d_H-i-s') . ".csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
         ];
 
         $columns = ['ID', 'Title', 'Platform', 'SKU', 'Target Keyword', 'Base Price ($)', 'Compare At Price ($)', 'Stock', 'Status', 'Created Date'];
 
-        $callback = function() use($products, $columns) {
+        $callback = function () use ($products, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
@@ -85,7 +89,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'platform' => 'required|in:Amazon,eBay,AliExpress,Other',
+            'platform' => 'required|in:Walmart,eBay,AliExpress,Other',
             'product_url' => 'nullable|url',
             'target_keyword' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -112,7 +116,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'platform' => 'required|in:Amazon,eBay,AliExpress,Other',
+            'platform' => 'required|in:Walmart,eBay,AliExpress,Other',
             'product_url' => 'nullable|url',
             'target_keyword' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',

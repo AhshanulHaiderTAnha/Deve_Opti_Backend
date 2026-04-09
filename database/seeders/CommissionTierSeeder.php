@@ -12,7 +12,7 @@ class CommissionTierSeeder extends Seeder
     {
         $tiers = [
             [
-                'name' => 'Amazon Tier',
+                'name' => 'Walmart Tier',
                 'min_amount' => 20,
                 'max_amount' => 399,
                 'commission_rate' => 4.0,
@@ -46,9 +46,9 @@ class CommissionTierSeeder extends Seeder
         foreach ($tiers as $tierData) {
             $benefits = $tierData['benefits'];
             unset($tierData['benefits']);
-            
+
             $tier = CommissionTier::create($tierData);
-            
+
             foreach ($benefits as $benefit) {
                 CommissionTierBenefit::create([
                     'commission_tier_id' => $tier->id,
