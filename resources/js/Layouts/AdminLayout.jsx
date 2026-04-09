@@ -1,13 +1,41 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 
 export default function AdminLayout({ children }) {
-    const { auth, settings } = usePage().props;
+    const { auth, settings, flash } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [openSubmenus, setOpenSubmenus] = useState({});
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [globalLoading, setGlobalLoading] = useState(false);
     const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (flash?.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: flash.success,
+                icon: 'success',
+                confirmButtonColor: '#111827',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl font-black uppercase tracking-widest text-[10px] px-8 py-4'
+                }
+            });
+        }
+        if (flash?.error) {
+            Swal.fire({
+                title: 'Error!',
+                text: flash.error,
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl font-black uppercase tracking-widest text-[10px] px-8 py-4'
+                }
+            });
+        }
+    }, [flash]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {

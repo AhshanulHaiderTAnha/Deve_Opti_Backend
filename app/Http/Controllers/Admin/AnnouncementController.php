@@ -89,7 +89,7 @@ class AnnouncementController extends Controller
         ]);
 
         Announcement::create($validated);
-        return back()->with('success', 'Announcement created successfully.');
+        return redirect()->route('admin.announcements.index')->with('success', 'Announcement created successfully.');
     }
 
     public function update(Request $request, Announcement $announcement)
@@ -103,12 +103,12 @@ class AnnouncementController extends Controller
         ]);
 
         $announcement->update($validated);
-        return back()->with('success', 'Announcement updated successfully.');
+        return redirect()->route('admin.announcements.index')->with('success', 'Announcement updated successfully.');
     }
 
     public function destroy(Announcement $announcement)
     {
         $announcement->delete();
-        return back()->with('success', 'Announcement deleted successfully.');
+        return redirect()->route('admin.announcements.index')->with('success', 'Announcement deleted successfully.');
     }
 }
