@@ -14,7 +14,7 @@ class UserController extends Controller
     protected function getFilteredUsersQuery(Request $request)
     {
         $query = User::role('user')
-            ->with(['kycSubmission', 'roles'])
+            ->with(['kycSubmission', 'roles', 'referrer'])
             ->withSum(['depositRequests as total_deposits' => fn($q) => $q->where('status', 'approved')], 'amount')
             ->withSum(['withdrawalRequests as total_withdrawals' => fn($q) => $q->where('status', 'approved')], 'amount')
             ->withSum(['userTasks as total_commissions' => fn($q) => $q->where('status', 'completed')], 'total_earned_commission');
@@ -69,7 +69,7 @@ class UserController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['ID', 'Name', 'Email', 'Phone', 'Status', 'KYC Status', 'Total Deposits ($)', 'Total Withdrawals ($)', 'Task Earnings ($)', 'Registered Date'];
+        $columns = ['ID', 'Name', 'Email', 'Phone', 'Status', 'KYC Status', 'Referral Code', 'Referrer Name', 'Referrer Email', 'Total Deposits ($)', 'Total Withdrawals ($)', 'Task Earnings ($)', 'Registered Date'];
 
         $callback = function() use($users, $columns) {
             $file = fopen('php://output', 'w');
@@ -83,6 +83,9 @@ class UserController extends Controller
                     $user->phone ?? 'N/A',
                     $user->status,
                     $user->kycSubmission?->status ?? 'not_submitted',
+                    $user->referral_code ?? 'N/A',
+                    $user->referrer?->name ?? 'N/A',
+                    $user->referrer?->email ?? 'N/A',
                     $user->total_deposits ?? 0,
                     $user->total_withdrawals ?? 0,
                     $user->total_commissions ?? 0,

@@ -138,6 +138,7 @@ export default function UserIndex({ users, filters }) {
                             <tr className="bg-slate-50/50 text-slate-400 text-[11px] uppercase tracking-[0.1em] font-black">
                                 <th className="px-8 py-5 border-b border-slate-50">User Profile</th>
                                 <th className="px-8 py-5 border-b border-slate-50">Verification</th>
+                                <th className="px-8 py-5 border-b border-slate-50">Referral Info</th>
                                 <th className="px-8 py-5 border-b border-slate-50">Financial Stats</th>
                                 <th className="px-8 py-5 border-b border-slate-50 text-center">Account Status</th>
                                 <th className="px-8 py-5 border-b border-slate-50 text-right">Actions</th>
@@ -171,6 +172,23 @@ export default function UserIndex({ users, filters }) {
                                             </span>
                                             {(user.kyc_status || 'NOT SUBMITTED').toUpperCase()}
                                         </span>
+                                    </td>
+                                    <td className="px-8 py-5">
+                                        <div className="flex flex-col space-y-1">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">My Code:</span>
+                                                <span className="text-[11px] font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded italic select-all cursor-pointer" title="Click to copy">{user.referral_code}</span>
+                                            </div>
+                                            {user.referred_by_name && (
+                                                <div className="mt-2 pt-2 border-t border-slate-50">
+                                                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] block mb-1">Referred By</span>
+                                                    <Link href={route('admin.users.show', user.referred_by_id)} className="group/ref">
+                                                        <div className="text-[11px] font-bold text-slate-700 group-hover/ref:text-orange-500 transition-colors uppercase">{user.referred_by_name}</div>
+                                                        <div className="text-[10px] font-medium text-slate-400 group-hover/ref:text-slate-500 transition-colors lowercase">{user.referred_by_email}</div>
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-8 py-5">
                                         <div className="flex flex-col space-y-1">

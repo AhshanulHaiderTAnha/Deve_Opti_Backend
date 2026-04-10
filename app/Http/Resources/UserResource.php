@@ -33,6 +33,8 @@ class UserResource extends JsonResource
             'referral_code'        => $this->referral_code,
             'withdrawal_enable'    => $this->withdrawal_enable,
             'referred_by_name'     => $this->whenLoaded('referrer', fn () => $this->referrer?->name),
+            'referred_by_email'    => $this->whenLoaded('referrer', fn () => $this->referrer?->email),
+            'referred_by_id'       => $this->whenLoaded('referrer', fn () => $this->referrer?->id),
             'total_referral_earnings' => $this->total_referral_earned ?? 0,
             'created_at'           => $this->created_at->toIso8601String(),
             'updated_at'           => $this->updated_at->toIso8601String(),
