@@ -23,6 +23,7 @@ class ReferralController extends Controller
     {
         $query = User::role('user')
             ->select('users.*')
+            ->with(['referrer'])
             ->withCount('directReferrals')
             ->withSum(['referralEarnings as total_referral_earned' => fn($q) => $q->where('status', 'credited')], 'earned_amount');
 
@@ -99,7 +100,7 @@ class ReferralController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['ID', 'Name', 'Email', 'Referral Code', 'Direct Referrals', 'Total Earned ($)', 'Status', 'Joined'];
+        $columns = ['ID', 'Name', 'Email', 'Referral Code', 'Referrer Name', 'Referrer Email', 'Direct Referrals', 'Total Earned ($)', 'Status', 'Joined'];
 
         $callback = function() use($users, $columns) {
             $file = fopen('php://output', 'w');
@@ -110,6 +111,8 @@ class ReferralController extends Controller
                     $user->name,
                     $user->email,
                     $user->referral_code,
+                    $user->referrer?->name ?? 'N/A',
+                    $user->referrer?->email ?? 'N/A',
                     $user->direct_referrals_count,
                     round($user->total_referral_earned ?? 0, 2),
                     $user->status,

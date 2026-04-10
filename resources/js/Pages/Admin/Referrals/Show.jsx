@@ -39,9 +39,18 @@ export default function ReferralShow({ referralData, performance, earnings }) {
                         </div>
                     </div>
                     <div className="flex space-x-3">
-                        <span className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-mono font-bold border border-gray-200">
-                            CODE: {user.referral_code}
-                        </span>
+                        <div className="flex flex-col space-y-1 items-end">
+                            <span className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-mono font-bold border border-gray-200">
+                                MY CODE: {user.referral_code}
+                            </span>
+                            {user.referred_by_name && (
+                                <Link href={route('admin.users.show', user.referred_by_id)} className="flex items-center space-x-2 group">
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Referred By:</span>
+                                    <span className="text-xs font-bold text-gray-600 group-hover:text-orange-500 transition-colors uppercase">{user.referred_by_name}</span>
+                                    <span className="text-[10px] text-gray-400 font-medium group-hover:text-slate-500 transition-colors lowercase">({user.referred_by_email})</span>
+                                </Link>
+                            )}
+                        </div>
                         <Link
                             href={route('admin.users.show', user.id)}
                             className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-sm shadow-orange-200"
@@ -80,13 +89,13 @@ export default function ReferralShow({ referralData, performance, earnings }) {
                 {/* Team Performance Monitoring */}
                 <div className="bg-white rounded-[2.5rem] border border-orange-100 p-10 shadow-xl shadow-orange-50/50 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <span className="material-icons-outlined text-9xl text-orange-500">query_stats</span>
+                        <span className="material-icons-outlined text-9xl text-orange-500">query_stats</span>
                     </div>
                     <h2 className="text-xl font-black text-slate-900 mb-8 flex items-center relative z-10">
                         <span className="material-icons-outlined mr-3 text-orange-500">monitoring</span>
                         Team Performance Monitoring (3 Levels)
                     </h2>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
                         <div className="space-y-2">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Team Deposits</p>

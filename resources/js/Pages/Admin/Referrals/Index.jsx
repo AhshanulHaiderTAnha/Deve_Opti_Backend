@@ -135,9 +135,20 @@ export default function ReferralsIndex({ users, filters, globalStats }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-mono font-bold">
-                                                {user.referral_code || '—'}
-                                            </span>
+                                            <div className="flex flex-col space-y-2">
+                                                <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-mono font-bold w-fit">
+                                                    {user.referral_code || '—'}
+                                                </span>
+                                                {user.referrer && (
+                                                    <div className="pt-2 border-t border-gray-50">
+                                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">Referred By</span>
+                                                        <Link href={route('admin.users.show', user.referred_by)} className="group/ref">
+                                                            <p className="text-[11px] font-bold text-gray-600 group-hover/ref:text-orange-500 transition-colors uppercase">{user.referrer.name}</p>
+                                                            <p className="text-[10px] text-gray-400 group-hover/ref:text-gray-500 transition-colors">{user.referrer.email}</p>
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <span className="inline-flex items-center justify-center h-8 w-8 bg-blue-50 text-blue-700 rounded-full text-sm font-black">
@@ -151,12 +162,12 @@ export default function ReferralsIndex({ users, filters, globalStats }) {
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${user.status === 'active' ? 'bg-green-50 text-green-700' :
-                                                    user.status === 'suspended' ? 'bg-red-50 text-red-700' :
-                                                        'bg-gray-50 text-gray-600'
+                                                user.status === 'suspended' ? 'bg-red-50 text-red-700' :
+                                                    'bg-gray-50 text-gray-600'
                                                 }`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${user.status === 'active' ? 'bg-green-500' :
-                                                        user.status === 'suspended' ? 'bg-red-500' :
-                                                            'bg-gray-400'
+                                                    user.status === 'suspended' ? 'bg-red-500' :
+                                                        'bg-gray-400'
                                                     }`}></span>
                                                 {user.status}
                                             </span>
@@ -195,7 +206,7 @@ export default function ReferralsIndex({ users, filters, globalStats }) {
                                         key={i}
                                         href={link.url || '#'}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${link.active ? 'bg-orange-500 text-white' :
-                                                link.url ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'
+                                            link.url ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'
                                             }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

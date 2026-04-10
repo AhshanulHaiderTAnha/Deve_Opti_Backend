@@ -64,14 +64,14 @@ class ReferralService
 
             // Create earning record
             $earning = ReferralEarning::create([
-                'user_id'            => $referrer->id,
-                'referred_user_id'   => $depositUser->id,
+                'user_id' => $referrer->id,
+                'referred_user_id' => $depositUser->id,
                 'deposit_request_id' => $deposit->id,
-                'level'              => $level,
-                'commission_rate'    => $rate,
-                'deposit_amount'     => $deposit->amount,
-                'earned_amount'      => $earnedAmount,
-                'status'             => 'credited',
+                'level' => $level,
+                'commission_rate' => $rate,
+                'deposit_amount' => $deposit->amount,
+                'earned_amount' => $earnedAmount,
+                'status' => 'credited',
             ]);
 
             // Credit referrer's wallet
@@ -85,13 +85,13 @@ class ReferralService
 
             // Record wallet transaction
             WalletTransaction::create([
-                'user_id'        => $referrer->id,
-                'type'           => 'credit',
-                'amount'         => $earnedAmount,
-                'balance_after'  => $wallet->balance,
+                'user_id' => $referrer->id,
+                'type' => 'credit',
+                'amount' => $earnedAmount,
+                'balance_after' => $wallet->balance,
                 'reference_type' => 'referral_earnings',
-                'reference_id'   => $earning->id,
-                'description'    => "Referral commission (Level {$level}) from {$depositUser->name}'s deposit",
+                'reference_id' => $earning->id,
+                'description' => "Referral commission (Level {$level}) from {$depositUser->name}'s deposit",
             ]);
 
             // Move up the chain
@@ -122,12 +122,12 @@ class ReferralService
             ->toArray();
 
         return [
-            'total_referrals'   => $totalReferrals,
-            'active_referrals'  => $activeReferrals,
+            'total_referrals' => $totalReferrals,
+            'active_referrals' => $activeReferrals,
             'pending_referrals' => $pendingReferrals,
-            'total_earned'      => round($totalEarned, 2),
-            'referral_code'     => $user->referral_code,
-            'referral_link'     => config('app.frontend_url', config('app.url')) . '/signup?ref=' . $user->referral_code,
+            'total_earned' => round($totalEarned, 2),
+            'referral_code' => $user->referral_code,
+            'referral_link' => config('app.frontend_url', config('app.url')) . '/signup?ref=' . $user->referral_code,
             'commission_structure' => [
                 ['level' => 1, 'rate' => self::COMMISSION_RATES[1], 'label' => 'Direct referrals'],
                 ['level' => 2, 'rate' => self::COMMISSION_RATES[2], 'label' => 'Referrals of your referrals'],
@@ -154,7 +154,7 @@ class ReferralService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('id', $search);
+                    ->orWhere('id', $search);
             });
         }
 
@@ -203,7 +203,7 @@ class ReferralService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('id', $search);
+                    ->orWhere('id', $search);
             });
         }
 
@@ -215,9 +215,9 @@ class ReferralService
         $referrals = $query->latest()->paginate($filters['per_page'] ?? 15);
 
         $totals = [
-            'total_deposits'    => 0,
+            'total_deposits' => 0,
             'total_withdrawals' => 0,
-            'net_deposit'       => 0,
+            'net_deposit' => 0,
         ];
 
         $referrals->getCollection()->transform(function ($referral) use (&$totals) {
@@ -247,7 +247,7 @@ class ReferralService
 
         return [
             'referrals' => $referrals,
-            'totals'    => $totals,
+            'totals' => $totals,
         ];
     }
 
@@ -285,7 +285,7 @@ class ReferralService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -344,16 +344,16 @@ class ReferralService
 
         return [
             'agent' => [
-                'id'    => $agent->id,
-                'name'  => $agent->name,
+                'id' => $agent->id,
+                'name' => $agent->name,
                 'email' => $agent->email,
             ],
             'team_performance' => [
-                'total_team_size'        => $allMemberIds->count(),
-                'active_team_members'    => $activeTeamMembers,
-                'total_team_deposits'    => round($totalDeposits, 2),
+                'total_team_size' => $allMemberIds->count(),
+                'active_team_members' => $activeTeamMembers,
+                'total_team_deposits' => round($totalDeposits, 2),
                 'total_team_withdrawals' => round($totalWithdrawals, 2),
-                'net_team_profit'        => round($totalDeposits - $totalWithdrawals, 2),
+                'net_team_profit' => round($totalDeposits - $totalWithdrawals, 2),
                 'total_agent_commission' => round($totalCommissionPaidToAgent, 2),
             ],
             'level_breakdown' => [
@@ -378,8 +378,8 @@ class ReferralService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('referral_code', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('referral_code', 'like', "%{$search}%");
             });
         }
 
@@ -430,21 +430,23 @@ class ReferralService
 
         return [
             'user' => [
-                'id'            => $user->id,
-                'name'          => $user->name,
-                'email'         => $user->email,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
                 'referral_code' => $user->referral_code,
-                'referred_by'   => $user->referrer?->name,
+                'referred_by_name' => $user->referrer?->name,
+                'referred_by_email' => $user->referrer?->email,
+                'referred_by_id' => $user->referred_by,
             ],
             'stats' => [
-                'level_1_count'    => $level1Ids->count(),
-                'level_2_count'    => $level2Ids->count(),
-                'level_3_count'    => $level3Ids->count(),
-                'total_referrals'  => $level1Ids->count() + $level2Ids->count() + $level3Ids->count(),
-                'total_earned'     => round($totalEarned, 2),
-                'level_1_earned'   => round($earningsByLevel[1]->total ?? 0, 2),
-                'level_2_earned'   => round($earningsByLevel[2]->total ?? 0, 2),
-                'level_3_earned'   => round($earningsByLevel[3]->total ?? 0, 2),
+                'level_1_count' => $level1Ids->count(),
+                'level_2_count' => $level2Ids->count(),
+                'level_3_count' => $level3Ids->count(),
+                'total_referrals' => $level1Ids->count() + $level2Ids->count() + $level3Ids->count(),
+                'total_earned' => round($totalEarned, 2),
+                'level_1_earned' => round($earningsByLevel[1]->total ?? 0, 2),
+                'level_2_earned' => round($earningsByLevel[2]->total ?? 0, 2),
+                'level_3_earned' => round($earningsByLevel[3]->total ?? 0, 2),
             ],
             'referral_tree' => [
                 'level_1' => $level1Users,
