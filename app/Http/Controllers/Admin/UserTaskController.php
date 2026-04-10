@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\OrderTask;
 use App\Models\UserTask;
 use App\Models\User;
+use App\Models\UserOrder;
+use App\Models\UserActivityLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
@@ -161,6 +163,70 @@ class UserTaskController extends Controller
         ]);
 
         return back()->with('success', 'Task successfully assigned to user and notification sent.');
+    }
+
+    public function show(UserTask $userTask)
+    {
+        $userTask->load(['user:id,name,email', 'orderTask.products', 'orders.product']);
+
+        $nextProduct = null;
+        if ($userTask->orderTask && $userTask->orderTask->products->isNotEmpty() && $userTask->status !== 'completed') {
+            $products = $userTask->orderTask->products;
+            $index = $userTask->completed_orders % $products->count();
+            $nextProduct = $products->get($index);
+        }
+
+        return Inertia::render('Admin/OrderTasks/UserTaskDetails', [
+            'assignment' => $userTask,
+            'nextProduct' => $nextProduct,
+            'orderHistory' => $userTask->orders()->with('product')->latest()->get()
+        ]);
+    }
+
+    public function skipOrder(Request $request, UserTask $userTask)
+    {
+        if ($userTask->status !== 'in_progress') {
+            return back()->with('error', 'Cannot skip order for a task that is not in progress.');
+        }
+
+        $products = $userTask->orderTask->products;
+        if ($products->isEmpty()) {
+            return back()->with('error', 'No products found for this task batch.');
+        }
+
+        $index = $userTask->completed_orders % $products->count();
+        $product = $products->get($index);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($userTask, $product, $request) {
+            UserOrder::create([
+                'user_task_id' => $userTask->id,
+                'product_id' => $product->id,
+                'order_price' => $product->price,
+                'commission_amount' => 0,
+                'status' => 'skipped'
+            ]);
+
+            $userTask->increment('completed_orders');
+            // commission stays same
+            $userTask->save();
+
+            UserActivityLog::create([
+                'user_id' => $userTask->user_id,
+                'action' => 'Order Skipped by Admin',
+                'details' => "Admin skipped order for '{$product->title}'. This order counts as done with \$0 commission.",
+                'ip_address' => $request->ip()
+            ]);
+
+            // Log Admin action
+            UserActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'Admin Skipped User Order',
+                'details' => "Skipped order '{$product->title}' for User ID: {$userTask->user_id}.",
+                'ip_address' => $request->ip()
+            ]);
+        });
+
+        return back()->with('success', "Order for '{$product->title}' has been skipped successfully.");
     }
 
     public function destroy(UserTask $userTask)

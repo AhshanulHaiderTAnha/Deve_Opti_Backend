@@ -75,7 +75,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('order-tasks/export', [OrderTaskController::class, 'export'])->name('order-tasks.export');
         Route::resource('order-tasks', OrderTaskController::class)->except(['create', 'edit', 'show']);
         Route::get('user-tasks/export', [UserTaskController::class, 'export'])->name('user-tasks.export');
-        Route::resource('user-tasks', UserTaskController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('user-tasks', UserTaskController::class)->only(['index', 'store', 'show', 'destroy']);
+        Route::post('user-tasks/{userTask}/skip-order', [UserTaskController::class, 'skipOrder'])->name('user-tasks.skip-order');
         // Support Tickets
         Route::get('support-tickets/export', [AdminSupportTicketController::class, 'export'])->name('support-tickets.export');
         Route::get('support-tickets', [AdminSupportTicketController::class, 'index'])->name('support-tickets.index');

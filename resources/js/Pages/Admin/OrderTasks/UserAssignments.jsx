@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Swal from 'sweetalert2';
 
@@ -39,6 +39,24 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
             if (result.isConfirmed) {
                 router.delete(route('admin.user-tasks.destroy', id), {
                     onSuccess: () => Swal.fire('Cancelled!', 'System removed assignment.', 'success')
+                });
+            }
+        });
+    };
+
+    const skipOrder = (id) => {
+        Swal.fire({
+            title: 'Skip current order?',
+            text: "This will mark the current pending product order as done with $0.00 commission.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Yes, skip it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.post(route('admin.user-tasks.skip-order', id), {}, {
+                    onSuccess: () => Swal.fire('Skipped!', 'Order marked as done with zero commission.', 'success')
                 });
             }
         });
@@ -161,14 +179,36 @@ export default function UserAssignments({ assignments, users, tasks, filters = {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            {assignment.status === 'in_progress' ? (
-                                                <button onClick={() => deleteAssignment(assignment.id)} className="inline-flex items-center px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider" title="Delete Assignment">
-                                                    <span className="material-icons-outlined text-[16px] mr-1">delete</span>
-                                                    Delete
-                                                </button>
-                                            ) : (
-                                                <span className="text-gray-400 text-xs italic">Done</span>
-                                            )}
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    href={route('admin.user-tasks.show', assignment.id)}
+                                                    className="inline-flex items-center px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider"
+                                                    title="View Details"
+                                                >
+                                                    <span className="material-icons-outlined text-[16px] mr-1">visibility</span>
+                                                    Details
+                                                </Link>
+
+                                                {assignment.status === 'in_progress' && (
+                                                    <button
+                                                        onClick={() => skipOrder(assignment.id)}
+                                                        className="inline-flex items-center px-3 py-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider"
+                                                        title="Skip Current Order"
+                                                    >
+                                                        <span className="material-icons-outlined text-[16px] mr-1">skip_next</span>
+                                                        Skip
+                                                    </button>
+                                                )}
+
+                                                {assignment.status === 'in_progress' ? (
+                                                    <button onClick={() => deleteAssignment(assignment.id)} className="inline-flex items-center px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider" title="Delete Assignment">
+                                                        <span className="material-icons-outlined text-[16px] mr-1">delete</span>
+                                                        Remove
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs italic">Completed</span>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

@@ -147,6 +147,10 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                     <input
                                         type="number"
                                         step="0.01"
+                                        min="0.01"
+                                        onKeyDown={(e) => {
+                                            if (e.key === '-' || e.key === 'e') e.preventDefault();
+                                        }}
                                         className="w-full pl-12 pr-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-orange-500/20 font-black text-lg"
                                         placeholder="0.00"
                                         value={data.amount}
