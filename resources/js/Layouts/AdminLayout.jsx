@@ -100,10 +100,10 @@ export default function AdminLayout({ children }) {
         },
         { name: 'Support Tickets', href: route('admin.support-tickets.index'), current: route().current('admin.support-tickets.*'), icon: 'confirmation_number' },
         { name: 'Referrals', href: route('admin.referrals.index'), current: route().current('admin.referrals.*'), icon: 'group_add' },
-        { name: 'Blogs', href: '/admin/blogs', current: window.location.pathname.startsWith('/admin/blogs'), icon: 'article' },
         { name: 'Success Stories', href: route('admin.success-stories.index'), current: route().current('admin.success-stories.*'), icon: 'auto_awesome' },
         { name: 'FAQs', href: route('admin.faqs.index'), current: route().current('admin.faqs.*'), icon: 'quiz' },
         { name: 'Subscribers', href: route('admin.subscribers.index'), current: route().current('admin.subscribers.*'), icon: 'mail' },
+        { name: 'Blogs', href: '/admin/blogs', current: window.location.pathname.startsWith('/admin/blogs'), icon: 'article' },
         {
             name: 'System Activity',
             icon: 'settings_suggest',
