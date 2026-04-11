@@ -35,6 +35,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'referral_code',
         'referred_by',
         'withdrawal_enable',
+        'google_id',
+        'google_avatar',
     ];
 
     /**

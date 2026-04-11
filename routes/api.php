@@ -42,6 +42,8 @@ Route::prefix('public')->group(function () {
 
 // Public Auth Routes  (rate limited)
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
+    Route::get('google/url', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'getGoogleUrl']);
+    Route::post('google/callback', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'handleGoogleCallback']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::get('verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware('signed')->name('api.auth.verify-email');
