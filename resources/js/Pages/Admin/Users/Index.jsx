@@ -5,6 +5,12 @@ import AdminLayout from '@/Layouts/AdminLayout';
 export default function UserIndex({ users, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [targetUser, setTargetUser] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [selectedReferrer, setSelectedReferrer] = useState(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     const { data, setData, post, patch, processing, errors, reset, clearErrors } = useForm({
         name: '',
@@ -61,6 +67,42 @@ export default function UserIndex({ users, filters }) {
 
     const applyFilters = (newFilters) => {
         router.get(route('admin.users.index'), { ...filters, ...newFilters }, { preserveState: true });
+    };
+
+    const openAssignModal = (user) => {
+        setTargetUser(user);
+        setSearchQuery('');
+        setSearchResults([]);
+        setSelectedReferrer(null);
+        setIsAssignModalOpen(true);
+    };
+
+    const handleReferrerSearch = async (val) => {
+        setSearchQuery(val);
+        if (val.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const res = await fetch(route('admin.users.search-ajax', { search: val }));
+            const users = await res.json();
+            // Filter out the target user from results
+            setSearchResults(users.filter(u => u.id !== targetUser?.id));
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const submitAssignment = () => {
+        if (!selectedReferrer) return;
+        router.post(route('admin.users.assign-referrer', targetUser.id), {
+            referrer_id: selectedReferrer.id
+        }, {
+            onSuccess: () => setIsAssignModalOpen(false),
+        });
     };
 
     return (
@@ -230,6 +272,13 @@ export default function UserIndex({ users, filters }) {
                                         >
                                             <span className="material-icons-outlined">visibility</span>
                                         </Link>
+                                        <button
+                                            onClick={() => openAssignModal(user)}
+                                            className="p-2 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                                            title="Assign Referrer"
+                                        >
+                                            <span className="material-icons-outlined">person_add_alt</span>
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -367,6 +416,102 @@ export default function UserIndex({ users, filters }) {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Assign Referrer Modal */}
+            {isAssignModalOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+                        <div className="p-8 border-b border-slate-50 bg-slate-50/50">
+                            <h3 className="text-xl font-black text-slate-900">Assign Referrer</h3>
+                            <p className="text-slate-400 text-xs font-semibold mt-1">Assign an agent context to <span className="text-orange-500">{targetUser?.name}</span></p>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="relative">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Search Agent</label>
+                                <div className="relative group">
+                                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                                        <span className="material-icons-outlined text-lg">search</span>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        autoFocus
+                                        className="w-full pl-11 pr-4 py-4 bg-slate-50 border-0 rounded-2xl text-slate-900 font-bold placeholder-slate-300 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
+                                        placeholder="Name, Email or Referral Code..."
+                                        value={searchQuery}
+                                        onChange={e => handleReferrerSearch(e.target.value)}
+                                    />
+                                    {isSearching && (
+                                        <div className="absolute right-4 inset-y-0 flex items-center">
+                                            <div className="h-4 w-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {searchResults.length > 0 && (
+                                    <div className="absolute z-10 left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-100 shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                                        <div className="max-h-60 overflow-y-auto">
+                                            {searchResults.map(u => (
+                                                <button
+                                                    key={u.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedReferrer(u);
+                                                        setSearchResults([]);
+                                                        setSearchQuery(u.name);
+                                                    }}
+                                                    className="w-full px-5 py-3 text-left hover:bg-slate-50 flex flex-col transition-colors border-b border-slate-50 last:border-0"
+                                                >
+                                                    <span className="text-sm font-black text-slate-900">{u.name}</span>
+                                                    <span className="text-[10px] text-slate-400 font-bold lowercase">{u.email}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {selectedReferrer && (
+                                <div className="p-5 bg-orange-50/50 rounded-2xl border border-orange-100 animate-in zoom-in-95 duration-200">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="h-10 w-10 bg-orange-500 rounded-xl flex items-center justify-center text-white font-black">
+                                            {selectedReferrer.name[0]}
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-0.5">Selected Referrer</p>
+                                            <p className="text-sm font-black text-slate-900 leading-none">{selectedReferrer.name}</p>
+                                            <p className="text-[10px] text-slate-500 font-bold lowercase mt-1">{selectedReferrer.email}</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setSelectedReferrer(null)}
+                                            className="ml-auto p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-rose-500 transition-all"
+                                        >
+                                            <span className="material-icons-outlined text-lg">close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="pt-2 flex space-x-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAssignModalOpen(false)}
+                                    className="flex-1 py-4 text-xs font-black text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={!selectedReferrer || processing}
+                                    onClick={submitAssignment}
+                                    className="flex-1 py-4 text-xs font-black text-white bg-emerald-500 hover:bg-emerald-600 rounded-2xl shadow-lg shadow-emerald-100 transition-all disabled:opacity-50 disabled:shadow-none"
+                                >
+                                    {processing ? 'ASSIGNING...' : 'CONFIRM ASSIGNMENT'}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

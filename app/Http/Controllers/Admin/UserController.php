@@ -106,7 +106,8 @@ class UserController extends Controller
         $users = User::role('user')
             ->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('referral_code', 'like', "%{$search}%");
             })
             ->limit(10)
             ->get(['id', 'name', 'email']);
@@ -244,5 +245,47 @@ class UserController extends Controller
         $user->update(['status' => $validated['status']]);
 
         return back()->with('success', "User status updated to {$validated['status']}.");
+    }
+
+    public function assignReferrer(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'referrer_id' => ['required', 'exists:users,id', "different:{$id}"],
+        ], [
+            'referrer_id.different' => 'A user cannot refer themselves.',
+        ]);
+
+        $user = User::findOrFail($id);
+        $referrer = User::findOrFail($validated['referrer_id']);
+
+        // Check if the chosen referrer is an admin (optional, usually referrers are users)
+        if ($referrer->hasRole('admin')) {
+            return back()->withErrors(['referrer_id' => 'Administrators cannot be referrers.']);
+        }
+
+        $oldReferrer = $user->referrer?->name ?? 'None';
+        $user->update(['referred_by' => $referrer->id]);
+
+        // Log activity for Admin
+        \App\Models\UserActivity::create([
+            'user_id' => $request->user()->id,
+            'type' => 'referral_assigned',
+            'severity' => 'info',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'description' => "Manually assigned referrer '{$referrer->name}' to user '{$user->name}' (Old: {$oldReferrer})",
+        ]);
+
+        // Log activity for User
+        \App\Models\UserActivity::create([
+            'user_id' => $user->id,
+            'type' => 'referrer_updated',
+            'severity' => 'info',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'description' => "Your referrer has been manually updated to '{$referrer->name}' by an administrator.",
+        ]);
+
+        return back()->with('success', "Referrer '{$referrer->name}' successfully assigned to '{$user->name}'.");
     }
 }
