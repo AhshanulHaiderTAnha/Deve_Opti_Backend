@@ -19,20 +19,25 @@ class UserController extends Controller
             ->withSum(['withdrawalRequests as total_withdrawals' => fn($q) => $q->where('status', 'approved')], 'amount')
             ->withSum(['userTasks as total_commissions' => fn($q) => $q->where('status', 'completed')], 'total_earned_commission');
 
-        $query->when($request->search, fn ($q) => $q->where(function ($q) use ($request) {
+        $query->when($request->search, fn($q) => $q->where(function ($q) use ($request) {
             $q->where('name', 'like', "%{$request->search}%")
-              ->orWhere('email', 'like', "%{$request->search}%");
+                ->orWhere('email', 'like', "%{$request->search}%");
         }))
-        ->when($request->status, fn ($q) => $q->where('status', $request->status))
-        ->when($request->kyc_status, fn ($q) => $q->whereHas(
-            'kycSubmission', fn ($q) => $q->where('status', $request->kyc_status)
-        ))
-        ->when($request->date_filter, function ($q) use ($request) {
-            if ($request->date_filter === 'today') $q->whereDate('created_at', now()->toDateString());
-            if ($request->date_filter === 'last_7_days') $q->where('created_at', '>=', now()->subDays(7));
-            if ($request->date_filter === 'last_30_days') $q->where('created_at', '>=', now()->subDays(30));
-            if ($request->date_filter === 'this_month') $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
-        });
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->kyc_status, fn($q) => $q->whereHas(
+                'kycSubmission',
+                fn($q) => $q->where('status', $request->kyc_status)
+            ))
+            ->when($request->date_filter, function ($q) use ($request) {
+                if ($request->date_filter === 'today')
+                    $q->whereDate('created_at', now()->toDateString());
+                if ($request->date_filter === 'last_7_days')
+                    $q->where('created_at', '>=', now()->subDays(7));
+                if ($request->date_filter === 'last_30_days')
+                    $q->where('created_at', '>=', now()->subDays(30));
+                if ($request->date_filter === 'this_month')
+                    $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
+            });
 
         if ($request->sort_by === 'highest_earning') {
             $query->orderByDesc('total_commissions');
@@ -52,7 +57,7 @@ class UserController extends Controller
         $users = $this->getFilteredUsersQuery($request)->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
-            'users'   => UserResource::collection($users),
+            'users' => UserResource::collection($users),
             'filters' => $request->only(['search', 'status', 'kyc_status', 'date_filter', 'sort_by']),
         ]);
     }
@@ -62,16 +67,16 @@ class UserController extends Controller
         $users = $this->getFilteredUsersQuery($request)->get();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=users_export_" . date('Y-m-d_H-i-s') . ".csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
         ];
 
         $columns = ['ID', 'Name', 'Email', 'Phone', 'Status', 'KYC Status', 'Referral Code', 'Referrer Name', 'Referrer Email', 'Total Deposits ($)', 'Total Withdrawals ($)', 'Task Earnings ($)', 'Registered Date'];
 
-        $callback = function() use($users, $columns) {
+        $callback = function () use ($users, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
@@ -104,10 +109,10 @@ class UserController extends Controller
     {
         $search = $request->search;
         $users = User::role('user')
-            ->where(function($q) use ($search) {
+            ->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('referral_code', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('referral_code', 'like', "%{$search}%");
             })
             ->limit(10)
             ->get(['id', 'name', 'email']);
@@ -144,31 +149,31 @@ class UserController extends Controller
         ];
 
         return Inertia::render('Admin/Users/Show', [
-            'user'       => new UserResource($user),
-            'wallet'     => $user->wallet,
+            'user' => new UserResource($user),
+            'wallet' => $user->wallet,
             'activities' => $activities,
-            'deposits'   => $deposits,
-            'withdrawals'=> $withdrawals,
-            'userTasks'  => $userTasks,
-            'taskStats'  => $taskStats,
+            'deposits' => $deposits,
+            'withdrawals' => $withdrawals,
+            'userTasks' => $userTasks,
+            'taskStats' => $taskStats,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'status'   => ['required', 'in:active,inactive,suspended'],
-            'role'     => ['required', 'in:admin,user'],
+            'status' => ['required', 'in:active,inactive,suspended'],
+            'role' => ['required', 'in:admin,user'],
         ]);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
-            'status'   => $validated['status'],
+            'status' => $validated['status'],
         ]);
 
         $user->assignRole($validated['role']);
@@ -181,18 +186,18 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'name'              => ['required', 'string', 'max:255'],
-            'email'             => ['required', 'string', 'email', 'max:255', "unique:users,email,{$id}"],
-            'password'          => ['nullable', 'string', 'min:8'],
-            'status'            => ['required', 'in:active,inactive,suspended'],
-            'role'              => ['required', 'in:admin,user'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', "unique:users,email,{$id}"],
+            'password' => ['nullable', 'string', 'min:8'],
+            'status' => ['required', 'in:active,inactive,suspended'],
+            'role' => ['required', 'in:admin,user'],
             'withdrawal_enable' => ['boolean'],
         ]);
 
         $user->update([
-            'name'              => $validated['name'],
-            'email'             => $validated['email'],
-            'status'            => $validated['status'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'status' => $validated['status'],
             'withdrawal_enable' => $validated['withdrawal_enable'] ?? true,
         ]);
 
@@ -212,7 +217,7 @@ class UserController extends Controller
         ]);
 
         $user = User::findOrFail($id);
-        
+
         // If user already has a submission, update it
         if ($user->kycSubmission) {
             $user->kycSubmission->update([

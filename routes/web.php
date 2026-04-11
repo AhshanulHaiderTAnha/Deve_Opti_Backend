@@ -34,32 +34,32 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Guest-only admin routes
     Route::middleware('guest')->group(function () {
-        Route::get('/login',  [AdminAuthController::class, 'showLogin'])->name('login');
+        Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
         Route::post('/login', [AdminAuthController::class, 'login'])->name('login.store');
     });
     // Authenticated + admin-role-only
     Route::middleware(['auth', 'role:admin'])->group(function () {
-        Route::post('/logout',        [AdminAuthController::class, 'logout'])->name('logout');
-        Route::get('/dashboard',      [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/clear-cache', [DashboardController::class, 'clearCache'])->name('dashboard.clear-cache');
         // User management
-        Route::get('/users',          [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/export',   [UserController::class, 'export'])->name('users.export');
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
         Route::get('/users/search-ajax', [UserController::class, 'searchAjax'])->name('users.search-ajax');
-        Route::post('/users',         [UserController::class, 'store'])->name('users.store');
-        Route::get('/users/{id}',     [UserController::class, 'show'])->name('users.show');
-        Route::patch('/users/{id}',   [UserController::class, 'update'])->name('users.update');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+        Route::patch('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{id}/status', [UserController::class, 'updateStatus'])->name('users.status');
         Route::patch('/users/{id}/kyc-status', [UserController::class, 'updateKycStatus'])->name('users.kyc-status');
         Route::post('/users/{id}/assign-referrer', [UserController::class, 'assignReferrer'])->name('users.assign-referrer');
         // Settings management
-        Route::get('/settings',       [SettingController::class, 'index'])->name('settings.index');
-        Route::post('/settings',      [SettingController::class, 'update'])->name('settings.update');
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
         // KYC management
-        Route::get('/kyc',            [KycController::class, 'index'])->name('kyc.index');
-        Route::get('/kyc/{id}',       [KycController::class, 'show'])->name('kyc.show');
+        Route::get('/kyc', [KycController::class, 'index'])->name('kyc.index');
+        Route::get('/kyc/{id}', [KycController::class, 'show'])->name('kyc.show');
         Route::post('/kyc/{id}/approve', [KycController::class, 'approve'])->name('kyc.approve');
-        Route::post('/kyc/{id}/reject',  [KycController::class, 'reject'])->name('kyc.reject');
+        Route::post('/kyc/{id}/reject', [KycController::class, 'reject'])->name('kyc.reject');
         // Seller Management
         Route::get('sellers/export', [SellerController::class, 'export'])->name('sellers.export');
         Route::resource('sellers', SellerController::class)->except(['create', 'edit', 'show']);
@@ -92,7 +92,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('faqs/export', [FaqController::class, 'export'])->name('faqs.export');
         Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
         Route::get('subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
-        Route::resource('subscribers',SubscriberController::class)->only(['index', 'destroy']);
+        Route::resource('subscribers', SubscriberController::class)->only(['index', 'destroy']);
         // Wallet System
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
         Route::post('wallets/deposit', [WalletController::class, 'deposit'])->name('wallets.deposit');
@@ -136,4 +136,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // Redirect root to dashboard (auth middleware will handle guest redirection to login)
-Route::get('/', fn () => redirect()->route('admin.dashboard'));
+Route::get('/', fn() => redirect()->route('admin.dashboard'));

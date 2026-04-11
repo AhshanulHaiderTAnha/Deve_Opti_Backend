@@ -484,7 +484,7 @@ export default function UserIndex({ users, filters }) {
                                             <p className="text-sm font-black text-slate-900 leading-none">{selectedReferrer.name}</p>
                                             <p className="text-[10px] text-slate-500 font-bold lowercase mt-1">{selectedReferrer.email}</p>
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={() => setSelectedReferrer(null)}
                                             className="ml-auto p-1.5 hover:bg-white rounded-lg text-slate-400 hover:text-rose-500 transition-all"
                                         >
