@@ -207,7 +207,15 @@ class UserTaskController extends Controller
             ]);
 
             $userTask->increment('completed_orders');
-            // commission stays same
+            
+            // Sync commission from actual orders
+            $userTask->total_earned_commission = UserOrder::where('user_task_id', $userTask->id)->sum('commission_amount');
+
+            // Complete task if limit reached
+            if ($userTask->completed_orders >= ($userTask->orderTask->required_orders ?? 0)) {
+                $userTask->status = 'completed';
+            }
+
             $userTask->save();
 
             UserActivityLog::create([
@@ -217,7 +225,6 @@ class UserTaskController extends Controller
                 'ip_address' => $request->ip()
             ]);
 
-            // Log Admin action
             UserActivityLog::create([
                 'user_id' => auth()->id(),
                 'action' => 'Admin Skipped User Order',

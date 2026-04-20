@@ -61,7 +61,7 @@ export default function UserTaskDetails({ assignment, nextProduct, orderHistory 
                     </div>
                     
                     <div className="flex items-center gap-3">
-                        {assignment.status === 'in_progress' && (
+                        {assignment.status === 'in_progress' && assignment.completed_orders < (assignment.order_task?.required_orders || 0) && (
                             <>
                                 <button
                                     onClick={skipOrder}

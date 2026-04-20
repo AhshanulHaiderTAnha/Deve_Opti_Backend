@@ -44,14 +44,25 @@ export default function AdminLayout({ children }) {
             }
         };
 
-        const unbindStart = router.on('start', () => setGlobalLoading(true));
-        const unbindFinish = router.on('finish', () => setGlobalLoading(false));
+        let loadingTimeout;
+        const unbindStart = router.on('start', () => {
+            setGlobalLoading(true);
+            // Safety fallback: clear loading after 10s if finish fails to trigger
+            clearTimeout(loadingTimeout);
+            loadingTimeout = setTimeout(() => setGlobalLoading(false), 10000);
+        });
+
+        const unbindFinish = router.on('finish', () => {
+            setGlobalLoading(false);
+            clearTimeout(loadingTimeout);
+        });
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             unbindStart();
             unbindFinish();
+            clearTimeout(loadingTimeout);
         };
     }, []);
 
