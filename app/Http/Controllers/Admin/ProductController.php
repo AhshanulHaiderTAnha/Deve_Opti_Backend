@@ -89,7 +89,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'platform' => 'required|in:Walmart,eBay,AliExpress,Other',
+            'platform' => 'required|in:Walmart,Amazon,eBay,AliExpress,Other',
             'product_url' => 'nullable|url',
             'target_keyword' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -116,7 +116,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'platform' => 'required|in:Walmart,eBay,AliExpress,Other',
+            'platform' => 'required|in:Walmart,Amazon,eBay,AliExpress,Other',
             'product_url' => 'nullable|url',
             'target_keyword' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',

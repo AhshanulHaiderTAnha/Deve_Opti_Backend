@@ -184,6 +184,7 @@ export default function ProductIndex({ products, filters }) {
                         >
                             <option value="">All Platforms</option>
                             <option value="Walmart">Walmart</option>
+                            <option value="Amazon">Amazon</option>
                             <option value="eBay">eBay</option>
                             <option value="AliExpress">AliExpress</option>
                             <option value="Other">Other</option>
@@ -238,9 +239,10 @@ export default function ProductIndex({ products, filters }) {
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${product.platform === 'Walmart' ? 'bg-orange-50 text-orange-600' :
-                                                product.platform === 'eBay' ? 'bg-blue-50 text-blue-600' :
-                                                    product.platform === 'AliExpress' ? 'bg-rose-50 text-rose-600' :
-                                                        'bg-gray-100 text-gray-600'
+                                                product.platform === 'Amazon' ? 'bg-amber-50 text-amber-600' :
+                                                    product.platform === 'eBay' ? 'bg-blue-50 text-blue-600' :
+                                                        product.platform === 'AliExpress' ? 'bg-rose-50 text-rose-600' :
+                                                            'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {product.platform}
                                             </span>
@@ -332,10 +334,12 @@ export default function ProductIndex({ products, filters }) {
                                                     onChange={e => setData('platform', e.target.value)}
                                                 >
                                                     <option value="Walmart">Walmart</option>
+                                                    <option value="Amazon">Amazon</option>
                                                     <option value="eBay">eBay</option>
                                                     <option value="AliExpress">AliExpress</option>
                                                     <option value="Other">Other</option>
                                                 </select>
+                                                {errors.platform && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.platform}</p>}
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Target Keyword</label>
@@ -345,6 +349,7 @@ export default function ProductIndex({ products, filters }) {
                                                     value={data.target_keyword}
                                                     onChange={e => setData('target_keyword', e.target.value)}
                                                 />
+                                                {errors.target_keyword && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.target_keyword}</p>}
                                             </div>
                                         </div>
 
@@ -376,6 +381,7 @@ export default function ProductIndex({ products, filters }) {
                                                     </div>
                                                 )}
                                             </div>
+                                            {errors.image && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.image}</p>}
                                         </div>
                                         <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-2">
@@ -388,6 +394,7 @@ export default function ProductIndex({ products, filters }) {
                                                     <option value="published">Published</option>
                                                     <option value="inactive">Inactive</option>
                                                 </select>
+                                                {errors.status && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.status}</p>}
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">SKU</label>
@@ -397,6 +404,7 @@ export default function ProductIndex({ products, filters }) {
                                                     value={data.sku}
                                                     onChange={e => setData('sku', e.target.value)}
                                                 />
+                                                {errors.sku && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.sku}</p>}
                                             </div>
                                         </div>
                                     </div>
@@ -413,6 +421,7 @@ export default function ProductIndex({ products, filters }) {
                                                 value={data.price}
                                                 onChange={e => setData('price', e.target.value)}
                                             />
+                                            {errors.price && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.price}</p>}
                                         </div>
                                     </div>
                                     <div className="space-y-2">
@@ -425,6 +434,7 @@ export default function ProductIndex({ products, filters }) {
                                                 value={data.compare_at_price}
                                                 onChange={e => setData('compare_at_price', e.target.value)}
                                             />
+                                            {errors.compare_at_price && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.compare_at_price}</p>}
                                         </div>
                                     </div>
                                     <div className="space-y-2">
@@ -435,6 +445,7 @@ export default function ProductIndex({ products, filters }) {
                                             value={data.stock_quantity}
                                             onChange={e => setData('stock_quantity', e.target.value)}
                                         />
+                                        {errors.stock_quantity && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.stock_quantity}</p>}
                                     </div>
                                 </div>
 
@@ -446,6 +457,7 @@ export default function ProductIndex({ products, filters }) {
                                         value={data.description}
                                         onChange={e => setData('description', e.target.value)}
                                     ></textarea>
+                                    {errors.description && <p className="text-rose-500 text-xs mt-1 pl-1 font-medium">{errors.description}</p>}
                                 </div>
                             </div>
 
