@@ -42,6 +42,27 @@ class WithdrawalController extends Controller
             'withdrawal_password' => 'required|string',
         ]);
 
+        // Add Eligibility check based on completed orders
+        $totalCompleted = \App\Models\UserOrder::whereHas('userTask', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('status', 'completed')->count();
+        
+        $withdrawalRequestsCount = \App\Models\WithdrawalRequest::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->count();
+            
+        $requiredPerWithdrawal = 25;
+        $usedOrders = $withdrawalRequestsCount * $requiredPerWithdrawal;
+        $availableOrders = max(0, $totalCompleted - $usedOrders);
+        
+        if ($availableOrders < $requiredPerWithdrawal) {
+            $ordersNeeded = $requiredPerWithdrawal - $availableOrders;
+            return response()->json([
+                'status' => 'error',
+                'message' => "You need to complete {$ordersNeeded} more orders to make a withdrawal request."
+            ], 403);
+        }
+
         $userWithdrawalPassword = UserWithdrawalPassword::where('user_id', $user->id)->first();
 
         if (!$userWithdrawalPassword) {
@@ -135,6 +156,43 @@ class WithdrawalController extends Controller
     {
         return response()->json([
             'suspend' => !auth()->user()->withdrawal_enable
+        ]);
+    }
+
+    public function checkEligibility(Request $request)
+    {
+        $user = $request->user();
+        
+        $totalCompleted = \App\Models\UserOrder::whereHas('userTask', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('status', 'completed')->count();
+        
+        $withdrawalRequestsCount = \App\Models\WithdrawalRequest::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->count();
+            
+        $requiredPerWithdrawal = 25;
+        $usedOrders = $withdrawalRequestsCount * $requiredPerWithdrawal;
+        $availableOrders = max(0, $totalCompleted - $usedOrders);
+        
+        $isEligible = $availableOrders >= $requiredPerWithdrawal;
+        
+        if (!$user->withdrawal_enable) {
+            $isEligible = false;
+        }
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'total_completed_orders' => $totalCompleted,
+                'withdrawal_requests_count' => $withdrawalRequestsCount,
+                'used_orders' => $usedOrders,
+                'available_orders' => $availableOrders,
+                'is_eligible' => $isEligible,
+                'required_orders' => $requiredPerWithdrawal,
+                'orders_needed' => $isEligible ? 0 : ($requiredPerWithdrawal - $availableOrders),
+                'withdrawal_enable_status' => (bool)$user->withdrawal_enable
+            ]
         ]);
     }
 }

@@ -103,6 +103,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('deposits/{id}', [DepositController::class, 'destroy']);
         Route::get('withdrawals', [WithdrawalController::class, 'index']);
         Route::get('withdrawals/check-suspend-status', [WithdrawalController::class, 'checkSuspendStatus']);
+        Route::get('withdrawals/check-eligibility', [WithdrawalController::class, 'checkEligibility']);
         Route::post('withdrawals', [WithdrawalController::class, 'store']);
         Route::delete('withdrawals/{id}', [WithdrawalController::class, 'destroy']);
         // Announcements
