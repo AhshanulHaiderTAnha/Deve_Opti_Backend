@@ -96,6 +96,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Wallet System
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
         Route::post('wallets/deposit', [WalletController::class, 'deposit'])->name('wallets.deposit');
+        Route::post('wallets/withdraw', [WalletController::class, 'withdraw'])->name('wallets.withdraw');
         // Deposit
         Route::get('deposits', [DepositController::class, 'index'])->name('deposits.index');
         Route::post('deposits/{deposit}/approve', [DepositController::class, 'approve'])->name('deposits.approve');

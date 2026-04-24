@@ -82,6 +82,75 @@ class WalletController extends Controller
         return back()->with('success', 'Manual deposit processed successfully.');
     }
 
+    public function withdraw(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:0.01',
+            'description' => 'required|string|max:500',
+            'status' => 'required|in:pending,approved'
+        ]);
+
+        $wallet = Wallet::where('user_id', $request->user_id)->firstOrFail();
+
+        if ($request->status === 'approved' && $wallet->balance < $request->amount) {
+            return back()->with('error', 'Insufficient balance for an approved withdrawal.');
+        }
+
+        DB::transaction(function () use ($request, $wallet) {
+            $wallet = Wallet::where('user_id', $request->user_id)->lockForUpdate()->firstOrFail();
+            
+            // Re-check balance inside transaction if approved
+            if ($request->status === 'approved' && $wallet->balance < $request->amount) {
+                throw new \Exception('Insufficient balance.');
+            }
+
+            $withdrawal = \App\Models\WithdrawalRequest::create([
+                'user_id' => $request->user_id,
+                'amount' => $request->amount,
+                'payment_gateway_info' => 'Manual Admin Withdrawal: ' . $request->description,
+                'status' => $request->status,
+                'admin_comments' => $request->description,
+                'reviewed_by' => $request->status === 'approved' ? auth()->id() : null,
+                'reviewed_at' => $request->status === 'approved' ? now() : null,
+                'admin_transaction_id' => $request->status === 'approved' ? 'MANUAL_ADMIN_WITHDRAWAL' : null,
+            ]);
+
+            if ($request->status === 'approved') {
+                $oldBalance = $wallet->balance;
+                $wallet->balance -= $request->amount;
+                $wallet->save();
+
+                WalletTransaction::create([
+                    'user_id' => $request->user_id,
+                    'type' => 'debit',
+                    'amount' => $request->amount,
+                    'balance_after' => $oldBalance - $request->amount,
+                    'description' => "Manual Withdrawal by Admin: " . $request->description,
+                    'reference_type' => 'manual_withdrawal',
+                    'reference_id' => auth()->id()
+                ]);
+            }
+
+            UserActivityLog::create([
+                'user_id' => $request->user_id,
+                'action' => 'Manual Withdrawal ' . ucfirst($request->status),
+                'details' => "Admin manually created a " . $request->status . " withdrawal of \${$request->amount}. Note: {$request->description}",
+                'ip_address' => $request->ip()
+            ]);
+
+            // Log Admin action too
+            UserActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'Admin Manual Withdrawal',
+                'details' => "Manually created a " . $request->status . " withdrawal of \${$request->amount} for User ID: {$request->user_id}.",
+                'ip_address' => $request->ip()
+            ]);
+        });
+
+        return back()->with('success', 'Manual withdrawal request created successfully.');
+    }
+
     private function exportCsv($wallets)
     {
         $filename = "wallets_report_" . now()->format('Ymd_His') . ".csv";

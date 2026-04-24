@@ -3,31 +3,58 @@ import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function WalletIndex({ wallets, filters = {} }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [selectedWallet, setSelectedWallet] = useState(null);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const depositForm = useForm({
         user_id: '',
         amount: '',
         description: '',
     });
 
+    const withdrawForm = useForm({
+        user_id: '',
+        amount: '',
+        status: 'approved',
+        description: '',
+    });
+
     const openDepositModal = (wallet) => {
         setSelectedWallet(wallet);
-        setData('user_id', wallet.user_id);
-        setIsModalOpen(true);
+        depositForm.setData('user_id', wallet.user_id);
+        setIsDepositModalOpen(true);
     };
 
     const closeDepositModal = () => {
-        setIsModalOpen(false);
+        setIsDepositModalOpen(false);
         setSelectedWallet(null);
-        reset();
+        depositForm.reset();
     };
 
     const submitDeposit = (e) => {
         e.preventDefault();
-        post(route('admin.wallets.deposit'), {
+        depositForm.post(route('admin.wallets.deposit'), {
             onSuccess: () => closeDepositModal(),
+        });
+    };
+
+    const openWithdrawModal = (wallet) => {
+        setSelectedWallet(wallet);
+        withdrawForm.setData('user_id', wallet.user_id);
+        setIsWithdrawModalOpen(true);
+    };
+
+    const closeWithdrawModal = () => {
+        setIsWithdrawModalOpen(false);
+        setSelectedWallet(null);
+        withdrawForm.reset();
+    };
+
+    const submitWithdraw = (e) => {
+        e.preventDefault();
+        withdrawForm.post(route('admin.wallets.withdraw'), {
+            onSuccess: () => closeWithdrawModal(),
         });
     };
 
@@ -101,7 +128,14 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                     <td className="px-10 py-5 text-right font-black text-emerald-600 text-xl tracking-tight">
                                         ${parseFloat(wallet.balance).toFixed(2)}
                                     </td>
-                                    <td className="px-10 py-5 text-right">
+                                    <td className="px-10 py-5 text-right space-x-2">
+                                        <button
+                                            onClick={() => openWithdrawModal(wallet)}
+                                            className="inline-flex items-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-black rounded-xl transition-all uppercase tracking-widest text-[9px]"
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-xs">remove_circle</span>
+                                            Withdraw
+                                        </button>
                                         <button
                                             onClick={() => openDepositModal(wallet)}
                                             className="inline-flex items-center px-4 py-2 bg-orange-50 text-orange-600 hover:bg-orange-100 font-black rounded-xl transition-all uppercase tracking-widest text-[9px]"
@@ -126,7 +160,7 @@ export default function WalletIndex({ wallets, filters = {} }) {
             </div>
 
             {/* Deposit Modal */}
-            {isModalOpen && (
+            {isDepositModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-lg shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-start mb-8">
@@ -153,12 +187,12 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                         }}
                                         className="w-full pl-12 pr-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-orange-500/20 font-black text-lg"
                                         placeholder="0.00"
-                                        value={data.amount}
-                                        onChange={e => setData('amount', e.target.value)}
+                                        value={depositForm.data.amount}
+                                        onChange={e => depositForm.setData('amount', e.target.value)}
                                         required
                                     />
                                 </div>
-                                {errors.amount && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{errors.amount}</p>}
+                                {depositForm.errors.amount && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{depositForm.errors.amount}</p>}
                             </div>
 
                             <div>
@@ -166,11 +200,11 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                 <textarea
                                     className="w-full px-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-orange-500/20 font-medium text-sm min-h-[120px]"
                                     placeholder="Enter reason for direct deposit..."
-                                    value={data.description}
-                                    onChange={e => setData('description', e.target.value)}
+                                    value={depositForm.data.description}
+                                    onChange={e => depositForm.setData('description', e.target.value)}
                                     required
                                 />
-                                {errors.description && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{errors.description}</p>}
+                                {depositForm.errors.description && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{depositForm.errors.description}</p>}
                                 <p className="mt-2 text-[10px] text-gray-400 font-bold uppercase tracking-wider italic">* This note will be visible to the user.</p>
                             </div>
 
@@ -184,10 +218,96 @@ export default function WalletIndex({ wallets, filters = {} }) {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={processing}
+                                    disabled={depositForm.processing}
                                     className="flex-[2] py-5 bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-500/30 font-black rounded-3xl transition-all uppercase tracking-widest text-xs disabled:opacity-50"
                                 >
-                                    {processing ? 'Processing...' : 'Confirm Deposit'}
+                                    {depositForm.processing ? 'Processing...' : 'Confirm Deposit'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Withdraw Modal */}
+            {isWithdrawModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[2.5rem] p-10 w-full max-w-lg shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-start mb-8">
+                            <div>
+                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Manual Withdrawal</h3>
+                                <p className="text-gray-500 font-medium text-sm">Deduct funds from {selectedWallet?.user?.name}'s wallet.</p>
+                            </div>
+                            <button onClick={closeWithdrawModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                <span className="material-icons-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <form onSubmit={submitWithdraw} className="space-y-6">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Withdrawal Amount ($)</label>
+                                <div className="relative">
+                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 font-black text-gray-400">$</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        onKeyDown={(e) => {
+                                            if (e.key === '-' || e.key === 'e') e.preventDefault();
+                                        }}
+                                        className="w-full pl-12 pr-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-red-500/20 font-black text-lg"
+                                        placeholder="0.00"
+                                        value={withdrawForm.data.amount}
+                                        onChange={e => withdrawForm.setData('amount', e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                {withdrawForm.errors.amount && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{withdrawForm.errors.amount}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Status</label>
+                                <select
+                                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-red-500/20 font-medium text-sm"
+                                    value={withdrawForm.data.status}
+                                    onChange={e => withdrawForm.setData('status', e.target.value)}
+                                    required
+                                >
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved (Deduct Immediately)</option>
+                                </select>
+                                {withdrawForm.errors.status && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{withdrawForm.errors.status}</p>}
+                                {withdrawForm.data.status === 'approved' && (
+                                    <p className="mt-2 text-[10px] text-red-500 font-bold uppercase tracking-wider italic">Warning: This will immediately deduct funds from the user's wallet.</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Transaction Note</label>
+                                <textarea
+                                    className="w-full px-6 py-5 bg-gray-50 border-none rounded-3xl focus:ring-2 focus:ring-red-500/20 font-medium text-sm min-h-[100px]"
+                                    placeholder="Enter reason for withdrawal..."
+                                    value={withdrawForm.data.description}
+                                    onChange={e => withdrawForm.setData('description', e.target.value)}
+                                    required
+                                />
+                                {withdrawForm.errors.description && <p className="mt-2 text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg inline-block">{withdrawForm.errors.description}</p>}
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={closeWithdrawModal}
+                                    className="flex-1 py-5 bg-gray-100 text-gray-500 hover:bg-gray-200 font-black rounded-3xl transition-all uppercase tracking-widest text-xs"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={withdrawForm.processing}
+                                    className="flex-[2] py-5 bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/30 font-black rounded-3xl transition-all uppercase tracking-widest text-xs disabled:opacity-50"
+                                >
+                                    {withdrawForm.processing ? 'Processing...' : 'Confirm Withdrawal'}
                                 </button>
                             </div>
                         </form>
